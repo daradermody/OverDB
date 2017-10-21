@@ -15,12 +15,12 @@ function getFilmography(actor) {
     var content = "";
     for (var i in films) {
         content += `
-            <div class="card" style="width: 20rem;">
-              <img class="card-img-top" src="images/film-xxl.png" alt="Card image cap">
-              <div class="card-body">
-                <h4 class="card-title">` + films[i] + `</h4>
-                <p class="card-text">It's a movie about cancer.</p>
-              </div>
+            <div class="card">
+              <img class="card-img-top img-fluid" src="images/film.png" alt="Card image cap">
+                <div class="card-block">
+                    <h4 class="card-title">` + films[i] + `</h4>
+                    <p class="card-text">It's a movie about cancer.</p>
+                </div>
             </div>
         `;
     }
@@ -38,7 +38,9 @@ function getSectionIdOfPage(pageId, sectionName) {
     console.debug("Getting section IDs");
     var response = get("https://en.wikipedia.org/w/api.php?action=parse&pageid=" + pageId + "&prop=sections&format=json");
     console.debug("Response from get for getSectionIdOfPage: " + JSON.stringify(response, null, 4));
-    return response.parse.sections.find(function(element) {return element.line === sectionName; }).index;
+    return response.parse.sections.find(function (element) {
+        return element.line === sectionName;
+    }).index;
 }
 
 function getFilmsInSection(pageId, sectionId) {
@@ -52,7 +54,7 @@ function getFilmsInSection(pageId, sectionId) {
     return films
 
 
-//    link["*"] for link in response.json()["parse"]["links"]
+    //    link["*"] for link in response.json()["parse"]["links"]
 }
 
 function get(url) {

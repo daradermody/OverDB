@@ -40,11 +40,13 @@ function getFilmsInSection(pageId, sectionId){
 //    link["*"] for link in response.json()["parse"]["links"]
 }
 
-function get(endpoint) {
+function get(url) {
+    var url = 'https://cors-anywhere.herokuapp.com/' + url;
+
     var response = $.ajax({
         "async": false,
         "crossDomain": true,
-        "url": endpoint,
+        "url": url,
         "method": "GET",
         "headers": {
             "cache-control": "no-cache",

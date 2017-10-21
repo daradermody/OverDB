@@ -18,8 +18,10 @@ function getFilmography(actor) {
             <div class="card">
               <img class="card-img-top img-fluid" src="images/film.png" alt="Card image cap">
                 <div class="card-block">
-                    <h4 class="card-title">` + films[i] + `</h4>
-                    <p class="card-text">It's a movie about cancer.</p>
+                    <div class="card-body">
+                        <h4 class="card-title">` + films[i] + `</h4>
+                        <p class="card-text">It's a movie about cancer.</p>
+                    </div>
                 </div>
             </div>
         `;

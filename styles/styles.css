@@ -9,7 +9,7 @@ th, td, tr {
 
 th, td, tr {
     text-align: left;
-    vertical-align: top;
+    vertical-align: center;
 }
 
 td:hover {
@@ -20,8 +20,7 @@ td:hover {
 /* Paragraph */
 p {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 36px;
-    font-variant: small-caps;
+    font-size: 24px;
 }
 
 /* Input */

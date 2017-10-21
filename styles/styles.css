@@ -5,7 +5,6 @@ table, th, td, tr {
 th, td, tr {
     border: 1px solid #ddd;
     padding: 5px;
-
 }
 
 th, td {
@@ -14,7 +13,7 @@ th, td {
 }
 
 td:hover {
-    background-color: azure;
+    /* background-color: azure; */
 }
 
 

@@ -14,7 +14,7 @@
     "clearTimeout",
     "setInterval",
     "clearInterval",
-    "alert", "confirm", "console", "prompt"
+    "alert", "confirm", "console, prompt
   ],
 
   /*** Enforcing options ***/

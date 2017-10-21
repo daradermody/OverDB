@@ -4,24 +4,22 @@
 
 <head>
     <meta charset="utf-8">
+    
     <script src="libraries/Please-compressed.js"></script>
     <script src="libraries/jquery-3.2.1.min.js"></script>
-    <script src="scripts/color.js"></script>
-    <script src="scripts/search.js"></script>
-    <script src="scripts/keyHandler.js"></script>
-    <script src="scripts/buttonHandler.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    
+    <script data-main="scripts/main" src="scripts/require.js"></script>
+    
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     <link rel="stylesheet" href="styles/offcanvas.css">
-    <link rel="icon" href="images/fav.ico">
+    <link rel="icon" href="images/favicon.ico">
 
     <title>overDB</title>
 </head>
 
-<!--<body onLoad="getRandomPleaseColour();">-->
 <body style="background-color:#ddd">
-
     <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
         <a class="navbar-brand" href="#">overDB</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,8 +39,8 @@
                 </li>
             </ul>
             <div class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" id="searchField" type="text" value="George Clooney" placeholder="Search" aria-label="Search" onkeypress="handleKeyPress(event)">
-                <button class="btn btn-outline-light my-2 my-sm-0" onclick="handleSearchButton()">Search</button>
+                <input id="searchField" class="form-control mr-sm-2" type="text" value="George Clooney" placeholder="Search" aria-label="Search">
+                <button id="searchButton" class="btn btn-outline-light my-2 my-sm-0">Search</button>
             </div>
         </div>
     </nav>
@@ -96,13 +94,6 @@
         <hr>
 
     </main>
-    <!--/.container-->
-
-
-
-
-
-
 
 
 

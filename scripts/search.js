@@ -1,8 +1,6 @@
 function getFilmography(actor) {
     "use strict";
 
-    document.getElementById("mainContentArea").innerHTML = actor;
-
     var pageId = getIdOfPage(actor);
     console.debug("ID of page: " + pageId);
 

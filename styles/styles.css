@@ -3,8 +3,8 @@ table, th, td, tr {
 }
 
 th, td, tr {
-    border: 1px solid #ddd;
-    padding: 5px;
+    /*border: 1px solid #ddd;*/
+    /*padding: 5px;*/
 }
 
 th, td {
@@ -22,3 +22,34 @@ p {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
 }
+
+/* Input */
+input.rounded {
+	border: 1px solid #ccc;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	-moz-box-shadow: 2px 2px 3px #666;
+	-webkit-box-shadow: 2px 2px 3px #666;
+	box-shadow: 2px 2px 3px #666;
+	font-size: 20px;
+	padding: 4px 7px;
+	outline: 0;
+	-webkit-appearance: none;
+}
+input.rounded:focus {
+	border-color: #339933;
+}
+
+button {
+    background-color: #ddd;
+}
+
+button.rounded {
+    border-radius: 8px;
+    font-size: 20px;
+	padding: 4px 7px;
+
+}
+
+

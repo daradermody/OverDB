@@ -6,6 +6,7 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="styles/styles.css">
     <script src="scripts/search.js"></script>
+    <script src="scripts/keyHandler.js"></script>
     <script src="libraries/Please-compressed.js"></script>
     <script src="scripts/color.js"></script>
     <script src="libraries/jquery-3.2.1.min.js"></script>
@@ -15,27 +16,27 @@
 <body onLoad="getRandomPleaseColour();">
 
     <table style="height:100%;width:100%; position: absolute; top: 0; bottom: 0; left: 0; right: 0;border:1px solid">
-        <tr style="height: 15%">
-            <td colspan="2">
-                <p>HEADER</p>
+        <tr style="height: 5%">
+            <td>
+                <p>OverDB</p>
             </td>
-        </tr>
-        <tr style="height: 2%">
-            <td colspan="2">
-                <input type="text" id="searchField">
-                <button name="searchButton" onclick="getFilmography(document.getElementById('searchField').value)">Search</button>
+            <td style="text-align: right">
+                <input type="text" class="rounded" id="searchField" onkeypress="handleKeyPress(event)">
+            </td>
+            <td style="text-align: center">
+                <p>Login</p>
             </td>
         </tr>
         <tr style="height: 80%">
             <td style="width: 20%">
                 <p>Left Navigation Bar</p>
             </td>
-            <td style="width: 80%">
+            <td style="width: 80%" colspan="2">
                 <p id="mainContentArea">This is where the main content will be</p>
             </td>
         </tr>
         <tr style="height: 3%">
-            <td colspan="2">
+            <td colspan="3">
                 <p>FOOTER</p>
             </td>
         </tr>

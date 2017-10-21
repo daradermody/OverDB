@@ -4,17 +4,16 @@
 
 <head>
     <meta charset="utf-8">
-    <!--<link rel="stylesheet" href="styles/styles.css">-->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-    <link rel="stylesheet" href="styles/offcanvas.css">
+    <script src="libraries/Please-compressed.js"></script>
+    <script src="libraries/jquery-3.2.1.min.js"></script>
+    <script src="scripts/color.js"></script>
     <script src="scripts/search.js"></script>
     <script src="scripts/keyHandler.js"></script>
-    <script src="libraries/Please-compressed.js"></script>
-    <script src="scripts/color.js"></script>
-    <script src="libraries/jquery-3.2.1.min.js"></script>
-    <!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>-->
+    <script src="scripts/buttonHandler.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles/offcanvas.css">
     <title>HOME - OVERDB</title>
 </head>
 
@@ -29,31 +28,50 @@
         <div class="collapse navbar-collapse" id="navbarsExampleDefault">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Profile <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="#">home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Crap</a>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</a>
-                    <div class="dropdown-menu" aria-labelledby="dropdown01">
-                        <a class="dropdown-item" href="#">Maybe</a>
-                        <a class="dropdown-item" href="#">Actions</a>
-                        <a class="dropdown-item" href="#">Here?</a>
-                    </div>
+                    <a class="nav-link" href="#">profile</a>
                 </li>
             </ul>
             <div class="form-inline my-2 my-lg-0">
                 <input class="form-control mr-sm-2" id="searchField" type="text" placeholder="Search" aria-label="Search" onkeypress="handleKeyPress(event)">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                <button class="btn btn-outline-light my-2 my-sm-0" onclick="handleSearchButton()">Search</button>
             </div>
         </div>
     </nav>
 
-    <div id="mainContentArea">
+    <main role="main" class="container">
 
-    </div>
+        <div class="row row-offcanvas row-offcanvas-right">
+
+            <div class="col-6 col-md-3 sidebar-offcanvas" id="sidebar">
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action list-group-item-light active">Something</a>
+                    <a href="#" class="list-group-item list-group-item-action list-group-item-light">Something Else</a>
+                    <a href="#" class="list-group-item list-group-item-action list-group-item-light">Here is some new stuff too!</a>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-9">
+                <div class="jumbotron">
+                    <h1>Welcome to overDB</h1>
+                    <p>When you search for shit, other shit should display below...</p>
+                </div>
+                <div class="row">
+                    <div class="col-6 col-lg-4">
+                        <div id="mainContentArea"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <hr>
+
+    </main>
+    <!--/.container-->
+
 
 
 

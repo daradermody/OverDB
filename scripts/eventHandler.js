@@ -4,7 +4,7 @@
 
 define(["./filmography"], function (filmography) {
     $("#searchField").keypress(function (e) {
-        if (e.which == 13) {
+        if (e.which === 13) {
             var input = document.getElementById('searchField').value;
             document.getElementById('resultTitle').innerHTML = "<p>Showing results for " + input + "</p>";
             filmography.getFilmography(input.toString());
@@ -20,3 +20,5 @@ define(["./filmography"], function (filmography) {
     });
 
 });
+
+

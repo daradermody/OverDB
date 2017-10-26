@@ -30,7 +30,7 @@ define(["./wikipediaApi", "./requests"], function (wikipediaApi, requests) {
                     `;
 
             }
-            document.getElementById("mainContentArea").innerHTML = content;
+            document.getElementById("resultContent").innerHTML = content;
         },
 
         getFilmsInSection: function (pageId, sectionId) {

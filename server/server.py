@@ -1,10 +1,13 @@
 #!/usr/bin/env python3.6
 
 from flask import Flask, jsonify
+from flask_cors import CORS
 from py2neo import Graph, Node, Relationship
 
 
 app = Flask(__name__)
+CORS(app)
+
 print("Connecting to Graph DB")
 g = Graph(user="neo4j", password="neo4j")
 print("Connected!")
@@ -14,8 +17,7 @@ print("Connected!")
 def actors():
     return jsonify([name["a.name"] for name in g.data('MATCH (a:Person) WHERE (a)-[:ACTED_IN]->() RETURN a.name')])
 
-
-@app.route("/actor/<actor>")
+@app.route("/actor/<string:actor>")
 def get_filmography(actor):
     data = g.data('MATCH (:Person {name: "%s"})-[:ACTED_IN]->(m:Movie) RETURN m.title' % actor)
     return jsonify([title["m.title"] for title in data])

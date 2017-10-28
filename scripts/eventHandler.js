@@ -7,9 +7,9 @@ define(["./filmography"], function (filmography) {
         if (e.which === 13) {
             var input = document.getElementById('searchField').value.trim();
             if (!input) {
-                document.getElementById('resultContent').innerHTML = "No search input given"
+                document.getElementById('resultContent').innerHTML = "No search input given";
             } else {
-                document.getElementById('resultContent').innerHTML = ""
+                document.getElementById('resultContent').innerHTML = "";
                 document.getElementById('resultTitle').innerHTML = "<p>Showing results for " + input + "</p>";
                 filmography.showFilmography(input.toString());
                 document.getElementById('searchField').value = "";
@@ -18,12 +18,16 @@ define(["./filmography"], function (filmography) {
     });
 
     $("#searchButton").click(function () {
-        var input = document.getElementById('searchField').value;
-        document.getElementById('resultTitle').innerHTML = "<p>Showing results for " + input + "</p>";
-        filmography.showFilmography(input.toString());
-        document.getElementById('searchField').value = "";
+        var input = document.getElementById('searchField').value.trim();
+        if (!input) {
+            document.getElementById('resultContent').innerHTML = "No search input given";
+        } else {
+            document.getElementById('resultContent').innerHTML = "";
+            document.getElementById('resultTitle').innerHTML = "<p>Showing results for " + input + "</p>";
+            filmography.showFilmography(input.toString());
+            document.getElementById('searchField').value = "";
+        }
+
     });
 
 });
-
-

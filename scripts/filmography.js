@@ -2,7 +2,7 @@
 /*global $, define */
 "use strict";
 
-define(["./wikipediaApi", "./requests"], function (wikipediaApi, requests) {
+define(["./requests"], function (requests) {
     return {
         showFilmography: function (actor) {
             require("./requests").get("/actor/" + actor).done(presentFilmography);

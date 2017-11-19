@@ -1,0 +1,23 @@
+<div class="row" style="text-align:center">
+    <div class="col-6 col-lg-12" style="margin-top: 10px">
+        <div id="resultTitle"></div>
+        <div id="resultContentLoadingBar" class="single4" style="margin:auto" ng-hide="errorMessage || filmList.length"></div>
+        <h3 ng-model="errorMessage" ng-show="errorMessage">{{errorMessage}}</h3>
+        <div class="card-columns" id="resultContent">
+            <div ng-repeat="film in filmList" ng-hide="errorMessage">
+                <div class="card">
+                    <img class="card-img-top img-fluid" src="images/film.png" alt="{{film.name}}">
+                    <div class="card-block">
+                        <div class="card-body">
+                            <h4 class="card-title">{{film.title}}</h4>
+                            <p class="card-text">{{film.tagline}}</p>
+                            <p class="card-text">{{film.released}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

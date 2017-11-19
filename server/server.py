@@ -1,12 +1,13 @@
 #!/usr/bin/env python3.6
-from unittest.mock import Mock
+import os
 
 from flask import Flask, jsonify
 from flask_cors import CORS
 from py2neo import Graph
 from py2neo.packages.httpstream import SocketError
 
-app = Flask(__name__, static_url_path='')
+application_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "..")).replace('C:/cygwin64/', '/')
+app = Flask("app", static_url_path='', static_folder='', root_path=application_path)
 CORS(app)
 
 
@@ -28,6 +29,11 @@ def _connect_to_database():
         return MockGraph()
 
 
+@app.route("/")
+def index():
+    return app.send_static_file('index.html')
+
+
 @app.route("/actors")
 def actors():
     return jsonify([name["a.name"] for name in g.data('MATCH (a:Person) WHERE (a)-[:ACTED_IN]->() RETURN a.name')])
@@ -41,16 +47,18 @@ def get_filmography(actor):
 
 class MockGraph(object):
     def __init__(self):
-        self.data = [
+        self._data = [
             {
-                "title": "bob",
-                "tagline": "cancer",
-                "released": 2009
+                "m": {
+                    "title": "bob",
+                    "tagline": "cancer",
+                    "released": 2009
+                }
             }
         ]
 
-    def graph(self, _):
-        return self.data
+    def data(self, _):
+        return self._data
 
 
 if __name__ == "__main__":

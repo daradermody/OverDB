@@ -3,14 +3,13 @@ angular.module('OverDB')
         $scope.filmList = [];
         $scope.errorMessage = null;
         $scope.searchActor = function(actor) {
-            $http.get("http://localhost:5000/actor/" + actor)
+            $scope.errorMessage = null;
+            $http.get("/actor/" + actor)
                 .success(function(data) {
                     console.log(data);
                     $scope.filmList = data;
                     if (!data.length) {
                         $scope.errorMessage = "Nothing found! :(";
-                    } else {
-                        $scope.errorMessage = null;
                     }
                 })
                 .error(function(data) {

@@ -1,0 +1,33 @@
+<nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark" ng-controller="headerController">
+  <a class="navbar-brand" href="#">OverDB</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" routerLink="home" routerLinkActive="active">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="movies" routerLinkActive="active">Movies</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="profile" routerLinkActive="active">Profile</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="login" routerLinkActive="active">Login</a>
+      </li>
+    </ul>
+
+    <div class="form-inline my-2 my-lg-0">
+      <input #query id="searchField" class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" (keyup.enter)="search(query.value);">
+    </div>
+  </div>
+</nav>
+
+<router-outlet></router-outlet>
+
+<footer>
+  <p>&copy; FeckOffOutOfIt Ltd.</p>
+</footer>

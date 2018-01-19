@@ -10,6 +10,7 @@ import {SearchComponent} from './search/search.component';
 import {MovieServiceService} from "./movie-service.service";
 import {HttpClientModule} from "@angular/common/http";
 import { MovieInfoComponent } from './movie-info/movie-info.component';
+import {NgxPageScrollModule} from "ngx-page-scroll";
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { MovieInfoComponent } from './movie-info/movie-info.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    NgxPageScrollModule
   ],
   providers: [
     MovieServiceService

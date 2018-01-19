@@ -7,11 +7,5 @@ import {Router} from "@angular/router";
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'app';
-
   constructor(private router: Router) { }
-
-  search(query) {
-    this.router.navigateByUrl("/search/" + query);
-  }
 }

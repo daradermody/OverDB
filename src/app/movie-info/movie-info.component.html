@@ -1,1 +1,116 @@
-{{film}}
+<div class="container">
+  <div class="row">
+    <div class="col-3 col-md-2 position-relative d-none d-sm-block p-0">
+      <div id="scrolling-navbar" class="list-group position-fixed">
+        <a pageScroll [pageScrollDuration]="250" [pageScrollOffset]="100" [pageScrollAdjustHash]="true"
+           class="list-group-item list-group-item-action"
+           href="#poster">Top</a>
+        <a pageScroll [pageScrollDuration]="250" [pageScrollOffset]="100" [pageScrollAdjustHash]="true"
+           class="list-group-item list-group-item-action"
+           href="#description">Description</a>
+        <a pageScroll [pageScrollDuration]="250" [pageScrollOffset]="100" [pageScrollAdjustHash]="true"
+           class="list-group-item list-group-item-action"
+           href="#details">Details</a>
+        <a pageScroll [pageScrollDuration]="250" [pageScrollOffset]="100" [pageScrollAdjustHash]="true"
+           class="list-group-item list-group-item-action"
+           href="#cast-and-crew">Cast and Crew</a>
+      </div>
+    </div>
+
+    <div class="col">
+
+      <div class="hero-image" style="position: relative; width: 100%">
+        <img id="poster" class="img-fluid rounded" src="http://via.placeholder.com/2000x1000" alt="Movie poster">
+        <div class="text-white" style="position: absolute; bottom: 8px; left: 16px">
+          <h1>Movie title</h1>
+        </div>
+      </div>
+
+
+      <div id="description" class="card mt-2 mb-2">
+        <div class="card-body">
+          <h4 class="card-title">Description</h4>
+          <p class="card-text">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vitae tempus purus. Donec facilisis
+            quis ex sit amet bibendum. Vestibulum varius hendrerit risus quis tristique. Etiam pharetra elementum
+            tortor, dictum efficitur nulla fermentum non. Praesent condimentum nibh libero. Duis congue aliquet est, vel
+            maximus lorem egestas a. Nulla placerat, mauris a malesuada maximus, dui ipsum bibendum urna, non viverra
+            elit sapien facilisis nisl. Sed at congue velit, a fringilla sem. Mauris commodo, quam id pellentesque
+            tempor, enim dolor vehicula purus, eu lobortis ex sem a quam. Integer vel lorem a metus commodo vulputate at
+            venenatis mi. Integer et enim quis lorem posuere ullamcorper eu vel elit. Morbi tempus, est ac pretium
+            posuere, magna dui rutrum tellus, sit amet dignissim mauris nunc nec magna.
+          </p>
+          <p class="card-text">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vitae tempus purus. Donec facilisis
+            quis ex sit amet bibendum. Vestibulum varius hendrerit risus quis tristique. Etiam pharetra elementum
+            tortor, dictum efficitur nulla fermentum non. Praesent condimentum nibh libero. Duis congue aliquet est, vel
+            maximus lorem egestas a. Nulla placerat, mauris a malesuada maximus, dui ipsum bibendum urna, non viverra
+            elit sapien facilisis nisl. Sed at congue velit, a fringilla sem. Mauris commodo, quam id pellentesque
+            tempor, enim dolor vehicula purus, eu lobortis ex sem a quam. Integer vel lorem a metus commodo vulputate at
+            venenatis mi. Integer et enim quis lorem posuere ullamcorper eu vel elit. Morbi tempus, est ac pretium
+            posuere, magna dui rutrum tellus, sit amet dignissim mauris nunc nec magna.
+          </p>
+        </div>
+      </div>
+
+      <div id="details" class="card mt-2 mb-2">
+        <div class="card-body">
+          <h4 class="card-title">Details</h4>
+          <p class="card-text">
+            {{film | json}}
+          <p class="card-text">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vitae tempus purus. Donec facilisis
+            quis ex sit amet bibendum. Vestibulum varius hendrerit risus quis tristique. Etiam pharetra elementum
+            tortor, dictum efficitur nulla fermentum non. Praesent condimentum nibh libero. Duis congue aliquet est, vel
+            maximus lorem egestas a. Nulla placerat, mauris a malesuada maximus, dui ipsum bibendum urna, non viverra
+            elit sapien facilisis nisl. Sed at congue velit, a fringilla sem. Mauris commodo, quam id pellentesque
+            tempor, enim dolor vehicula purus, eu lobortis ex sem a quam. Integer vel lorem a metus commodo vulputate at
+            venenatis mi. Integer et enim quis lorem posuere ullamcorper eu vel elit. Morbi tempus, est ac pretium
+            posuere, magna dui rutrum tellus, sit amet dignissim mauris nunc nec magna.
+          </p>
+          <p class="card-text">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vitae tempus purus. Donec facilisis
+            quis ex sit amet bibendum. Vestibulum varius hendrerit risus quis tristique. Etiam pharetra elementum
+            tortor, dictum efficitur nulla fermentum non. Praesent condimentum nibh libero. Duis congue aliquet est, vel
+            maximus lorem egestas a. Nulla placerat, mauris a malesuada maximus, dui ipsum bibendum urna, non viverra
+            elit sapien facilisis nisl. Sed at congue velit, a fringilla sem. Mauris commodo, quam id pellentesque
+            tempor, enim dolor vehicula purus, eu lobortis ex sem a quam. Integer vel lorem a metus commodo vulputate at
+            venenatis mi. Integer et enim quis lorem posuere ullamcorper eu vel elit. Morbi tempus, est ac pretium
+            posuere, magna dui rutrum tellus, sit amet dignissim mauris nunc nec magna.
+          </p>
+        </div>
+      </div>
+
+      <div id="cast-and-crew" class="card mt-2 mb-2">
+        <div class="card-body">
+          <h4 class="card-title">Cast and Crew</h4>
+          <p class="card-text">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vitae tempus purus. Donec facilisis
+            quis ex sit amet bibendum. Vestibulum varius hendrerit risus quis tristique. Etiam pharetra elementum
+            tortor, dictum efficitur nulla fermentum non. Praesent condimentum nibh libero. Duis congue aliquet est, vel
+            maximus lorem egestas a. Nulla placerat, mauris a malesuada maximus, dui ipsum bibendum urna, non viverra
+            elit sapien facilisis nisl. Sed at congue velit, a fringilla sem. Mauris commodo, quam id pellentesque
+            tempor, enim dolor vehicula purus, eu lobortis ex sem a quam. Integer vel lorem a metus commodo vulputate at
+            venenatis mi. Integer et enim quis lorem posuere ullamcorper eu vel elit. Morbi tempus, est ac pretium
+            posuere, magna dui rutrum tellus, sit amet dignissim mauris nunc nec magna.
+          </p>
+          <p class="card-text">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vitae tempus purus. Donec facilisis
+            quis ex sit amet bibendum. Vestibulum varius hendrerit risus quis tristique. Etiam pharetra elementum
+            tortor, dictum efficitur nulla fermentum non. Praesent condimentum nibh libero. Duis congue aliquet est, vel
+            maximus lorem egestas a. Nulla placerat, mauris a malesuada maximus, dui ipsum bibendum urna, non viverra
+            elit sapien facilisis nisl. Sed at congue velit, a fringilla sem. Mauris commodo, quam id pellentesque
+            tempor, enim dolor vehicula purus, eu lobortis ex sem a quam. Integer vel lorem a metus commodo vulputate at
+            venenatis mi. Integer et enim quis lorem posuere ullamcorper eu vel elit. Morbi tempus, est ac pretium
+            posuere, magna dui rutrum tellus, sit amet dignissim mauris nunc nec magna.
+          </p>
+          <p class="card-text">{{film.cast | json}}</p>
+          <p class="card-text">{{film.crew | json}}</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+</div>

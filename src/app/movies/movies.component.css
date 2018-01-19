@@ -1,0 +1,20 @@
+#scrolling-navbar {
+  position: absolute;
+  width: 120px;
+}
+
+@media (min-width: 992px) {
+  #scrolling-navbar {
+    width: 160px;
+  }
+}
+
+@media (min-width: 1200px) {
+  #scrolling-navbar {
+    width: 190px;
+  }
+}
+
+a {
+  color: inherit;
+}

@@ -6,11 +6,11 @@ import {SearchComponent} from "./search/search.component";
 import {MovieInfoComponent} from "./movie-info/movie-info.component";
 
 const ROUTES: Routes = [
-  // {
-  //   path: '',
-  //   redirectTo: 'home',
-  //   pathMatch: 'full',
-  // },
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
+  },
   {
     path: 'home',
     component: MainComponent,

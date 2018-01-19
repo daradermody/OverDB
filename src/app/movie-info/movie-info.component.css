@@ -1,0 +1,36 @@
+#scrolling-navbar {
+  width: 120px;
+}
+
+@media (min-width: 992px) {
+  #scrolling-navbar {
+    width: 160px;
+  }
+}
+
+@media (min-width: 1200px) {
+  #scrolling-navbar {
+    width: 190px;
+  }
+}
+
+
+img {
+  /*  To contain the image to the confines of the div  */
+  max-width: 100%;
+}
+
+.hero-image {
+  max-width: 100%;
+  margin: auto;
+}
+
+.hero-image::after {
+  display: block;
+  position: relative;
+  background-image: linear-gradient(to bottom, rgba(52, 58, 64, 0) 0%, #343a40 80%);
+  margin-top: -150px;
+  height: 150px;
+  width: 100%;
+  content: '';
+}

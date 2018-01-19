@@ -13,7 +13,7 @@ const router = express.Router();
 
 // Error handling
 const sendError = (err, res) => {
-  "use strict"
+  "use strict";
   res.status = 501;
   res.message = typeof err === 'object' ? err.message : err;
   res.status(501).json(res);

@@ -35,9 +35,9 @@ function start_prod_server() {
 
   if command_exists sudo; then
     echo -e "\nUsing system port requires sudo privileges"
-    sudo PORT=443 node server.js
+    sudo PORT=80 node server.js
   else
-    PORT=443 node server.js
+    PORT=80 node server.js
   fi
 }
 

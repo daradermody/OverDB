@@ -1,0 +1,35 @@
+<main role="main" class="container">
+
+  <div class="row">
+    <div class="col-3 col-md-2 position-relative d-none d-sm-block p-0">
+      <div class="list-group" id="scrolling-navbar">
+        <a class="list-group-item list-group-item-action list-group-item-secondary active">All movies</a>
+        <a class="list-group-item list-group-item-action list-group-item-secondary">Good movies</a>
+        <a class="list-group-item list-group-item-action list-group-item-secondary">Bad movies</a>
+      </div>
+    </div>
+
+    <div class="col-sm-9 col-md-10">
+      <div id="resultContentLoadingBar" class="single4" style="margin:auto" *ngIf="!(errorMessage || filmList)"></div>
+      <!--TODO: Extract to reusable component or something-->
+      <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+        <h3>{{errorMessage}}</h3>
+      </div>
+
+      <div class="card-deck" *ngIf="!errorMessage">
+        <div *ngFor="let film of filmList;">
+            <div class="card mb-2 ml-2 mr-0">
+              <img class="card-img-top img-fluid" src="../../assets/film_poster_placeholder.png" alt="{{film.name}}">
+              <div class="card-block">
+                <div class="card-body">
+                  <h4 class="card-title">{{film.title}}</h4>
+                  <p class="card-text">{{film.tagline}}</p>
+                  <p class="card-text">{{film.released}}</p>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

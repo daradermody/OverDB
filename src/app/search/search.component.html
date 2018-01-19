@@ -1,0 +1,44 @@
+<main role="main" class="container">
+  <div class="row row-offcanvas row-offcanvas-right">
+
+    <!-- LEFT NAV BAR -->
+    <div class="col-6 col-md-3 sidebar-offcanvas" id="sidebar">
+      <div class="list-group">
+        <a class="list-group-item list-group-item-action list-group-item-secondary active">All results</a>
+        <a class="list-group-item list-group-item-action list-group-item-secondary">Movies</a>
+        <a class="list-group-item list-group-item-action list-group-item-secondary">People</a>
+      </div>
+    </div>
+
+    <!-- CENTRE BODY -->
+    <div class="row" style="text-align:center">
+      <div class="col-6 col-lg-12" style="margin-top: 10px">
+
+        <div id="resultContentLoadingBar" class="single4" style="margin:auto" *ngIf="!(errorMessage || filmList)"></div>
+
+        <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+          <h3>{{errorMessage}}</h3>
+        </div>
+
+        <div class="card-columns" *ngIf="!errorMessage">
+          <div *ngFor="let film of filmList;">
+            <div class="card">
+              <img class="card-img-top img-fluid" src="../../assets/film_poster_placeholder.png" alt="{{film.name}}">
+              <div class="card-block">
+                <div class="card-body">
+                  <h4 class="card-title">{{film.title}}</h4>
+                  <p class="card-text">{{film.tagline}}</p>
+                  <p class="card-text">{{film.released}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button type="button" (click)="error();">Error, please</button>
+    </div>
+  </div>
+</main>
+
+
+

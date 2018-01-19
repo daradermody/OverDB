@@ -1,0 +1,68 @@
+{
+  "name": "over-db",
+  "version": "0.1.0",
+  "author": "Dara Dermody",
+  "description": "Web application that allows people to easily follow their favourite cast and crew in movies",
+  "main": "server.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daradermody/OverDB.git"
+  },
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "test": "ng test",
+    "lint": "ng lint",
+    "e2e": "ng e2e"
+  },
+  "keywords": [
+    "movies",
+    "director",
+    "actor",
+    "application"
+  ],
+  "bugs": {
+    "url": "https://github.com/daradermody/OverDB/issues"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "server/database/data_files/"
+    ],
+    "watch": [
+      "server"
+    ]
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^5.0.0",
+    "@angular/common": "^5.0.0",
+    "@angular/compiler": "^5.0.0",
+    "@angular/core": "^5.0.0",
+    "@angular/forms": "^5.0.0",
+    "@angular/http": "^5.0.0",
+    "@angular/platform-browser": "^5.0.0",
+    "@angular/platform-browser-dynamic": "^5.0.0",
+    "@angular/router": "^5.0.0",
+    "body-parser": "^1.18.2",
+    "bootstrap": "^4.0.0-beta.2",
+    "core-js": "^2.4.1",
+    "express": "^4.16.2",
+    "jquery": "^3.2.1",
+    "popper.js": "^1.12.9",
+    "rxjs": "^5.5.2",
+    "zone.js": "^0.8.14"
+  },
+  "devDependencies": {
+    "@angular/cli": "^1.6.0",
+    "@angular/compiler-cli": "^5.0.0",
+    "@angular/language-service": "^5.0.0",
+    "@types/node": "~6.0.60",
+    "codelyzer": "^4.0.1",
+    "nodemon": "^1.14.11",
+    "ts-node": "~3.2.0",
+    "tslint": "~5.7.0",
+    "typescript": "~2.4.2"
+  }
+}

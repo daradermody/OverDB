@@ -7,7 +7,7 @@ import {ActivatedRoute} from "@angular/router";
   styleUrls: ['./search.component.css']
 })
 export class SearchComponent {
-  errorMessage: string
+  errorMessage: string;
   filmList: any;
 
   constructor(private route: ActivatedRoute) {

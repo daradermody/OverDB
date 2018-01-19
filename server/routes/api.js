@@ -13,11 +13,19 @@ const router = express.Router();
 
 // Error handling
 const sendError = (err, res) => {
-  "use strict"
+  "use strict";
   res.status = 501;
   res.message = typeof err === 'object' ? err.message : err;
   res.status(501).json(res);
 };
+
+const errorMessageExample = {
+  "developerMessage": "Verbose, plain language description of the problem. Provide developers suggestions about how to solve their problems here",
+  "userMessage": "This is a message that can be passed along to end-users, if needed.",
+  "errorCode": "444444",
+  "moreInfo": "http://www.example.gov/developer/path/to/help/for/444444, http://tests.org/node/444444"
+};
+
 //
 // Response handling
 let res = {
@@ -50,6 +58,7 @@ router.get('/filmList', (req, res) => {
       "released": "released4"
     }
   ]);
+
   //TODO: Use actual database
   // connection((db) => {
   //     db.collection('users')

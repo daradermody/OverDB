@@ -3,14 +3,13 @@ import {RouterModule, Routes} from '@angular/router';
 import {MainComponent} from './main/main.component';
 import {MoviesComponent} from "./movies/movies.component";
 import {SearchComponent} from "./search/search.component";
-import {MovieInfoComponent} from "./movie-info/movie-info.component";
 
 const ROUTES: Routes = [
-  // {
-  //   path: '',
-  //   redirectTo: 'home',
-  //   pathMatch: 'full',
-  // },
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
+  },
   {
     path: 'home',
     component: MainComponent,
@@ -22,11 +21,6 @@ const ROUTES: Routes = [
   {
     path: 'search/:query',
     component: SearchComponent,
-    pathMatch: "full"
-  },
-  {
-    path: 'movieInfo/:title',
-    component: MovieInfoComponent,
     pathMatch: "full"
   }
 ];

@@ -8,11 +8,14 @@ import {MovieServiceService} from "../movie-service.service";
 })
 export class MoviesComponent implements OnInit {
   filmList: any = [];
+  errorMessage: string;
 
   constructor(private movieService: MovieServiceService) { }
 
   ngOnInit() {
-    this.movieService.getAllMovies().subscribe(data => this.filmList = data)
+    this.movieService.getAllMovies().subscribe(
+      data => this.filmList = data,
+      error => this.errorMessage = error["userMessage"])
   }
 
 }

@@ -9,7 +9,6 @@ import {MoviesComponent} from './movies/movies.component';
 import {SearchComponent} from './search/search.component';
 import {MovieServiceService} from "./movie-service.service";
 import {HttpClientModule} from "@angular/common/http";
-import { MovieInfoComponent } from './movie-info/movie-info.component';
 
 
 @NgModule({
@@ -17,8 +16,7 @@ import { MovieInfoComponent } from './movie-info/movie-info.component';
     AppComponent,
     MainComponent,
     MoviesComponent,
-    SearchComponent,
-    MovieInfoComponent
+    SearchComponent
   ],
   imports: [
     BrowserModule,

@@ -3,6 +3,7 @@ const router = express.Router();
 
 // Connect
 //TODO: Connect to Neo4j
+//TODO: Fill database with info from developers.themoviedb.org (e.g. see /3/people/get-person-movie-credits)
 // const connection = (closure) => {
 //     return MongoClient.connect('mongodb://localhost:27017/mean', (err, db) => {
 //         if (err) return console.log(err);

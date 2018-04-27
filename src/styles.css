@@ -1,12 +1,13 @@
 /* Bootstrap example extra */
-html,
-body {
-  background-color:#ddd;
+html, body {
+  background-color: #ddd;
   overflow-x: hidden; /* Prevent scroll on narrow devices */
 }
+
 body {
   padding-top: 70px;
 }
+
 footer {
   padding: 30px 0;
 }
@@ -14,15 +15,17 @@ footer {
 @media screen and (max-width: 767px) {
   .row-offcanvas {
     position: relative;
-    transition: all .25s ease-out;
+    transition: all 0.25s ease-out;
   }
 
   .row-offcanvas-right {
     right: 0;
   }
 
-  .row-offcanvas-left {
-    left: 0;
+  .sidebar-offcanvas {
+    position: absolute;
+    top: 0;
+    width: 50%; /* 6 columns */
   }
 
   .row-offcanvas-right .sidebar-offcanvas {
@@ -33,26 +36,8 @@ footer {
     right: -50%; /* 6 columns */
   }
 
-  .row-offcanvas-left .sidebar-offcanvas {
-    left: -100%; /* 12 columns */
-  }
-
-  .row-offcanvas-left.active .sidebar-offcanvas {
-    left: -50%; /* 6 columns */
-  }
-
   .row-offcanvas-right.active {
     right: 50%; /* 6 columns */
-  }
-
-  .row-offcanvas-left.active {
-    left: 50%; /* 6 columns */
-  }
-
-  .sidebar-offcanvas {
-    position: absolute;
-    top: 0;
-    width: 50%; /* 6 columns */
   }
 }
 
@@ -61,9 +46,9 @@ footer {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  border: 6px solid #EEEEEE;
-  border-top-color: #BFBFBF;
-  border-bottom-color: #BFBFBF;
+  border: 6px solid #eee;
+  border-top-color: #bfbfbf;
+  border-bottom-color: #bfbfbf;
   -webkit-animation: single4 2.5s infinite ease-in-out;
   animation: single4 2.5s infinite ease-in-out;
 }
@@ -73,6 +58,7 @@ footer {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
   }
+
   100% {
     -webkit-transform: rotate(540deg);
     transform: rotate(540deg);
@@ -84,6 +70,7 @@ footer {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
   }
+
   100% {
     -webkit-transform: rotate(540deg);
     transform: rotate(540deg);

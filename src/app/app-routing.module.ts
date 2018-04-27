@@ -1,8 +1,8 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {MainComponent} from './main/main.component';
-import {MoviesComponent} from "./movies/movies.component";
-import {SearchComponent} from "./search/search.component";
+import {MainComponent} from './components/main/main.component';
+import {MoviesComponent} from './components/movies/movies.component';
+import {SearchComponent} from './components/search/search.component';
 
 const ROUTES: Routes = [
   {
@@ -21,7 +21,7 @@ const ROUTES: Routes = [
   {
     path: 'search/:query',
     component: SearchComponent,
-    pathMatch: "full"
+    pathMatch: 'full'
   }
 ];
 

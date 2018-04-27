@@ -15,7 +15,7 @@ app.get('', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist$/index.html'));
 });
 
-const port = process.env.PORT || '3000';
-app.set('port', port);
 
+const port = (process.env.NODE_ENV === 'production') ? 80 : 4000
+app.set('port', port);
 http.createServer(app).listen(port, () => console.log(`Running on localhost:${port}`));

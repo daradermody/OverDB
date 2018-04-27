@@ -4,20 +4,11 @@ ARGS=$*
 
 function main() {
   set -e  # Exit if any command fails
-  verify_commands_installed
   cd $(dirname $0)
   if [[ ${ARGS} == *--prod* ]]; then
     start_prod_server
   else
     start_dev_server
-  fi
-}
-
-function verify_commands_installed() {
-  if ! command_exists ng || ! command_exists nodemon; then
-    echo "Ensure both ng and nodemon are installed globally:"
-    echo "    npm install -g @angular/cli nodemon"
-    exit 1
   fi
 }
 
@@ -31,25 +22,26 @@ function start_prod_server() {
     exit 1
   fi
 
-  ng build --prod --aot
+  ./build.sh
 
   if command_exists sudo; then
     echo -e "\nUsing system port requires sudo privileges"
-    sudo PORT=80 node server.js
+    sudo NODE_ENV=production node server.js
   else
-    PORT=80 node server.js
+    NODE_ENV=production node server
   fi
 }
 
 function cygwin_run_as_administrator() {
   id --groups | grep --quiet --extended-regexp '\<(114|544)\>'
-  return $?
 }
 
 function start_dev_server() {
-  nodemon &
+  mkdir --parent logs
+  touch logs/server.log logs/error.log
+  $(npm bin)/nodemon > >(tee -a logs/server.log) 2> >(tee -a logs/error.log >&2) &
   trap "kill $!" EXIT SIGINT SIGKILL  # Kill all child process if this process is stopped/ends
-  ng serve --open
+  $(npm bin)/ng serve --open > >(tee -a logs/server.log) 2> >(tee -a logs/error.log >&2)
 }
 
 main

@@ -16,6 +16,6 @@ app.get('', (req, res) => {
 });
 
 
-const port = (process.env.NODE_ENV === 'production') ? 80 : 4000
+const port = (process.env.NODE_ENV === 'production') ? 80 : 4000;
 app.set('port', port);
 http.createServer(app).listen(port, () => console.log(`Running on localhost:${port}`));

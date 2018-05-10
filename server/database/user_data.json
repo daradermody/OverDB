@@ -1,0 +1,21 @@
+{
+  "Dara": {
+    "followedPeople": [
+      {
+        "name": "George Takei",
+        "profile_path": "/5eBSvAPy6DnWsMX61IlJyjUzCRJ.jpg",
+        "id": 1752
+      },
+      {
+        "name": "George Lazenby",
+        "profile_path": "/rmrprW2rSKq49nPClGUfrJ2J0U4.jpg",
+        "id": 10167
+      },
+      {
+        "name": "George Reeves",
+        "profile_path": "/98aYzkJmmsMHPmY77IUHVc2sbgy.jpg",
+        "id": 11496
+      }
+    ]
+  }
+}

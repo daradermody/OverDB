@@ -9,6 +9,7 @@ import {MoviesComponent} from './components/movies/movies.component';
 import {SearchComponent} from './components/search/search.component';
 import {MovieServiceService} from './services/movie-service.service';
 import {HttpClientModule} from '@angular/common/http';
+import {PersonSearchService} from './services/person-search.service';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import {HttpClientModule} from '@angular/common/http';
     HttpClientModule
   ],
   providers: [
-    MovieServiceService
+    MovieServiceService,
+    PersonSearchService
   ],
   bootstrap: [AppComponent]
 })

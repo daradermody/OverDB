@@ -1,12 +1,15 @@
 const fs = require('fs');
 
-
 class Storage {
   constructor() {
     this.userFile = __dirname + '/user_data.json';
   }
 
-  getUserInfo(user, usersInfo) {
+  getUsers() {
+    return JSON.parse(fs.readFileSync(this.userFile, 'utf-8'));
+  }
+
+  static getUserInfo(user, usersInfo) {
     if (!(user in usersInfo)) {
       throw new Error(`User ${user} does not exist`);
     }
@@ -14,13 +17,12 @@ class Storage {
   }
 
   getFollowedPeople(user) {
-    const usersInfo = JSON.parse(fs.readFileSync(this.userFile, 'utf-8'));
-    return this.getUserInfo(user, usersInfo).followedPeople;
+    return Storage.getUserInfo(user, this.getUsers()).followedPeople;
   }
 
   addFollowedPerson(person, user) {
-    const usersInfo = JSON.parse(fs.readFileSync(this.userFile, 'utf-8'));
-    const userInfo = this.getUserInfo(user, usersInfo);
+    const usersInfo = this.getUsers();
+    const userInfo = Storage.getUserInfo(user, usersInfo);
 
     if (userInfo.followedPeople.find((p) => p.name === person.name)) {
       throw new Error('Person already followed!');
@@ -31,8 +33,8 @@ class Storage {
   }
 
   removeFollowedPerson(person, user) {
-    const usersInfo = JSON.parse(fs.readFileSync(this.userFile, 'utf-8'));
-    const userInfo = this.getUserInfo(user, usersInfo);
+    const usersInfo = this.getUsers();
+    const userInfo = Storage.getUserInfo(user, usersInfo);
 
     const index = userInfo.followedPeople.findIndex((p) => p.name === person);
     if (index === -1) {

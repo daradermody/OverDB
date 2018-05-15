@@ -3,6 +3,9 @@
 
 /logs
 
+# Data files
+saved_data.json
+
 # Dependencies
 /node_modules
 
@@ -12,3 +15,7 @@
 # System Files
 .DS_Store
 Thumbs.db
+
+# Keys and passwords
+tmdbApiKey.txt
+email_auth.json

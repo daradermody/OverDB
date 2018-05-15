@@ -10,10 +10,10 @@ export interface Person {
 
 @Injectable()
 export class PersonSearchService {
-  private apiKey;
+  private readonly apiKey;
 
   constructor(private http: HttpClient) {
-    this.apiKey = '39ddef1da9fcaa6207e6421b04dbd9ec';
+    this.http.get('/api/getTmdbApiKey', {responseType: 'text'}).subscribe(key => this.apiKey = key);
   }
 
   searchPerson(name: string): Observable<{ results: Array<{ name: string, id: number, profile_path: string }> }> {

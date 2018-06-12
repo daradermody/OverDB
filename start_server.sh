@@ -26,9 +26,9 @@ function start_prod_server() {
 
   if command_exists sudo; then
     echo -e "\nUsing system port requires sudo privileges"
-    sudo NODE_ENV=production node server.js
+    sudo NODE_ENV=production node dist/server
   else
-    NODE_ENV=production node server
+    NODE_ENV=production node dist/server
   fi
 }
 

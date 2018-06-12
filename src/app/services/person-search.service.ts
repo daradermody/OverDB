@@ -10,7 +10,7 @@ export interface Person {
 
 @Injectable()
 export class PersonSearchService {
-  private readonly apiKey;
+  private apiKey;
 
   constructor(private http: HttpClient) {
     this.http.get('/api/getTmdbApiKey', {responseType: 'text'}).subscribe(key => this.apiKey = key);

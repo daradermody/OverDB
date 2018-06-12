@@ -5,3 +5,6 @@ cd $(dirname $0)
 
 # Build front-end
 $(npm bin)/ng build --prod --aot
+
+# Compile server-side
+$(npm bin)/tsc --project server/tsconfig.server.json

@@ -4,6 +4,7 @@ import {FamousPerson, Storage, UserData} from '../database';
 import * as merge from 'deepmerge';
 import * as _ from 'lodash';
 import * as emailing from '../emailing';
+import * as moment from 'moment';
 
 const MovieDb = require('moviedb-promise');
 const Converter = require('ansi-to-html');
@@ -11,6 +12,8 @@ const Converter = require('ansi-to-html');
 
 interface Project {
   id: number;
+  title: string
+  release_date: string
   job: string;
   jobs: string[];
 }
@@ -32,7 +35,7 @@ export class DataChecker {
   async getNewProjects() {
     const users = Storage.getUsers();
     const followedPeople = DataChecker.getFollowedPeople(users);
-    const credits = await this.getCredits(followedPeople);
+    const credits = await this.getFutureCredits(followedPeople);
     const savedCredits: { [id: string]: Project } = JSON.parse(fs.readFileSync(DataChecker.dataFile, 'utf-8'));
     const diff = detailedDiff(savedCredits, credits);
     this.printNewProjectInformation(users, diff, credits, savedCredits);
@@ -51,7 +54,7 @@ export class DataChecker {
     return followedPeople;
   }
 
-  private getCredits(people: { [name: string]: FamousPerson }): Promise<{ [name: string]: FamousPerson }> {
+  private getFutureCredits(people: { [name: string]: FamousPerson }): Promise<{ [name: string]: FamousPerson }> {
     const queries = [];
 
     for (let id in people) {
@@ -67,12 +70,16 @@ export class DataChecker {
     return Promise.all(queries)
       .then(() => people)
       .catch(error => {
-        throw new Error('Could not get projects for followed people: ' + error);
+        error.message = 'Could not get projects for followed people: ' + error.message;
+        throw error;
       });
   }
 
   private static filterData(projects: Project[]): Project[] {
-    return projects.map(project => <Project>_.pick(project, ['id', 'job', 'release_date', 'title']));
+    const now = moment();
+    return projects
+      .filter(project => !project.release_date || moment(project.release_date) > now)
+      .map(project => <Project>_.pick(project, ['id', 'job', 'release_date', 'title']));
   }
 
   private static convertMovieDataStructure(projects: Project[]): { [id: string]: Project } {
@@ -119,7 +126,7 @@ export class DataChecker {
       if (newProjects) {
         for (let projectId of newProjects) {
           const project = credits[person.id].projects[projectId];
-          output.push(`\x1b[32m&nbsp;&nbsp;${project.title}: ${project.release_date} (${project.jobs.join(', ')})\x1b[0m`);
+          output.push(`\x1b[32m&nbsp;&nbsp;${project.title}: ${project.release_date || 'TBD'} (${project.jobs.join(', ')})\x1b[0m`);
         }
       }
     }

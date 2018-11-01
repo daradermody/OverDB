@@ -64,7 +64,8 @@
     "nodemailer": "^4.6.4",
     "popper.js": "^1.14.3",
     "rxjs": "^6.1.0",
-    "zone.js": "^0.8.26"
+    "zone.js": "^0.8.26",
+    "moment": "latest"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.6.0",

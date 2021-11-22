@@ -27,13 +27,14 @@
     }
   },
   "nodemonConfig": {
-    "exec": "$(npm bin)/ts-node server",
+    "exec": "npx ts-node server",
     "watch": [
       "server"
     ],
     "ext": "ts",
     "ignore": [
-      "server/database/user_data.json"
+      "server/database/user_data.json",
+      "server/moviedb_cache.json"
     ]
   },
   "private": true,
@@ -47,11 +48,17 @@
     "@angular/platform-browser": "^6.0.0",
     "@angular/platform-browser-dynamic": "^6.0.0",
     "@angular/router": "^6.0.0",
+    "@material-ui/core": "^4.11.4",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.58",
+    "@react-hook/throttle": "^2.2.0",
     "@types/lodash": "^4.14.109",
+    "@types/lodash.throttle": "^4.1.6",
     "ansi-to-html": "^0.6.4",
+    "axios": "^0.21.1",
     "body-parser": "^1.18.2",
     "bootstrap": "^4.1.1",
-    "core-js": "^2.5.6",
+    "core-js": "^3.11.0",
     "cors": "^2.8.4",
     "deep-object-diff": "^1.1.0",
     "deepmerge": "^2.1.0",
@@ -59,32 +66,48 @@
     "hoek": "^5.0.3",
     "jquery": "^3.3.1",
     "lodash": "^4.17.10",
+    "lodash.throttle": "^4.1.1",
+    "moment": "latest",
     "morgan": "^1.9.0",
-    "moviedb-promise": "^1.2.2",
+    "moviedb-promise": "^3.1.8",
     "nodemailer": "^4.6.4",
     "popper.js": "^1.14.3",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-masonry-component": "^6.2.1",
+    "react-router-dom": "^5.2.0",
+    "regenerator-runtime": "^0.13.7",
     "rxjs": "^6.1.0",
-    "zone.js": "^0.8.26",
-    "moment": "latest"
+    "zone.js": "^0.8.26"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.6.0",
     "@angular/cli": "^6.0.0",
     "@angular/compiler-cli": "^6.0.0",
     "@angular/language-service": "^6.0.0",
+    "@babel/core": "^7.13.16",
+    "@babel/plugin-transform-react-jsx": "^7.13.12",
+    "@babel/preset-env": "^7.13.15",
     "@types/deepmerge": "^2.1.0",
     "@types/morgan": "^1.7.35",
-    "@types/node": "^10.1.1",
+    "@types/node": "^15.0.1",
     "@types/nodemailer": "^4.6.0",
+    "@types/react-router-dom": "^5.1.7",
+    "babel-loader": "^8.2.2",
     "codelyzer": "^4.3.0",
     "eslint": "^4.19.1",
     "eslint-config-google": "^0.9.1",
+    "html-webpack-plugin": "^5.3.1",
     "husky": "^1.0.0-rc.6",
-    "nodemon": "^1.17.4",
+    "nodemon": "^2.0.7",
     "stylelint": "^9.2.0",
     "stylelint-config-standard": "^18.2.0",
-    "ts-node": "^6.0.3",
+    "ts-loader": "^9.1.1",
+    "ts-node": "^9.1.1",
     "tslint": "~5.10.0",
-    "typescript": "^2.7.2"
+    "typescript": "^4.2.4",
+    "webpack": "^5.35.1",
+    "webpack-cli": "^4.6.0",
+    "webpack-dev-server": "^3.11.2"
   }
 }

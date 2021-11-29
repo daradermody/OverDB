@@ -19,7 +19,9 @@
     "url": "https://github.com/daradermody/OverDB/issues"
   },
   "scripts": {
-    "test": "eslint . && ./list_unused_css_classes.sh && stylelint '**/*.css' '**/*.html' && ng lint"
+    "server": "nodemon",
+    "start": "webpack serve --mode development",
+    "build": "webpack build --mode production"
   },
   "husky": {
     "hooks": {
@@ -69,7 +71,7 @@
     "lodash.throttle": "^4.1.1",
     "moment": "latest",
     "morgan": "^1.9.0",
-    "moviedb-promise": "^3.1.8",
+    "moviedb-promise": "^3.1.12",
     "nodemailer": "^4.6.4",
     "popper.js": "^1.14.3",
     "react": "^17.0.2",

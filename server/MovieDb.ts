@@ -1,26 +1,27 @@
-import {MovieDb as MovieDbApi} from "moviedb-promise";
 import * as fs from "fs";
-import {pick} from "lodash";
-import {Crew, MovieResponse, Person as MovieDbPerson, PersonMovieCreditsResponse, SearchMultiRequest} from "moviedb-promise/dist/request-types";
-import {Movie, MovieCreditForPerson, Person, PersonCreditForMovie} from "./types";
+import {MovieDb as MovieDbApi} from "moviedb-promise";
+import {Crew, MovieResponse, Person as TmdbPerson, PersonMovieCreditsResponse, SearchMultiRequest} from "moviedb-promise/dist/request-types";
+import {Movie, MovieCredit, Person, PersonCredit} from "./generated/graphql";
+import {isMovieSummary, isPersonSummary, MovieInfo, PersonInfo} from "./types";
 
 const key = fs.readFileSync(`${__dirname}/tmdbApikey.txt`, 'utf-8').trim()
 
 interface Cache {
   movieInfo: {
-    [movieId: string]: Movie;
+    [id: Movie['id']]: MovieInfo;
   }
   movieCredits: {
-    [movieId: string]: PersonCreditForMovie[];
+    [id: Movie['id']]: PersonCredit[];
   }
   personMovieCredits: {
-    [personId: string]: {
-      id: Movie['id']
-      jobs: MovieCreditForPerson['jobs']
+    [id: Person['id']]: {
+      id: MovieCredit['id']
+      title: MovieCredit['title']
+      jobs: MovieCredit['jobs']
     }[];
   }
   personInfo: {
-    [personId: string]: Person
+    [id: Person['id']]: PersonInfo
   },
 }
 
@@ -41,18 +42,18 @@ export default class MovieDb {
     return MovieDb.movieDbApi.searchPerson(params)
   }
 
-  static async personMovieCredits(id: number): Promise<{ id: Movie['id'], jobs: MovieCreditForPerson['jobs'] }[]> {
+  static async personMovieCredits(id: Person['id']): Promise<{ id: MovieCredit['id'], title: MovieCredit['title'], jobs: MovieCredit['jobs'] }[]> {
     if (!MovieDb.cache.personMovieCredits[id]) {
       const {crew} = await MovieDb.movieDbApi.personMovieCredits(id) as { crew: Required<PersonMovieCreditsResponse['crew'][0]>[] };
       const filteredMovies = filterInvalidMovies(crew)
       MovieDb.cache.personMovieCredits[id] = aggregateAndNormalizeJobs(filteredMovies)
-        .map(m => ({id: m.id, jobs: m.jobs}));
+        .map(m => ({id: `${m.id}`, jobs: m.jobs, title: m.title}));
       MovieDb.save();
     }
     return MovieDb.cache.personMovieCredits[id]
   }
 
-  static async personInfo(id: number): Promise<Person> {
+  static async personInfo(id: Person['id']): Promise<PersonInfo> {
     if (!MovieDb.cache.personInfo[id]) {
       const person = await MovieDb.movieDbApi.personInfo(id);
       MovieDb.cache.personInfo[id] = pickPersonProperties(person);
@@ -61,7 +62,7 @@ export default class MovieDb {
     return MovieDb.cache.personInfo[id];
   }
 
-  static async movieInfo(id: number): Promise<Movie> {
+  static async movieInfo(id: Movie['id']): Promise<MovieInfo> {
     if (!MovieDb.cache.movieInfo[id]) {
       const movie = await MovieDb.movieDbApi.movieInfo(id);
       MovieDb.cache.movieInfo[id] = pickMovieProperties(movie);
@@ -70,7 +71,7 @@ export default class MovieDb {
     return MovieDb.cache.movieInfo[id]
   }
 
-  static async movieCredits(id: number): Promise<PersonCreditForMovie[]> {
+  static async movieCredits(id: Movie['id']): Promise<PersonCredit[]> {
     if (!MovieDb.cache.movieCredits[id]) {
       const {crew} = await MovieDb.movieDbApi.movieCredits(id) as { crew: Required<Crew>[] };
       const filteredCredits = filterInsignificantPeople(crew)
@@ -83,6 +84,19 @@ export default class MovieDb {
     return MovieDb.cache.movieCredits[id]
   }
 
+  static async search(query: string): Promise<(MovieInfo | PersonInfo)[]> {
+    const {results} = await this.movieDbApi.searchMulti({query})
+    return results
+      .filter(result => isMovieSummary(result) || isPersonSummary(result))
+      .map(result => {
+        if (isMovieSummary(result)) {
+          return pickMovieProperties(result)
+        } else {
+          return pickPersonProperties(result)
+        }
+      })
+  }
+
   static save() {
     fs.writeFileSync(MovieDb.FILE_PATH, JSON.stringify(MovieDb.cache));
   }
@@ -93,7 +107,7 @@ function filterInvalidMovies<T extends { vote_count: number, job: string }>(cred
   return credits.filter(movie => !!movie.vote_count && !ignoredRoles.includes(movie.job))
 }
 
-function aggregateAndNormalizeJobs<T extends { id: number }, R extends T & { job: string }>(credits: (T & { job: string })[]): (T & { jobs: string[] })[] {
+function aggregateAndNormalizeJobs<T extends { id: number }>(credits: (T & { job: string })[]): (T & { jobs: string[] })[] {
   const creditsById = {}
   for (let credit of credits) {
     const normalizedRole = credit.job
@@ -131,7 +145,7 @@ function filterInsignificantPeople<T extends { job: string }>(crew: T[]): T[] {
   return crew.filter(personCredit => !ignoredRoles.includes(personCredit.job))
 }
 
-function sortByRole(creditA: PersonCreditForMovie, creditB: PersonCreditForMovie): number {
+function sortByRole(creditA: PersonCredit, creditB: PersonCredit): number {
   const jobsByImportance = [
     "Casting",
     "Editor",
@@ -147,14 +161,33 @@ function sortByRole(creditA: PersonCreditForMovie, creditB: PersonCreditForMovie
   return creditAPrecedence > creditBPrecedence ? -1 : 1
 }
 
-function pickPersonCreditForMovieProperties(movie: PersonCreditForMovie): PersonCreditForMovie {
-  return pick(movie, ['id', 'name', 'profile_path', 'jobs'])
+function pickPersonCreditForMovieProperties(credit: Pick<Crew, 'id' | 'name' | 'profile_path'> & { jobs: string[] }): PersonCredit {
+  return {
+    id: `${credit.id}`,
+    name: credit.name,
+    profilePath: credit.profile_path,
+    jobs: credit.jobs,
+  }
 }
 
-function pickMovieProperties(movie: MovieResponse): Movie {
-  return pick(movie, ['id', 'title', 'poster_path', 'release_date', 'vote_average', 'overview', 'tagline']) as Movie
+function pickMovieProperties(movie: MovieResponse): MovieInfo {
+  return {
+    id: `${movie.id}`,
+    title: movie.title,
+    posterPath: movie.poster_path,
+    releaseDate: movie.release_date,
+    voteAverage: movie.vote_average,
+    overview: movie.overview,
+    tagline: movie.tagline,
+  }
 }
 
-function pickPersonProperties(person: MovieDbPerson): Person {
-  return pick(person, ['id', 'name', 'biography', 'known_for_department', 'profile_path']) as Person
+function pickPersonProperties(person: TmdbPerson): PersonInfo {
+  return ({
+    id: `${person.id}`,
+    name: person.name,
+    biography: person.biography,
+    knownForDepartment: person.known_for_department,
+    profilePath: person.profile_path,
+  })
 }

@@ -1,18 +1,18 @@
 import * as fs from "fs";
-import {Sentiment} from "./types";
+import {Movie, Person, Sentiment} from "./generated/graphql";
 
 interface Data {
   [userId: number]: {
-    favourites: number[];
-    sentiments: Record<number, Sentiment>;
-    watched: number[];
-    watchlist: number[];
+    favourites: Person['id'][];
+    sentiments: Record<Movie['id'], Sentiment>;
+    watched: Movie['id'][];
+    watchlist: Movie['id'][];
   }
 }
 
 const emptyObject: Data[0] = {
   favourites: [],
-  sentiments: [],
+  sentiments: {},
   watched: [],
   watchlist: [],
 }
@@ -28,11 +28,26 @@ export class UserData {
     return JSON.parse(fs.readFileSync(UserData.FILE_PATH, 'utf-8'));
   }
 
-  public static getFavourites(userId: number): number[] {
+  public static getFavourites(userId: number): Person['id'][] {
     return UserData.data[userId]?.favourites || [];
   }
 
-  public static addFavourite(userId: number, personId: number) {
+  public static setFavourite(userId: number, personId: Person['id'], favourite: boolean): void {
+    let favourites = UserData.data[userId]?.favourites || []
+    if (favourite) {
+      favourites = Array.from(new Set([...favourites, personId]))
+    } else {
+      favourites = favourites.filter(id => id !== personId)
+    }
+
+    UserData.data[userId] = {
+      ...(UserData.data[userId] || emptyObject),
+      favourites,
+    };
+    UserData.save();
+  }
+
+  public static addFavourite(userId: number, personId: Person['id']): void {
     UserData.data[userId] = {
       ...(UserData.data[userId] || emptyObject),
       favourites: Array.from(new Set([...(UserData.data[userId]?.favourites || []), personId])),
@@ -40,11 +55,11 @@ export class UserData {
     UserData.save();
   }
 
-  public static isFavourited(userId: number, personId: number) {
+  public static isFavourited(userId: number, personId: Person['id']): boolean {
     return UserData.data[userId].favourites.includes(personId);
   }
 
-  public static removeFavourite(userId: number, personId: number) {
+  public static removeFavourite(userId: number, personId: Person['id']): void {
     UserData.data[userId] = {
       ...(UserData.data[userId] || emptyObject),
       favourites: (UserData.data[userId]?.favourites || []).filter(id => id !== personId)
@@ -52,12 +67,12 @@ export class UserData {
     UserData.save();
   }
 
-  static getSentiment(userId: number, movieId: number): Sentiment {
-    return UserData.data[userId].sentiments[movieId] || Sentiment.NONE
+  static getSentiment(userId: number, movieId: Movie['id']): Sentiment {
+    return UserData.data[userId].sentiments[movieId] || Sentiment.None
   }
 
-  static setSentiment(userId: number, movieId: number, sentiment: Sentiment): void {
-    if (sentiment === Sentiment.NONE) {
+  static setSentiment(userId: number, movieId: Movie['id'], sentiment: Sentiment): void {
+    if (sentiment === Sentiment.None) {
       delete UserData.data[userId].sentiments[movieId]
     } else {
       UserData.data[userId].sentiments[movieId] = sentiment
@@ -65,15 +80,15 @@ export class UserData {
     UserData.save()
   }
 
-  static getWatched(userId: number): number[] {
+  static getWatched(userId: number): string[] {
     return UserData.data[userId].watched
   }
 
-  static isWatched(userId: number, movieId: number): boolean {
+  static isWatched(userId: number, movieId: Movie['id']): boolean {
     return UserData.data[userId].watched.includes(movieId)
   }
 
-  static setWatched(userId: number, movieId: number, isWatched: boolean): void {
+  static setWatched(userId: number, movieId: Movie['id'], isWatched: boolean): void {
     if (isWatched) {
       UserData.data[userId].watched = Array.from(new Set([...UserData.data[userId].watched, movieId]))
     } else {
@@ -82,15 +97,15 @@ export class UserData {
     UserData.save()
   }
 
-  static getWatchlist(userId: number): number[] {
+  static getWatchlist(userId: number): Movie['id'][] {
     return UserData.data[userId].watchlist
   }
 
-  static inWatchlist(userId: number, movieId: number): boolean {
+  static inWatchlist(userId: number, movieId: Movie['id']): boolean {
     return UserData.data[userId].watchlist.includes(movieId)
   }
 
-  static setInWatchlist(userId: number, movieId: number, inWatchlist: boolean): void {
+  static setInWatchlist(userId: number, movieId: Movie['id'], inWatchlist: boolean): void {
     if (inWatchlist) {
       UserData.data[userId].watchlist = Array.from(new Set([...UserData.data[userId].watchlist, movieId]))
     } else {

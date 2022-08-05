@@ -13,7 +13,10 @@ module.exports = {
   },
   devtool: 'source-map',
   devServer: {
-    contentBase: path.join(__dirname, 'dist'),
+    allowedHosts: ['overdb.com'],
+    static: {
+      directory: path.join(__dirname, 'dist'),
+    },
     historyApiFallback: true,
     proxy: {
       '/api': 'http://localhost:4000',

@@ -1,0 +1,87 @@
+type Person {
+  id: ID!
+  name: String!
+  knownForDepartment: String!
+  profilePath: String
+  biography: String!
+  favourited: Boolean!
+}
+
+type PersonCredit {
+  id: ID!
+  name: String!
+  jobs: [String!]!
+  profilePath: String
+}
+
+type Movie {
+  id: ID!
+  title: String!
+  tagline: String!
+  overview: String!
+  voteAverage: Float!
+  releaseDate: String
+  posterPath: String
+  watched: Boolean!
+  inWatchlist: Boolean!
+  sentiment: Sentiment!
+  tomatometer: Tomatometer
+}
+
+type MovieCredit {
+  id: ID!
+  title: String!
+  posterPath: String
+  releaseDate: String
+  watched: Boolean!
+  inWatchlist: Boolean!
+  sentiment: Sentiment!
+  jobs: [String!]!
+}
+
+union SearchResult = Movie | Person
+
+enum Sentiment {
+  NONE
+  LIKED
+  DISLIKED
+}
+
+type PaginatedMovies {
+  offset: Int!
+  limit: Int!
+  endReached: Boolean!
+  results: [Movie!]!
+}
+
+enum TomatometerState {
+  CERTIFIED_FRESH
+  FRESH
+  ROTTEN
+}
+
+type Tomatometer {
+  state: TomatometerState!
+  score: Int!
+  consensus: String
+  link: String!
+}
+
+type Query {
+  favouritePeople: [Person!]!
+  recommendedMovies: [Movie!]!
+  movie(id: ID!): Movie!
+  creditsForMovie(id: ID!): [PersonCredit!]!
+  person(id: ID!): Person!
+  creditsForPerson(id: ID!): [MovieCredit!]!
+  search(query: String!): [SearchResult!]!
+  watchlist: [Movie!]!
+  watched(offset: Int, limit: Int): PaginatedMovies!
+}
+
+type Mutation {
+  setFavourite(id: ID!, favourited: Boolean!): Person!
+  setWatched(id: ID!, watched: Boolean!): Movie!
+  setInWatchlist(id: ID!, inWatchlist: Boolean!): Movie!
+  setSentiment(id: ID!, sentiment: Sentiment!): Movie!
+}

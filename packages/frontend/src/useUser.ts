@@ -24,8 +24,9 @@ export default function useUser({redirectIfNoAuth} = {redirectIfNoAuth: false}) 
   }, [])
 
   const login = useCallback(async (username: string, password: string) => {
-    await axios.post(`${SERVER_URL}/login`, {username, password}, {withCredentials: true})
-    userSignal.value = JSON.parse(Cookies.get('user'))
+    const {data} = await axios.post(`${SERVER_URL}/login`, {username, password}, {withCredentials: true})
+    Cookies.set('user', JSON.stringify(data))
+    userSignal.value = data
   }, [])
 
   return {

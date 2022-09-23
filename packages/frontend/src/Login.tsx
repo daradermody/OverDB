@@ -23,8 +23,10 @@ export default function Login() {
       await login(formData.get('username') as string, formData.get('password') as string)
       navigate('/')
     } catch (e) {
-      if (e.response.status === 401) {
+      if (e.response?.status === 401) {
         setError('Invalid credentials')
+      } else {
+        throw e
       }
     }
   }

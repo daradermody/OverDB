@@ -1,14 +1,3 @@
-# Compiled output
-/dist
-
-/logs
-
-# Data files
-saved_data.json
-
-# Dependencies
-/node_modules
-
 # IDEs and editors
 /.idea
 
@@ -16,10 +5,8 @@ saved_data.json
 .DS_Store
 Thumbs.db
 
-# Keys and passwords
-tmdbApiKey.txt
-email_auth.json
-
+# Yarn 3
+node_modules
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -27,4 +14,9 @@ email_auth.json
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+packages/frontend/public/static
+packages/frontend/build/
+packages/backend/.env
+packages/backend/data
 

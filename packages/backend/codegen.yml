@@ -1,0 +1,12 @@
+overwrite: true
+schema: "src/schema.graphql"
+generates:
+  types/graphql.ts:
+    config:
+      useIndexSignature: true
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-resolvers"
+      - "typescript-react-apollo"
+      - "fragment-matcher"

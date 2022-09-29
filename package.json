@@ -23,7 +23,9 @@
   },
   "scripts": {
     "dev": "concurrently -n client,server -c green,cyan 'yarn workspace @overdb/frontend dev' 'yarn workspace @overdb/backend dev'",
-    "graphql-type-gen": "yarn workspaces foreach run graphql-type-gen"
+    "graphql-type-gen": "yarn workspaces foreach run graphql-type-gen",
+    "build": "yarn workspaces foreach run build",
+    "deploy": "yarn workspaces foreach run deploy"
   },
   "private": true,
   "devDependencies": {

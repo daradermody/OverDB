@@ -6,6 +6,7 @@ import axios from 'axios'
 // @ts-ignore
 import Cookies from 'js-cookie'
 import { User } from '@overdb/backend/types'
+import { useApolloClient } from '@apollo/client'
 
 declare const SERVER_URL: string
 
@@ -13,6 +14,7 @@ export const userSignal = signal<User>(JSON.parse(cookie.parse(document.cookie).
 
 export default function useUser({redirectIfNoAuth} = {redirectIfNoAuth: false}) {
   const navigate = useNavigate()
+  const client = useApolloClient()
   const [user, setUser] = useState<User>(userSignal.value)
 
   useEffect(() => effect(() => setUser(userSignal.value)), [setUser])
@@ -33,6 +35,7 @@ export default function useUser({redirectIfNoAuth} = {redirectIfNoAuth: false}) 
     user,
     login,
     logout: () => {
+      void client.clearStore()
       Cookies.remove('user')
       userSignal.value = null
       navigate('/')

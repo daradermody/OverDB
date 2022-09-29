@@ -31,8 +31,8 @@ export default function Footer() {
   )
 }
 
-const Root = styled('div')(({theme}) => ({
-  backgroundColor: '#1b222b',
-  marginTop: 100,
-  padding: '20px 0 40px',
-}))
+const Root = styled('div')`
+  background-color: #1b222b;
+  margin-top: 100px;
+  padding: 20px 0 40px;
+`

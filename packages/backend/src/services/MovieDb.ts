@@ -46,6 +46,7 @@ export default class MovieDb {
       const crew = data.crew as Required<NonNullable<PersonMovieCreditsResponse['crew']>[0]>[]
       const filteredMovies = filterInvalidMovies(crew)
       MovieDb.cache.personMovieCredits[id] = aggregateAndNormalizeJobs(filteredMovies)
+        .sort((m1, m2) => m1.release_date < m2.release_date ? 1 : -1)
         .map(m => ({id: `${m.id}`, jobs: m.jobs, title: m.title}))
       MovieDb.save()
         .catch(console.error)
@@ -129,6 +130,7 @@ function aggregateAndNormalizeJobs<T extends { id: number }>(credits: (T & { job
       .replace('Conductor', 'Music')
       .replace('Original Music Composer', 'Music')
       .replace('Sound Designer', 'Sound')
+      .replace('Sound Editor', 'Sound')
       .replace('Screenplay', 'Writer')
       .replace('Scenario Writer', 'Writer')
       .replace('Theatre Play', 'Writer')
@@ -136,8 +138,13 @@ function aggregateAndNormalizeJobs<T extends { id: number }>(credits: (T & { job
       .replace('Author', 'Writer')
       .replace('Technical Advisor', 'Advisor')
       .replace('Script Consultant', 'Advisor')
+      .replace('Camera', 'Cameras')
       .replace('Camera Operator', 'Cameras')
+      .replace('Cameras Operator', 'Cameras')
+      .replace('First Assistant Cameras', 'Cameras')
+      .replace('Second Assistant Cameras', 'Cameras')
       .replace('Director of Photography', 'Cinematography')
+      .replace('"A" Cameras', 'Cinematography')
 
     if (creditsById[credit.id]) {
       creditsById[credit.id].jobs.push(normalizedRole)

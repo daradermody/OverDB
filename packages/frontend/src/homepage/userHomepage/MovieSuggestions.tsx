@@ -21,6 +21,9 @@ export function MovieSuggestions() {
           {loading ? <CircularProgress size={20}/> : <Loop/>}
         </IconButton>
       </div>
+      {!loading && !error && !data?.recommendedMovies.length && (
+        <Typography variant="body1">Favourite some people to get movie recommendations.</Typography>
+      )}
       <MovieCards movies={data?.recommendedMovies} loading={loading} loadingCount={18}/>
     </div>
   )

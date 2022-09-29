@@ -5,7 +5,7 @@ import App from './App'
 import theme from './theme'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import apollotClient from './apollotClient'
+import apolloClient from './apollotClient'
 
 document.body.style.fontFamily = 'Roboto'
 document.body.style.margin = '0'
@@ -16,7 +16,7 @@ const root = createRoot(container)
 root.render(
   <StyledEngineProvider injectFirst>
     <ThemeProvider theme={theme}>
-      <ApolloProvider client={apollotClient}>
+      <ApolloProvider client={apolloClient}>
         <BrowserRouter>
           <App/>
         </BrowserRouter>

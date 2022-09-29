@@ -48,24 +48,8 @@ export class UserData {
     UserData.save();
   }
 
-  public static addFavourite(userId: User['id'], personId: Person['id']): void {
-    UserData.data[userId] = {
-      ...UserData.forUser(userId),
-      favourites: Array.from(new Set([...UserData.forUser(userId).favourites, personId])),
-    };
-    UserData.save();
-  }
-
   public static isFavourited(userId: User['id'], personId: Person['id']): boolean {
     return UserData.forUser(userId).favourites.includes(personId);
-  }
-
-  public static removeFavourite(userId: User['id'], personId: Person['id']): void {
-    UserData.data[userId] = {
-      ...UserData.forUser(userId),
-      favourites: UserData.forUser(userId).favourites.filter(id => id !== personId)
-    };
-    UserData.save();
   }
 
   static getSentiment(userId: User['id'], movieId: Movie['id']): Sentiment {

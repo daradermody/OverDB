@@ -1,4 +1,4 @@
-import { ApolloServer, AuthenticationError, gql } from 'apollo-server-express'
+import { ApolloServer, gql } from 'apollo-server-express'
 import * as fs from 'fs'
 import resolvers from './resolvers'
 import { ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageLocalDefault, } from 'apollo-server-core'

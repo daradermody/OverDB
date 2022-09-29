@@ -3,7 +3,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import { Autocomplete, IconButton, InputAdornment, Modal, TextField, useMediaQuery, useTheme } from '@mui/material'
 import { useThrottleCallback } from '@react-hook/throttle'
 import * as React from 'react'
-import { HTMLAttributes, Ref, useCallback, useEffect, useRef, useState } from 'react'
+import { HTMLAttributes, useCallback, useState } from 'react'
 import { Movie, Person, SearchResult, useSearchLazyQuery } from '../../types/graphql'
 import { Poster } from '../shared/general/Poster'
 

@@ -27,7 +27,7 @@ export default function MovieCards({movies, loading, loadingCount}: MovieCardsPr
   } else {
     return (
       <StyledCardListWrapper>
-        {movies.map(movie => <MovieCard key={movie.id} movie={movie}/>)}
+        {movies?.map(movie => <MovieCard key={movie.id} movie={movie}/>)}
       </StyledCardListWrapper>
     )
   }

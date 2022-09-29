@@ -13,11 +13,6 @@ export default new ApolloClient({
         fields: {
           watched: {
             keyArgs: false,
-            read(existing, {args}) {
-              const offset = args.offset || 0
-              const limit = args.limit || undefined
-              return existing && existing.results.slice(offset, offset + limit)
-            },
             merge(existing, incoming, {args: {offset = 0}}) {
               const merged = existing?.results?.slice(0) || []
               for (let i = 0; i < incoming.results.length; ++i) {

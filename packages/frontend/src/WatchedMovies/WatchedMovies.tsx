@@ -24,13 +24,15 @@ export default function WatchedMovies() {
       <Typography variant="h1">Watched movies</Typography>
       <MovieCards movies={data?.watched?.results} loading={loading && !data} loadingCount={24}/>
       <div style={{display: initialLoading || data.watched.endReached ? 'none' : 'flex', justifyContent: 'center', marginTop: 20}}>
-        <LoadingButton
-          loading={loading}
-          variant="outlined"
-          onClick={() => fetchMore({variables: {offset: data?.watched?.results?.length}})}
-        >
-          Show More
-        </LoadingButton>
+        {!initialLoading && !data.watched.endReached && (
+          <LoadingButton
+            loading={loading}
+            variant="outlined"
+            onClick={() => fetchMore({variables: {offset: data?.watched?.results?.length}})}
+          >
+            Show More
+          </LoadingButton>
+        )}
       </div>
     </PageWrapper>
   )

@@ -16,16 +16,17 @@ import { TmdbRating } from './TmdbRating'
 import ApiErrorMessage from '../shared/ApiErrorMessage'
 import styled from '@emotion/styled'
 import { StyledCardListWrapper } from '../shared/styledComponents'
+import PageWrapper from '../shared/PageWrapper'
 
 export function MovieInfo() {
   const {id} = useParams<{ id: string }>()
 
   return (
-    <div>
+    <PageWrapper>
       <MovieSummary id={id}/>
       <InterestingDivider/>
       <CrewList id={id}/>
-    </div>
+    </PageWrapper>
   )
 }
 
@@ -85,6 +86,7 @@ const StyledActionsAndReview = styled.div`
   flex-direction: column;
   gap: 24px 60px;
   margin-top: 30px;
+
   ${({theme}) => theme.breakpoints.up('sm')} {
     flex-direction: row;
     align-items: center;

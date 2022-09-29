@@ -1,8 +1,7 @@
 import * as fs from 'fs'
 import { MovieDb as MovieDbApi } from 'moviedb-promise'
 import { Crew, MovieResponse, Person as TmdbPerson, PersonMovieCreditsResponse } from 'moviedb-promise/dist/request-types'
-import { Movie, MovieCredit, Person, PersonCredit } from '../../types'
-import { isMovieSummary, isPersonSummary, MovieInfo, PersonInfo } from '../../types'
+import { isMovieSummary, isPersonSummary, Movie, MovieCredit, MovieInfo, Person, PersonCredit, PersonInfo } from '../../types'
 import axios from 'axios'
 import getToken from '../utils/getToken'
 import { dataDir } from './dataStorage'
@@ -97,6 +96,13 @@ export default class MovieDb {
           return pickPersonProperties(result)
         }
       })
+  }
+
+  static async trending(): Promise<MovieInfo[]> {
+    const {results} = await this.movieDbApi.trending({time_window: 'week', media_type: 'movie'})
+    return results!
+      .map(pickMovieProperties)
+      .slice(0, 12)
   }
 
   static async save(): Promise<void> {

@@ -1,4 +1,5 @@
 import {
+  isMovieSummary,
   Movie,
   MovieCredit,
   MutationSetFavouriteArgs,
@@ -6,11 +7,14 @@ import {
   MutationSetSentimentArgs,
   MutationSetWatchedArgs,
   Person,
+  Query,
   QueryCreditsForMovieArgs,
   QueryCreditsForPersonArgs,
   QueryMovieArgs,
-  QueryPersonArgs, QuerySearchArgs,
+  QueryPersonArgs,
+  QuerySearchArgs,
   QueryWatchedArgs,
+  ResolverFn,
   Resolvers,
   SearchResult,
   User
@@ -19,14 +23,15 @@ import MovieDb from '../services/MovieDb'
 import RottenTomatoes from '../services/RottenTomatoes'
 import { UserData } from '../services/UserData'
 import recommendedMoviesResolver from './recommendedMovies'
-import { isMovieSummary } from '../../types'
+import { GraphQLResolveInfo } from 'graphql/type'
 
-const index: Resolvers<{user: User}> = {
+const unauthedQueries: (keyof Query)[] = ['trending']
+const index: Resolvers<{ user: User }> = {
   Movie: {
     sentiment: (parent, _, {user}) => UserData.getSentiment(user.id, parent.id),
     watched: (parent, _, {user}) => UserData.isWatched(user.id, parent.id),
     inWatchlist: (parent, _, {user}) => UserData.inWatchlist(user.id, parent.id),
-    tomatometer: ({title, releaseDate}, _, {user}) => {
+    tomatometer: ({title, releaseDate}) => {
       if (!releaseDate) {
         return null
       }
@@ -45,7 +50,7 @@ const index: Resolvers<{user: User}> = {
   SearchResult: {
     __resolveType: (obj: SearchResult) => isMovieSummary(obj) ? 'Movie' : 'Person'
   },
-  Query: {
+  Query: applyAuth({
     favouritePeople: (_1, _2, {user}) => Promise.all(UserData.getFavourites(user.id).map(MovieDb.personInfo)) as any,
     recommendedMovies: (_1, _2, {user}) => recommendedMoviesResolver(user.id),
     movie: (_: any, args: QueryMovieArgs) => MovieDb.movieInfo(args.id) as any,
@@ -53,7 +58,7 @@ const index: Resolvers<{user: User}> = {
     creditsForPerson: async (_: any, args: QueryCreditsForPersonArgs) => {
       try {
         const credits = await MovieDb.personMovieCredits(args.id)
-        return Promise.all(credits.map(async credit => ({
+        return await Promise.all(credits.map(async credit => ({
           ...(await MovieDb.movieInfo(credit.id)),
           ...credit
         }))) as any
@@ -76,7 +81,8 @@ const index: Resolvers<{user: User}> = {
         results: await Promise.all(movieIds.map(MovieDb.movieInfo)) as any
       }
     },
-  },
+    trending: () => MovieDb.trending(),
+  }),
   Mutation: {
     setFavourite: (_, args: MutationSetFavouriteArgs, {user}) => {
       UserData.setFavourite(user.id, args.id, args.favourited)
@@ -94,6 +100,25 @@ const index: Resolvers<{user: User}> = {
       UserData.setSentiment(user.id, args.id, args.sentiment)
       return MovieDb.movieInfo(args.id) as any
     }
+  }
+}
+
+function applyAuth<TResult, TParent, TContext, TArgs>(resolvers: Resolvers['Query']): Resolvers['Query'] {
+  if (!resolvers) return resolvers
+
+  const authedResolvers: Resolvers['Query'] = {}
+  for (const [queryName, resolver] of Object.entries(resolvers)) {
+    authedResolvers[queryName] = unauthedQueries.includes(queryName as keyof Query) ? resolver : withUser(resolver)
+  }
+  return authedResolvers
+}
+
+function withUser<TResult, TParent, TContext extends { user?: User }, TArgs>(resolver: ResolverFn<TResult, TParent, TContext, TArgs>): ResolverFn<TResult, TParent, TContext, TArgs> {
+  return (parent: TParent, args: TArgs, context: TContext, info: GraphQLResolveInfo): TResult | Promise<TResult> => {
+    if (!context.user) {
+      throw new Error('You must be logged in')
+    }
+    return resolver(parent, args, context, info)
   }
 }
 

@@ -10,5 +10,17 @@ export const users = [
     username: 'ethan',
     password: 'test',
     avatarUrl: 'https://www.indiewire.com/wp-content/uploads/2022/07/AP22142676279028.jpg?w=780',
-  }
+  },
+  {
+    id: 2,
+    username: 'barry',
+    password: 'test',
+    avatarUrl: 'https://avatars.githubusercontent.com/u/12631336',
+  },
+  {
+    id: 3,
+    username: 'facundo',
+    password: 'test',
+    avatarUrl: 'https://avatars.githubusercontent.com/u/5167196 ',
+  },
 ]

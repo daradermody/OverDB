@@ -4,19 +4,20 @@ import * as React from 'react'
 import { useGetWatchlistQuery } from '../../types/graphql'
 import MovieCards from '../shared/cards/MovieCard'
 import ApiErrorMessage from '../shared/ApiErrorMessage'
+import PageWrapper from '../shared/PageWrapper'
 
 export default function Watchlist() {
-  const {data, error, loading} = useGetWatchlistQuery({fetchPolicy: "network-only"})
+  const {data, error, loading} = useGetWatchlistQuery({fetchPolicy: 'network-only'})
 
   if (error) {
     return <ApiErrorMessage error={error}/>
   }
 
   return (
-    <div>
+    <PageWrapper>
       <Typography variant="h1">Watchlist</Typography>
       <MovieCards movies={data?.watchlist} loading={loading} loadingCount={6}/>
-    </div>
+    </PageWrapper>
   )
 }
 

@@ -1,11 +1,12 @@
-import {Divider, Typography} from "@mui/material";
+import { Divider, Typography } from '@mui/material'
 import * as React from 'react'
-import {useGetWatchedMoviesQuery} from "../../types/graphql";
-import MovieCards from "../shared/cards/MovieCard";
-import Link from "../shared/general/Link";
-import useUser from "../useUser";
+import { useGetWatchedMoviesQuery } from '../../types/graphql'
+import MovieCards from '../shared/cards/MovieCard'
+import Link from '../shared/general/Link'
+import useUser from '../useUser'
 import ApiErrorMessage from '../shared/ApiErrorMessage'
 import styled from '@emotion/styled'
+import PageWrapper from '../shared/PageWrapper'
 
 export default function Profile() {
   const {user} = useUser()
@@ -16,16 +17,18 @@ export default function Profile() {
   }
 
   return (
-    <StyledProfile>
-      <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, margin: '20px 0 50px'}}>
-        <img style={{width: 300, aspectRatio: '1', clipPath: 'circle()'}} src={user.avatarUrl} alt="profile photo"/>
-        <Stats/>
-      </div>
-      <div style={{width: '100%'}}>
-        <Typography variant="h1">Recently Watched</Typography>
-        <MovieCards movies={data?.watched?.results} loading={loading} loadingCount={3}/>
-      </div>
-    </StyledProfile>
+    <PageWrapper>
+      <StyledProfile>
+        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, margin: '20px 0 50px'}}>
+          <img style={{width: 300, aspectRatio: '1', clipPath: 'circle()'}} src={user.avatarUrl} alt="profile photo"/>
+          <Stats/>
+        </div>
+        <div style={{width: '100%'}}>
+          <Typography variant="h1">Recently Watched</Typography>
+          <MovieCards movies={data?.watched?.results} loading={loading} loadingCount={3}/>
+        </div>
+      </StyledProfile>
+    </PageWrapper>
   )
 }
 
@@ -35,6 +38,7 @@ const StyledProfile = styled.div`
   align-items: start;
   justify-content: center;
   flex-wrap: wrap;
+
   ${({theme}) => theme.breakpoints.up('md')} {
     flex-wrap: nowrap;
   }

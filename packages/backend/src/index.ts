@@ -2,7 +2,7 @@ import { ApolloServer, AuthenticationError, gql } from 'apollo-server-express'
 import * as fs from 'fs'
 import resolvers from './resolvers'
 import { ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageLocalDefault, } from 'apollo-server-core'
-import express from 'express'
+import express, { Request, Response } from 'express'
 import cors from 'cors'
 import * as http from 'http'
 import cookieParser from 'cookie-parser'
@@ -10,6 +10,7 @@ import * as dotenv from 'dotenv'
 import { users } from './services/users'
 import { User } from '../types'
 import { setupDataDir } from './services/dataStorage'
+import { ExpressContext } from 'apollo-server-express/src/ApolloServer'
 
 dotenv.config()
 const PORT = process.env.PORT || 3000
@@ -29,16 +30,7 @@ async function main() {
   app.use(cookieParser('secret'))
   app.get('/', (req, res) => res.send('OK'))
   app.use(express.static('../../client/build'))
-  app.post('/login', (req, res) => {
-    const user = users.find(u => u.username === req.body.username && u.password === req.body.password)
-    if (user) {
-      res.cookie('user', JSON.stringify(user), {sameSite: 'none', signed: true, secure: true})
-      const {password, ...userWithoutPassword} = user
-      res.json(userWithoutPassword)
-    } else {
-      res.sendStatus(401)
-    }
-  })
+  app.post('/login', login)
   const httpServer = http.createServer(app)
   const server = new ApolloServer({
     typeDefs: gql(fs.readFileSync(__dirname + '/schema.graphql', 'utf-8')),
@@ -49,11 +41,7 @@ async function main() {
     },
     csrfPrevention: true,
     cache: 'bounded',
-    context: ({req}) => {
-      const user = JSON.parse(req.signedCookies.user || null) as User
-      if (!user) throw new AuthenticationError('You must be logged in')
-      return {user}
-    },
+    context: authContext,
     plugins: [
       ApolloServerPluginDrainHttpServer({httpServer}),
       ApolloServerPluginLandingPageLocalDefault({embed: true}),
@@ -64,6 +52,22 @@ async function main() {
   server.applyMiddleware({app, cors: corsOptions})
   await new Promise<void>(resolve => httpServer.listen({port: PORT}, resolve))
   console.log(`🚀 Backend ready at http://localhost:${PORT}`)
+}
+
+function login(req: Request, res: Response) {
+  const user = users.find(u => u.username === req.body.username && u.password === req.body.password)
+  if (user) {
+    res.cookie('user', JSON.stringify(user), {sameSite: 'none', signed: true, secure: true})
+    const {password, ...userWithoutPassword} = user
+    res.json(userWithoutPassword)
+  } else {
+    res.sendStatus(401)
+  }
+}
+
+function authContext({req}: ExpressContext) {
+  const user = JSON.parse(req.signedCookies.user || null) as User || JSON.parse(req.cookies.user || null) as User
+  return {user}
 }
 
 main().catch(console.error)

@@ -2,11 +2,11 @@ import * as React from 'react'
 import { useState } from 'react'
 import { Button, Collapse, Typography } from '@mui/material'
 import { ExpandLess, ExpandMore } from '@mui/icons-material'
-import { LoadingPeople, PersonCard } from '../shared/cards/PersonCard'
+import { LoadingPeople, PersonCard } from '../../shared/cards/PersonCard'
 import { gql } from '@apollo/client'
-import { useGetFavouritePeopleQuery } from '../../types/graphql'
-import ApiErrorMessage from '../shared/ApiErrorMessage'
-import { StyledCardListWrapper } from '../shared/styledComponents'
+import { useGetFavouritePeopleQuery } from '../../../types/graphql'
+import ApiErrorMessage from '../../shared/ApiErrorMessage'
+import { StyledCardListWrapper } from '../../shared/styledComponents'
 
 export function PeopleList() {
   const [expanded, setExpanded] = useState(false)

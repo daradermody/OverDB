@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { Container, styled } from '@mui/material'
-import { Route, Routes } from 'react-router-dom'
+import { ReactNode } from 'react'
+import { Box, styled } from '@mui/material'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Footer from './Footer/Footer'
 import { PersonInfo } from './personInfo/PersonInfo'
 import { Homepage } from './homepage/Homepage'
@@ -11,6 +12,7 @@ import ScrollToTop from './shared/general/ScrollToTop'
 import WatchedMovies from './WatchedMovies/WatchedMovies'
 import Watchlist from './watchlist/Watchlist'
 import Login from './Login'
+import { userSignal } from './useUser'
 
 export default function App() {
   return (
@@ -18,24 +20,31 @@ export default function App() {
       <ScrollToTop/>
       <Root>
         <Header/>
-        <Container fixed sx={{minHeight: 'calc(100vh - 276px)', p: '20px 16px 0', color: 'text.primary'}}>
+        <Box sx={{minHeight: 'calc(100vh - 276px)', color: 'text.primary', pt: 4}}>
           <Routes>
             <Route path="/" element={<Homepage/>}/>
             <Route path="/login" element={<Login/>}/>
-            <Route path="/person/:id" element={<PersonInfo/>}/>
-            <Route path="/movie/:id" element={<MovieInfo/>}/>
-            <Route path="/profile" element={<Profile/>}/>
-            <Route path="/profile/watchlist" element={<Watchlist/>}/>
-            <Route path="/profile/watched" element={<WatchedMovies/>}/>
+            <Route path="/person/:id" element={authed(<PersonInfo/>)}/>
+            <Route path="/movie/:id" element={authed(<MovieInfo/>)}/>
+            <Route path="/profile" element={authed(<Profile/>)}/>
+            <Route path="/profile/watchlist" element={authed(<Watchlist/>)}/>
+            <Route path="/profile/watched" element={authed(<WatchedMovies/>)}/>
           </Routes>
-        </Container>
+        </Box>
         <Footer/>
       </Root>
     </>
   )
 }
 
+function authed(children: ReactNode) {
+  const location = useLocation()
+  if (!userSignal.value) {
+    return <Navigate replace to={`/login?andWeWillGetYouTo=${location.pathname}`}/>
+  }
+  return <div>{children}</div>
+}
+
 const Root = styled('div')(({theme}) => ({
   backgroundColor: theme.palette.background.default
 }))
-

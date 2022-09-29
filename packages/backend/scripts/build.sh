@@ -1,5 +1,6 @@
 rm -rf build/*
 mkdir -p build/unbundled
+yarn graphql-type-gen
 yarn esbuild --bundle --platform=node src/index.ts --define:process.env.NODE_ENV=\"production\" --external:canvas --external:./xhr-sync-worker.js > build/unbundled/backend.js
 touch build/unbundled/xhr-sync-worker.js
 cp src/schema.graphql build/unbundled

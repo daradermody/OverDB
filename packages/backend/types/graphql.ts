@@ -42,6 +42,18 @@ export type MovieCredit = {
   watched: Scalars['Boolean'];
 };
 
+export type MovieInfo = {
+  __typename?: 'MovieInfo';
+  id: Scalars['ID'];
+  overview: Scalars['String'];
+  posterPath?: Maybe<Scalars['String']>;
+  releaseDate?: Maybe<Scalars['String']>;
+  tagline: Scalars['String'];
+  title: Scalars['String'];
+  tomatometer?: Maybe<Tomatometer>;
+  voteAverage: Scalars['Float'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   setFavourite: Person;
@@ -109,6 +121,7 @@ export type Query = {
   person: Person;
   recommendedMovies: Array<Movie>;
   search: Array<SearchResult>;
+  trending: Array<MovieInfo>;
   watched: PaginatedMovies;
   watchlist: Array<Movie>;
 };
@@ -242,6 +255,7 @@ export type ResolversTypes = ResolversObject<{
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Movie: ResolverTypeWrapper<Movie>;
   MovieCredit: ResolverTypeWrapper<MovieCredit>;
+  MovieInfo: ResolverTypeWrapper<MovieInfo>;
   Mutation: ResolverTypeWrapper<{}>;
   PaginatedMovies: ResolverTypeWrapper<PaginatedMovies>;
   Person: ResolverTypeWrapper<Person>;
@@ -262,6 +276,7 @@ export type ResolversParentTypes = ResolversObject<{
   Int: Scalars['Int'];
   Movie: Movie;
   MovieCredit: MovieCredit;
+  MovieInfo: MovieInfo;
   Mutation: {};
   PaginatedMovies: PaginatedMovies;
   Person: Person;
@@ -296,6 +311,18 @@ export type MovieCreditResolvers<ContextType = any, ParentType extends Resolvers
   sentiment?: Resolver<ResolversTypes['Sentiment'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   watched?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type MovieInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['MovieInfo'] = ResolversParentTypes['MovieInfo']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  overview?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  posterPath?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  releaseDate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  tagline?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tomatometer?: Resolver<Maybe<ResolversTypes['Tomatometer']>, ParentType, ContextType>;
+  voteAverage?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -340,6 +367,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   person?: Resolver<ResolversTypes['Person'], ParentType, ContextType, RequireFields<QueryPersonArgs, 'id'>>;
   recommendedMovies?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
   search?: Resolver<Array<ResolversTypes['SearchResult']>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'query'>>;
+  trending?: Resolver<Array<ResolversTypes['MovieInfo']>, ParentType, ContextType>;
   watched?: Resolver<ResolversTypes['PaginatedMovies'], ParentType, ContextType, Partial<QueryWatchedArgs>>;
   watchlist?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
 }>;
@@ -359,6 +387,7 @@ export type TomatometerResolvers<ContextType = any, ParentType extends Resolvers
 export type Resolvers<ContextType = any> = ResolversObject<{
   Movie?: MovieResolvers<ContextType>;
   MovieCredit?: MovieCreditResolvers<ContextType>;
+  MovieInfo?: MovieInfoResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   PaginatedMovies?: PaginatedMoviesResolvers<ContextType>;
   Person?: PersonResolvers<ContextType>;

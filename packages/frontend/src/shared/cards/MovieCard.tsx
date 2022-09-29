@@ -39,9 +39,9 @@ interface MovieCardProps {
     title: Movie['title'];
     posterPath?: Movie['posterPath'];
     releaseDate?: Movie['releaseDate'];
-    watched: Movie['watched'];
-    inWatchlist: Movie['inWatchlist'];
-    sentiment: Movie['sentiment'];
+    watched?: Movie['watched'];
+    inWatchlist?: Movie['inWatchlist'];
+    sentiment?: Movie['sentiment'];
     jobs?: MovieCredit['jobs'];
   }
 }
@@ -96,18 +96,22 @@ function MovieImage({movie}: MovieCardProps) {
           />
         </CardActionArea>
       </Link>
-      <div style={{
-        display: 'flex',
-        marginTop: -56,
-        padding: '4px 0',
-        position: 'absolute',
-        visibility: showButtons ? 'visible' : 'hidden',
-        backgroundColor: 'rgba(0,0,0,0.8)'
-      }}>
-        <WatchedButton id={movie.id} watched={movie.watched}/>
-        <WatchlistButton id={movie.id} inWatchlist={movie.inWatchlist}/>
-        <SentimentSelect id={movie.id} sentiment={movie.sentiment} placement="top"/>
-      </div>
+      {
+        (movie.watched ?? movie.inWatchlist ?? movie.sentiment) && (
+          <div style={{
+            display: 'flex',
+            marginTop: -56,
+            padding: '4px 0',
+            position: 'absolute',
+            visibility: showButtons ? 'visible' : 'hidden',
+            backgroundColor: 'rgba(0,0,0,0.8)'
+          }}>
+            <WatchedButton id={movie.id} watched={movie.watched}/>
+            <WatchlistButton id={movie.id} inWatchlist={movie.inWatchlist}/>
+            <SentimentSelect id={movie.id} sentiment={movie.sentiment} placement="top"/>
+          </div>
+        )
+      }
     </div>
   )
 }

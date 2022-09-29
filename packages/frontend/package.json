@@ -11,24 +11,25 @@
     "@apollo/client": "^3.6.9",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
-    "@mui/icons-material": "^5.10.3",
-    "@mui/lab": "^5.0.0-alpha.99",
-    "@mui/material": "^5.10.5",
-    "@mui/styles": "^5.10.3",
-    "@preact/signals": "^1.0.4",
+    "@mui/icons-material": "^5.10.6",
+    "@mui/lab": "^5.0.0-alpha.101",
+    "@mui/material": "^5.10.7",
+    "@mui/styles": "^5.10.7",
+    "@preact/signals": "^1.1.1",
     "@react-hook/throttle": "^2.2.0",
     "axios": "^0.27.2",
     "body-parser": "^1.20.0",
-    "esbuild": "^0.15.7",
+    "esbuild": "^0.15.9",
     "js-cookie": "^3.0.1",
     "lodash": "^4.17.21",
     "preact": "^10.11.0",
+    "query-string": "^7.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.4.0"
+    "react-router-dom": "^6.4.1"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "2.12.0",
+    "@graphql-codegen/cli": "2.13.1",
     "@graphql-codegen/fragment-matcher": "3.3.1",
     "@graphql-codegen/introspection": "2.2.1",
     "@graphql-codegen/typescript": "2.7.3",
@@ -37,9 +38,9 @@
     "@graphql-codegen/typescript-resolvers": "2.7.3",
     "@overdb/backend": "workspace:*",
     "@types/js-cookie": "^3.0.2",
-    "@types/node": "^18.7.18",
+    "@types/node": "^18.7.23",
     "esbuild-server": "^0.1.1",
     "ts-node": "^10.9.1",
-    "typescript": "^4.8.3"
+    "typescript": "^4.8.4"
   }
 }

@@ -44,6 +44,18 @@ export type MovieCredit = {
   watched: Scalars['Boolean'];
 };
 
+export type MovieInfo = {
+  __typename?: 'MovieInfo';
+  id: Scalars['ID'];
+  overview: Scalars['String'];
+  posterPath?: Maybe<Scalars['String']>;
+  releaseDate?: Maybe<Scalars['String']>;
+  tagline: Scalars['String'];
+  title: Scalars['String'];
+  tomatometer?: Maybe<Tomatometer>;
+  voteAverage: Scalars['Float'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   setFavourite: Person;
@@ -111,6 +123,7 @@ export type Query = {
   person: Person;
   recommendedMovies: Array<Movie>;
   search: Array<SearchResult>;
+  trending: Array<MovieInfo>;
   watched: PaginatedMovies;
   watchlist: Array<Movie>;
 };
@@ -182,6 +195,11 @@ export type SearchQueryVariables = Exact<{
 
 
 export type SearchQuery = { __typename?: 'Query', search: Array<{ __typename?: 'Movie', id: string, title: string, posterPath?: string | null } | { __typename?: 'Person', id: string, name: string, profilePath?: string | null }> };
+
+export type GetTrendingMoviesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetTrendingMoviesQuery = { __typename?: 'Query', trending: Array<{ __typename?: 'MovieInfo', id: string, title: string, posterPath?: string | null, releaseDate?: string | null }> };
 
 export type GetRecommendedMoviesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -341,6 +359,7 @@ export type ResolversTypes = ResolversObject<{
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Movie: ResolverTypeWrapper<Movie>;
   MovieCredit: ResolverTypeWrapper<MovieCredit>;
+  MovieInfo: ResolverTypeWrapper<MovieInfo>;
   Mutation: ResolverTypeWrapper<{}>;
   PaginatedMovies: ResolverTypeWrapper<PaginatedMovies>;
   Person: ResolverTypeWrapper<Person>;
@@ -361,6 +380,7 @@ export type ResolversParentTypes = ResolversObject<{
   Int: Scalars['Int'];
   Movie: Movie;
   MovieCredit: MovieCredit;
+  MovieInfo: MovieInfo;
   Mutation: {};
   PaginatedMovies: PaginatedMovies;
   Person: Person;
@@ -395,6 +415,18 @@ export type MovieCreditResolvers<ContextType = any, ParentType extends Resolvers
   sentiment?: Resolver<ResolversTypes['Sentiment'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   watched?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type MovieInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['MovieInfo'] = ResolversParentTypes['MovieInfo']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  overview?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  posterPath?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  releaseDate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  tagline?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tomatometer?: Resolver<Maybe<ResolversTypes['Tomatometer']>, ParentType, ContextType>;
+  voteAverage?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -439,6 +471,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   person?: Resolver<ResolversTypes['Person'], ParentType, ContextType, RequireFields<QueryPersonArgs, 'id'>>;
   recommendedMovies?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
   search?: Resolver<Array<ResolversTypes['SearchResult']>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'query'>>;
+  trending?: Resolver<Array<ResolversTypes['MovieInfo']>, ParentType, ContextType>;
   watched?: Resolver<ResolversTypes['PaginatedMovies'], ParentType, ContextType, Partial<QueryWatchedArgs>>;
   watchlist?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
 }>;
@@ -458,6 +491,7 @@ export type TomatometerResolvers<ContextType = any, ParentType extends Resolvers
 export type Resolvers<ContextType = any> = ResolversObject<{
   Movie?: MovieResolvers<ContextType>;
   MovieCredit?: MovieCreditResolvers<ContextType>;
+  MovieInfo?: MovieInfoResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   PaginatedMovies?: PaginatedMoviesResolvers<ContextType>;
   Person?: PersonResolvers<ContextType>;
@@ -558,6 +592,43 @@ export function useSearchLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Sea
 export type SearchQueryHookResult = ReturnType<typeof useSearchQuery>;
 export type SearchLazyQueryHookResult = ReturnType<typeof useSearchLazyQuery>;
 export type SearchQueryResult = Apollo.QueryResult<SearchQuery, SearchQueryVariables>;
+export const GetTrendingMoviesDocument = gql`
+    query GetTrendingMovies {
+  trending {
+    id
+    title
+    posterPath
+    releaseDate
+  }
+}
+    `;
+
+/**
+ * __useGetTrendingMoviesQuery__
+ *
+ * To run a query within a React component, call `useGetTrendingMoviesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTrendingMoviesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTrendingMoviesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetTrendingMoviesQuery(baseOptions?: Apollo.QueryHookOptions<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>(GetTrendingMoviesDocument, options);
+      }
+export function useGetTrendingMoviesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>(GetTrendingMoviesDocument, options);
+        }
+export type GetTrendingMoviesQueryHookResult = ReturnType<typeof useGetTrendingMoviesQuery>;
+export type GetTrendingMoviesLazyQueryHookResult = ReturnType<typeof useGetTrendingMoviesLazyQuery>;
+export type GetTrendingMoviesQueryResult = Apollo.QueryResult<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>;
 export const GetRecommendedMoviesDocument = gql`
     query GetRecommendedMovies {
   recommendedMovies {

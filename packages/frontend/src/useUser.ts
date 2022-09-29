@@ -9,7 +9,7 @@ import { User } from '@overdb/backend/types'
 
 declare const SERVER_URL: string
 
-const userSignal = signal<User>(JSON.parse(cookie.parse(document.cookie).user || null))
+export const userSignal = signal<User>(JSON.parse(cookie.parse(document.cookie).user || null))
 
 export default function useUser({redirectIfNoAuth} = {redirectIfNoAuth: false}) {
   const navigate = useNavigate()

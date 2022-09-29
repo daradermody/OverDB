@@ -14,6 +14,17 @@ type PersonCredit {
   profilePath: String
 }
 
+type MovieInfo {
+  id: ID!
+  title: String!
+  tagline: String!
+  overview: String!
+  voteAverage: Float!
+  releaseDate: String
+  posterPath: String
+  tomatometer: Tomatometer
+}
+
 type Movie {
   id: ID!
   title: String!
@@ -22,10 +33,10 @@ type Movie {
   voteAverage: Float!
   releaseDate: String
   posterPath: String
+  tomatometer: Tomatometer
   watched: Boolean!
   inWatchlist: Boolean!
   sentiment: Sentiment!
-  tomatometer: Tomatometer
 }
 
 type MovieCredit {
@@ -77,6 +88,7 @@ type Query {
   search(query: String!): [SearchResult!]!
   watchlist: [Movie!]!
   watched(offset: Int, limit: Int): PaginatedMovies!
+  trending: [MovieInfo!]!
 }
 
 type Mutation {

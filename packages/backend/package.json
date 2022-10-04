@@ -6,7 +6,7 @@
     "dev": "nodemon",
     "graphql-type-gen": "graphql-codegen --config codegen.yml",
     "build": "scripts/build.sh",
-    "deploy": "rsync --archive --rsh 'ssh -i ~/.ssh/overdb.pem' build/backend ubuntu@ec2-63-32-108-2.eu-west-1.compute.amazonaws.com:/home/ubuntu/",
+    "deploy": "rsync --archive --rsh 'ssh -i ~/.ssh/overdb.pem' build/overdb-backend ubuntu@ec2-63-32-108-2.eu-west-1.compute.amazonaws.com:/home/ubuntu/",
     "ssh": "ssh -i ~/.ssh/overdb.pem ubuntu@ec2-63-32-108-2.eu-west-1.compute.amazonaws.com"
   },
   "dependencies": {

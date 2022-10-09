@@ -7,7 +7,7 @@ import ApiErrorMessage from '../shared/ApiErrorMessage'
 import PageWrapper from '../shared/PageWrapper'
 
 export default function Watchlist() {
-  const {data, error, loading} = useGetWatchlistQuery({fetchPolicy: 'network-only'})
+  const {data, error, loading} = useGetWatchlistQuery()
 
   if (error) {
     return <ApiErrorMessage error={error}/>

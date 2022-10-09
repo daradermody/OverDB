@@ -10,6 +10,7 @@ import { Poster } from '../shared/general/Poster'
 interface PersonSearchProps {
   onSelect: (result: SearchResult) => void
   clearOnSelect?: boolean
+  disabled?: boolean
 }
 
 export function Search(props: PersonSearchProps) {
@@ -19,11 +20,11 @@ export function Search(props: PersonSearchProps) {
   if (biggerDisplay) {
     return (
       <div style={{minWidth: '400px'}}>
-        <SearchInput onSelect={props.onSelect} clearOnSelect={props.clearOnSelect}/>
+        <SearchInput onSelect={props.onSelect} clearOnSelect={props.clearOnSelect} disabled={props.disabled}/>
       </div>
     )
   } else {
-    return <SearchButton onSelect={props.onSelect} clearOnSelect={props.clearOnSelect}/>
+    return <SearchButton onSelect={props.onSelect} clearOnSelect={props.clearOnSelect} disabled={props.disabled}/>
   }
 }
 
@@ -37,7 +38,7 @@ function SearchButton(props: PersonSearchProps) {
 
   return (
     <>
-      <IconButton size="large" onClick={() => setShowSearchInput(true)}>
+      <IconButton size="large" disabled={props.disabled} onClick={() => setShowSearchInput(true)}>
         <SearchIcon fontSize="inherit"/>
       </IconButton>
       <Modal
@@ -46,7 +47,7 @@ function SearchButton(props: PersonSearchProps) {
         onClose={() => setShowSearchInput(false)}
       >
         <div>
-          <SearchInput onSelect={handleSelect} clearOnSelect={props.clearOnSelect}/>
+          <SearchInput onSelect={handleSelect} clearOnSelect={props.clearOnSelect} disabled={props.disabled}/>
         </div>
       </Modal>
     </>
@@ -74,6 +75,7 @@ function SearchInput(props: PersonSearchProps) {
       open={!!data && !!query}
       isOptionEqualToValue={(option, value) => option.id === value.id}
       inputValue={query}
+      disabled={props.disabled}
       onInputChange={(e, value) => setQuery(value)}
       onChange={(e, result) => {
         props.onSelect(result as SearchResult)

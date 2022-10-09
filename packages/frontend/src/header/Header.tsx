@@ -6,10 +6,12 @@ import Link from '../shared/general/Link'
 import { ProfileIcon } from './ProfileIcon'
 import { Search } from './Search'
 import useUser from '../useUser'
+import useIsOnline from '../shared/useIsOnline'
 
 export function Header() {
   const navigate = useNavigate()
   const {user} = useUser()
+  const isOnline = useIsOnline()
 
   return (
     <Root>
@@ -26,8 +28,9 @@ export function Header() {
             <Search
               clearOnSelect
               onSelect={result => navigate(isMovieSummary(result) ? `/movie/${result.id}` : `/person/${result.id}`)}
+              disabled={!isOnline}
             />
-            <ProfileIcon/>
+            <ProfileIcon disabled={!isOnline}/>
           </div>
         )}
         {!user && window.location.pathname !== '/login' && (

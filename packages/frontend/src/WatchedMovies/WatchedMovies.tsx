@@ -11,7 +11,6 @@ export default function WatchedMovies() {
   const {data, error, loading, fetchMore} = useGetWatchedMoviesQuery({
     variables: {offset: 0, limit: 24},
     notifyOnNetworkStatusChange: true,
-    fetchPolicy: 'network-only',
   })
   const initialLoading = loading && !data
 

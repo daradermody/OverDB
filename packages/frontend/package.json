@@ -3,7 +3,7 @@
   "packageManager": "yarn@3.2.2",
   "scripts": {
     "dev": "node scripts/devServer.js",
-    "build": "rm -rf build/* && yarn graphql-type-gen && esbuild --bundle src/index.tsx --outdir=build/static --minify --define:SERVER_URL=\\\"https://dzbi8yrdpm1hx.cloudfront.net\\\" && rsync -a public/* build --exclude static",
+    "build": "scripts/build.sh",
     "graphql-type-gen": "graphql-codegen --config codegen.yml",
     "deploy": "aws s3 sync build s3://serverless-website-dara --exact-timestamps --delete && aws cloudfront create-invalidation --distribution-id E1UPTX47GL3PH1 --paths '/*'"
   },
@@ -17,16 +17,22 @@
     "@mui/styles": "^5.10.7",
     "@preact/signals": "^1.1.1",
     "@react-hook/throttle": "^2.2.0",
+    "apollo3-cache-persist": "^0.14.1",
     "axios": "^0.27.2",
     "body-parser": "^1.20.0",
     "esbuild": "^0.15.9",
+    "idb": "^7.1.0",
     "js-cookie": "^3.0.1",
+    "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "preact": "^10.11.0",
     "query-string": "^7.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.4.1"
+    "react-router-dom": "^6.4.1",
+    "workbox-precaching": "^6.5.4",
+    "workbox-routing": "^6.5.4",
+    "workbox-strategies": "^6.5.4"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.13.1",

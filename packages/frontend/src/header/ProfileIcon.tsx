@@ -4,7 +4,7 @@ import * as React from 'react'
 import Link from '../shared/general/Link'
 import useUser from '../useUser'
 
-export function ProfileIcon() {
+export function ProfileIcon({disabled}: {disabled?: boolean}) {
   const {user, logout} = useUser()
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
 
@@ -13,7 +13,7 @@ export function ProfileIcon() {
 
   return (
     <div>
-      <IconButton aria-describedby="profile-button" onClick={handleOpen}>
+      <IconButton aria-describedby="profile-button" disabled={disabled} onClick={handleOpen}>
         <img style={{width: 50, aspectRatio: '1', clipPath: 'circle()'}} src={user.avatarUrl} alt="profile photo"/>
       </IconButton>
 

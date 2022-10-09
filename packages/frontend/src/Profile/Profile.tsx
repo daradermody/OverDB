@@ -10,7 +10,7 @@ import PageWrapper from '../shared/PageWrapper'
 
 export default function Profile() {
   const {user} = useUser()
-  const {data, error, loading} = useGetWatchedMoviesQuery({variables: {limit: 8}, fetchPolicy: 'network-only'})
+  const {data, error, loading} = useGetWatchedMoviesQuery({variables: {limit: 8}})
 
   if (error) {
     return <ApiErrorMessage error={error}/>

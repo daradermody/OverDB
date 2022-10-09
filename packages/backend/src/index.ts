@@ -57,7 +57,7 @@ async function main() {
 function login(req: Request, res: Response) {
   const user = users.find(u => u.username === req.body.username && u.password === req.body.password)
   if (user) {
-    res.cookie('user', JSON.stringify(user), {maxAge: 900000, sameSite: 'none', signed: true, secure: true})
+    res.cookie('user', JSON.stringify(user), {maxAge: 900000000, sameSite: 'none', signed: true, secure: true})
     const {password, ...userWithoutPassword} = user
     res.json(userWithoutPassword)
   } else {

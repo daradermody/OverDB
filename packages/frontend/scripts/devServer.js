@@ -4,7 +4,7 @@ const PORT = 4000
 
 const server = createServer(
   {
-    entryPoints: ['src/index.tsx'],
+    entryPoints: ['src/index.tsx', 'src/serviceWorker.ts'],
     outdir: 'public/static',
     bundle: true,
     sourcemap: true,

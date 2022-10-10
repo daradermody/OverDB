@@ -72,7 +72,7 @@ function SearchInput(props: SearchProps) {
       if (e.code === 'Escape') {
         setIsOpen(false)
       } else {
-        await search({variables: {query: (e.target as HTMLInputElement).value}})
+        await search({variables: {query: (e.target as HTMLInputElement).value.trim()}})
       }
     }
   }, 2, true)
@@ -86,6 +86,7 @@ function SearchInput(props: SearchProps) {
       freeSolo
       size="medium"
       blurOnSelect
+      filterOptions={x => x}
       loading={loading}
       onFocus={() => setIsOpen(!!data && !!query)}
       onBlur={() => setIsOpen(false)}
@@ -134,11 +135,11 @@ interface MobileSearchInputProps {
 
 function MobileSearchInput(props: MobileSearchInputProps) {
   const [query, setQuery] = useState('')
-  const [search, {data, loading}] = useSearchLazyQuery({notifyOnNetworkStatusChange: true})
+  const [search, {data}] = useSearchLazyQuery({notifyOnNetworkStatusChange: true})
 
   const handleKeyUp = useThrottleCallback(async e => {
     if (e.target.value) {
-      await search({variables: {query: e.target.value}})
+      await search({variables: {query: e.target.value.trim()}})
     }
   }, 2, true)
 

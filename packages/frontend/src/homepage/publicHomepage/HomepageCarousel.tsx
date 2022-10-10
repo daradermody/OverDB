@@ -55,7 +55,7 @@ const StyledJob = styled(Typography)<{ index: number }>`
   font-size: inherit;
   white-space: nowrap;
   text-overflow: ellipsis;
-  overflow-x: hidden;
+  overflow: hidden;
   animation-delay: ${({index}) => index * 2 - 5}s;
   ${({theme}) => theme.breakpoints.up('sm')} {
     animation-delay: ${({index}) => index * 2  - 5.3}s;

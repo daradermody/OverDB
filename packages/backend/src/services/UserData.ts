@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from 'fs'
 import { Movie, Person, Sentiment, User } from '../../types'
 import { dataDir } from './dataStorage'
 
@@ -50,6 +50,12 @@ export class UserData {
 
   public static isFavourited(userId: User['id'], personId: Person['id']): boolean {
     return UserData.forUser(userId).favourites.includes(personId);
+  }
+
+  static getLikedMovies(userId: User['id']): Movie['id'][] {
+    return Object.entries(UserData.forUser(userId).sentiments)
+      .filter(([_, sentiment]) => sentiment === Sentiment.Liked)
+      .map(([movieId, _]) => movieId)
   }
 
   static getSentiment(userId: User['id'], movieId: Movie['id']): Sentiment {

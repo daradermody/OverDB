@@ -15,6 +15,7 @@ import Login from './Login'
 import { userSignal } from './useUser'
 import styled from '@emotion/styled'
 import useIsOnline from './shared/useIsOnline'
+import Favourites from './Favourites/Favourites'
 
 export default function App() {
   const isOnline = useIsOnline()
@@ -45,6 +46,7 @@ function AppRoutes() {
       <Route path="/person/:id" element={authed(<PersonInfo/>)}/>
       <Route path="/movie/:id" element={authed(<MovieInfo/>)}/>
       <Route path="/profile" element={authed(<Profile/>)}/>
+      <Route path="/profile/favourites" element={authed(<Favourites/>)}/>
       <Route path="/profile/watchlist" element={authed(<Watchlist/>)}/>
       <Route path="/profile/watched" element={authed(<WatchedMovies/>)}/>
     </Routes>

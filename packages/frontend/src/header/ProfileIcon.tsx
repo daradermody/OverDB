@@ -1,4 +1,4 @@
-import { AccountCircle, AlarmOn, Logout, Visibility } from '@mui/icons-material'
+import { AccountCircle, AlarmOn, Logout, Visibility, Favorite } from '@mui/icons-material'
 import { Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material'
 import * as React from 'react'
 import Link from '../shared/general/Link'
@@ -33,6 +33,15 @@ export function ProfileIcon({disabled}: {disabled?: boolean}) {
               <AccountCircle fontSize="small"/>
             </ListItemIcon>
             <ListItemText>Profile</ListItemText>
+          </MenuItem>
+        </Link>
+
+        <Link to="/profile/favourites">
+          <MenuItem onClick={handleClose}>
+            <ListItemIcon>
+              <Favorite fontSize="small"/>
+            </ListItemIcon>
+            <ListItemText>Favourites</ListItemText>
           </MenuItem>
         </Link>
 

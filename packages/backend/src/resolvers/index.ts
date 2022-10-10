@@ -53,9 +53,9 @@ const index: Resolvers<{ user: User }> = {
   Query: applyAuth({
     favouritePeople: (_1, _2, {user}) => Promise.all(UserData.getFavourites(user.id).map(MovieDb.personInfo)) as any,
     recommendedMovies: (_1, _2, {user}) => recommendedMoviesResolver(user.id),
-    movie: (_: any, args: QueryMovieArgs) => MovieDb.movieInfo(args.id) as any,
-    creditsForMovie: (_: any, args: QueryCreditsForMovieArgs) => MovieDb.movieCredits(args.id),
-    creditsForPerson: async (_: any, args: QueryCreditsForPersonArgs) => {
+    movie: (_, args: QueryMovieArgs) => MovieDb.movieInfo(args.id) as any,
+    creditsForMovie: (_, args: QueryCreditsForMovieArgs) => MovieDb.movieCredits(args.id),
+    creditsForPerson: async (_, args: QueryCreditsForPersonArgs) => {
       try {
         const credits = await MovieDb.personMovieCredits(args.id)
         return await Promise.all(credits.map(async credit => ({
@@ -66,10 +66,11 @@ const index: Resolvers<{ user: User }> = {
         console.error(e)
       }
     },
-    search: (_: any, args: QuerySearchArgs) => MovieDb.search(args.query) as any,
-    person: (_: any, args: QueryPersonArgs) => MovieDb.personInfo(args.id) as any,
+    search: (_, args: QuerySearchArgs) => MovieDb.search(args.query) as any,
+    person: (_, args: QueryPersonArgs) => MovieDb.personInfo(args.id) as any,
     watchlist: (_1, _2, {user}) => Promise.all(UserData.getWatchlist(user.id).map(MovieDb.movieInfo)) as any,
-    watched: async (_: any, args: QueryWatchedArgs, {user}) => {
+    likedMovies: (_1, _2, {user}) => Promise.all(UserData.getLikedMovies(user.id).map(MovieDb.movieInfo)) as any,
+    watched: async (_, args: QueryWatchedArgs, {user}) => {
       const offset = args.offset || 0
       const limit = args.limit || 10
       const watchedMovieIds = UserData.getWatched(user.id)

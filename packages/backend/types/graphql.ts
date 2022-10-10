@@ -117,6 +117,7 @@ export type Query = {
   creditsForMovie: Array<PersonCredit>;
   creditsForPerson: Array<MovieCredit>;
   favouritePeople: Array<Person>;
+  likedMovies: Array<Movie>;
   movie: Movie;
   person: Person;
   recommendedMovies: Array<Movie>;
@@ -363,6 +364,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   creditsForMovie?: Resolver<Array<ResolversTypes['PersonCredit']>, ParentType, ContextType, RequireFields<QueryCreditsForMovieArgs, 'id'>>;
   creditsForPerson?: Resolver<Array<ResolversTypes['MovieCredit']>, ParentType, ContextType, RequireFields<QueryCreditsForPersonArgs, 'id'>>;
   favouritePeople?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType>;
+  likedMovies?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
   movie?: Resolver<ResolversTypes['Movie'], ParentType, ContextType, RequireFields<QueryMovieArgs, 'id'>>;
   person?: Resolver<ResolversTypes['Person'], ParentType, ContextType, RequireFields<QueryPersonArgs, 'id'>>;
   recommendedMovies?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;

@@ -119,6 +119,7 @@ export type Query = {
   creditsForMovie: Array<PersonCredit>;
   creditsForPerson: Array<MovieCredit>;
   favouritePeople: Array<Person>;
+  likedMovies: Array<Movie>;
   movie: Movie;
   person: Person;
   recommendedMovies: Array<Movie>;
@@ -181,6 +182,16 @@ export enum TomatometerState {
   Rotten = 'ROTTEN'
 }
 
+export type GetFavouritePeopleQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetFavouritePeopleQuery = { __typename?: 'Query', favouritePeople: Array<{ __typename?: 'Person', id: string, profilePath?: string | null, name: string }> };
+
+export type GetLikedMoviesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetLikedMoviesQuery = { __typename?: 'Query', likedMovies: Array<{ __typename?: 'Movie', id: string, title: string, posterPath?: string | null, releaseDate?: string | null }> };
+
 export type GetWatchedMoviesQueryVariables = Exact<{
   offset?: InputMaybe<Scalars['Int']>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -205,11 +216,6 @@ export type GetRecommendedMoviesQueryVariables = Exact<{ [key: string]: never; }
 
 
 export type GetRecommendedMoviesQuery = { __typename?: 'Query', recommendedMovies: Array<{ __typename?: 'Movie', id: string, posterPath?: string | null, title: string, releaseDate?: string | null, watched: boolean, inWatchlist: boolean, sentiment: Sentiment }> };
-
-export type GetFavouritePeopleQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetFavouritePeopleQuery = { __typename?: 'Query', favouritePeople: Array<{ __typename?: 'Person', id: string, profilePath?: string | null, name: string }> };
 
 export type GetMovieInfoQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -467,6 +473,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   creditsForMovie?: Resolver<Array<ResolversTypes['PersonCredit']>, ParentType, ContextType, RequireFields<QueryCreditsForMovieArgs, 'id'>>;
   creditsForPerson?: Resolver<Array<ResolversTypes['MovieCredit']>, ParentType, ContextType, RequireFields<QueryCreditsForPersonArgs, 'id'>>;
   favouritePeople?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType>;
+  likedMovies?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
   movie?: Resolver<ResolversTypes['Movie'], ParentType, ContextType, RequireFields<QueryMovieArgs, 'id'>>;
   person?: Resolver<ResolversTypes['Person'], ParentType, ContextType, RequireFields<QueryPersonArgs, 'id'>>;
   recommendedMovies?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
@@ -503,6 +510,79 @@ export type Resolvers<ContextType = any> = ResolversObject<{
 
 
 
+export const GetFavouritePeopleDocument = gql`
+    query GetFavouritePeople {
+  favouritePeople {
+    id
+    profilePath
+    name
+  }
+}
+    `;
+
+/**
+ * __useGetFavouritePeopleQuery__
+ *
+ * To run a query within a React component, call `useGetFavouritePeopleQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFavouritePeopleQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFavouritePeopleQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetFavouritePeopleQuery(baseOptions?: Apollo.QueryHookOptions<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>(GetFavouritePeopleDocument, options);
+      }
+export function useGetFavouritePeopleLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>(GetFavouritePeopleDocument, options);
+        }
+export type GetFavouritePeopleQueryHookResult = ReturnType<typeof useGetFavouritePeopleQuery>;
+export type GetFavouritePeopleLazyQueryHookResult = ReturnType<typeof useGetFavouritePeopleLazyQuery>;
+export type GetFavouritePeopleQueryResult = Apollo.QueryResult<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>;
+export const GetLikedMoviesDocument = gql`
+    query GetLikedMovies {
+  likedMovies {
+    id
+    title
+    posterPath
+    releaseDate
+  }
+}
+    `;
+
+/**
+ * __useGetLikedMoviesQuery__
+ *
+ * To run a query within a React component, call `useGetLikedMoviesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetLikedMoviesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetLikedMoviesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetLikedMoviesQuery(baseOptions?: Apollo.QueryHookOptions<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>(GetLikedMoviesDocument, options);
+      }
+export function useGetLikedMoviesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>(GetLikedMoviesDocument, options);
+        }
+export type GetLikedMoviesQueryHookResult = ReturnType<typeof useGetLikedMoviesQuery>;
+export type GetLikedMoviesLazyQueryHookResult = ReturnType<typeof useGetLikedMoviesLazyQuery>;
+export type GetLikedMoviesQueryResult = Apollo.QueryResult<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>;
 export const GetWatchedMoviesDocument = gql`
     query GetWatchedMovies($offset: Int, $limit: Int) {
   watched(offset: $offset, limit: $limit) {
@@ -670,42 +750,6 @@ export function useGetRecommendedMoviesLazyQuery(baseOptions?: Apollo.LazyQueryH
 export type GetRecommendedMoviesQueryHookResult = ReturnType<typeof useGetRecommendedMoviesQuery>;
 export type GetRecommendedMoviesLazyQueryHookResult = ReturnType<typeof useGetRecommendedMoviesLazyQuery>;
 export type GetRecommendedMoviesQueryResult = Apollo.QueryResult<GetRecommendedMoviesQuery, GetRecommendedMoviesQueryVariables>;
-export const GetFavouritePeopleDocument = gql`
-    query GetFavouritePeople {
-  favouritePeople {
-    id
-    profilePath
-    name
-  }
-}
-    `;
-
-/**
- * __useGetFavouritePeopleQuery__
- *
- * To run a query within a React component, call `useGetFavouritePeopleQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetFavouritePeopleQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetFavouritePeopleQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetFavouritePeopleQuery(baseOptions?: Apollo.QueryHookOptions<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>(GetFavouritePeopleDocument, options);
-      }
-export function useGetFavouritePeopleLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>(GetFavouritePeopleDocument, options);
-        }
-export type GetFavouritePeopleQueryHookResult = ReturnType<typeof useGetFavouritePeopleQuery>;
-export type GetFavouritePeopleLazyQueryHookResult = ReturnType<typeof useGetFavouritePeopleLazyQuery>;
-export type GetFavouritePeopleQueryResult = Apollo.QueryResult<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>;
 export const GetMovieInfoDocument = gql`
     query GetMovieInfo($id: ID!) {
   movie(id: $id) {

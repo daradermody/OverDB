@@ -88,6 +88,7 @@ type Query {
   search(query: String!): [SearchResult!]!
   watchlist: [Movie!]!
   watched(offset: Int, limit: Int): PaginatedMovies!
+  likedMovies: [Movie!]!
   trending: [MovieInfo!]!
 }
 

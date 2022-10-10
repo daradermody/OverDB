@@ -3,7 +3,7 @@ import { range } from 'lodash'
 import * as React from 'react'
 import { PersonCredit } from '../../../types/graphql'
 import Link from '../general/Link'
-import { getPosterUrl } from '../general/Poster'
+import { getPosterUrl, handlePosterError } from '../general/Poster'
 import styled from '@emotion/styled'
 
 interface PersonCardProps {
@@ -18,6 +18,7 @@ export function PersonCard({person}: PersonCardProps) {
           <CardMedia
             component="img"
             image={getPosterUrl(person.profilePath)}
+            onError={handlePosterError}
             alt={`${person.name} photo`}
             height="256px"
             style={{

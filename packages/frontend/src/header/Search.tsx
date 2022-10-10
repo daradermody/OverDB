@@ -182,9 +182,9 @@ interface PersonResultProps {
 
 function PersonResult({person, liProps, onClick}: PersonResultProps) {
   return (
-    <StyledSearchResult onClick={onClick} {...(liProps || {})}>
+    <StyledSearchResult onClick={onClick} {...liProps}>
       <div style={{height: '80px'}}>
-        <Poster path={person.profilePath}/>
+        <Poster src={person.profilePath} style={{height: '81px', width: '54px'}}/>
       </div>
       <span style={{marginLeft: '8px'}}>{person.name}</span>
     </StyledSearchResult>
@@ -199,9 +199,9 @@ interface MovieResultProps {
 
 function MovieResult({movie, liProps, onClick}: MovieResultProps) {
   return (
-    <StyledSearchResult onClick={onClick} {...(liProps || {})}>
+    <StyledSearchResult onClick={onClick} {...liProps}>
       <div style={{height: '80px'}}>
-        <Poster path={movie.posterPath}/>
+        <Poster src={movie.posterPath} style={{height: '81px', width: '54px'}}/>
       </div>
       <Box display="flex" gap="4px" alignItems="baseline" overflow="hidden">
         <Typography variant="body1" sx={{ml: '8px', overflowX: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{movie.title}</Typography>

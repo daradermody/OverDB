@@ -7,7 +7,7 @@ import { PersonCard } from '../shared/cards/PersonCard'
 import { InterestingDivider } from '../shared/general/InterestingDivider'
 import Link from '../shared/general/Link'
 import LoadingSpinner from '../shared/general/LoadingSpinner'
-import { getPosterUrl } from '../shared/general/Poster'
+import { Poster } from '../shared/general/Poster'
 import { SentimentSelect } from '../shared/movieActionButtons/SentimentSelect'
 import { WatchedButton } from '../shared/movieActionButtons/WatchedButton'
 import { WatchlistButton } from '../shared/movieActionButtons/WatchlistButton'
@@ -46,7 +46,7 @@ function MovieSummary({id}: { id: Movie['id'] }) {
   return (
     <StyledWrapper>
       <div style={{height: '400px', width: '267px', margin: '0 auto'}}>
-        <img style={{height: '400px'}} src={getPosterUrl(movie.posterPath)} alt={`poster of ${movie.title}`}/>
+        <Poster style={{height: '400px'}} src={movie.posterPath} alt={`poster of ${movie.title}`}/>
         <TmdbRating id={movie.id} vote={movie.voteAverage} release={movie.releaseDate}/>
       </div>
       <div>

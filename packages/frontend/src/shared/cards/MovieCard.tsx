@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useState } from 'react'
 import { Movie, MovieCredit } from '../../../types/graphql'
 import Link from '../general/Link'
-import { getPosterUrl } from '../general/Poster'
+import { getPosterUrl, handlePosterError } from '../general/Poster'
 import { SentimentSelect } from '../movieActionButtons/SentimentSelect'
 import { WatchedButton } from '../movieActionButtons/WatchedButton'
 import { WatchlistButton } from '../movieActionButtons/WatchlistButton'
@@ -87,6 +87,7 @@ function MovieImage({movie}: MovieCardProps) {
           <CardMedia
             component="img"
             image={getPosterUrl(movie.posterPath)}
+            onError={handlePosterError}
             alt={`${movie.title} poster`}
             height="256px"
             style={{

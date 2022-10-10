@@ -5,7 +5,7 @@ import { Button, Typography } from '@mui/material'
 import * as React from 'react'
 import { Person, useGetPersonInfoQuery, useSetFavouriteMutation } from '../../types/graphql'
 import LoadingSpinner from '../shared/general/LoadingSpinner'
-import { getPosterUrl } from '../shared/general/Poster'
+import { Poster } from '../shared/general/Poster'
 import ApiErrorMessage from '../shared/ApiErrorMessage'
 import styled from '@emotion/styled'
 
@@ -25,9 +25,10 @@ export function PersonSummary({id}: { id: Person['id'] }) {
   const {person} = data
   return (
     <StyledWrapper>
-      <img
+      <Poster
         style={{height: '400px', width: '266.66px', backgroundColor: 'white', margin: '0 auto'}}
-        src={getPosterUrl(person.profilePath)} alt={`image of ${person.name}`}
+        src={person.profilePath}
+        alt={`image of ${person.name}`}
       />
       <div>
         <Typography variant="h1" sx={{mt: 0}}>{person.name}</Typography>

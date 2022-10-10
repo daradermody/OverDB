@@ -19,5 +19,5 @@ packages/frontend/public/static
 packages/frontend/build/
 packages/backend/.env
 packages/backend/build
-packages/backend/data
+packages/backend/data/*
 

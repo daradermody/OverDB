@@ -7,7 +7,7 @@ export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K]
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
-const defaultOptions = {} as const;
+const defaultOptions = {"fetchPolicy":"cache-and-network"} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -15,6 +15,14 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+};
+
+export type Counts = {
+  __typename?: 'Counts';
+  favouritePeople: Scalars['Int'];
+  moviesLiked: Scalars['Int'];
+  watched: Scalars['Int'];
+  watchlist: Scalars['Int'];
 };
 
 export type Movie = {
@@ -122,6 +130,7 @@ export type Query = {
   likedMovies: Array<Movie>;
   movie: Movie;
   person: Person;
+  profileCounts: Counts;
   recommendedMovies: Array<Movie>;
   search: Array<SearchResult>;
   trending: Array<MovieInfo>;
@@ -191,6 +200,11 @@ export type GetLikedMoviesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetLikedMoviesQuery = { __typename?: 'Query', likedMovies: Array<{ __typename?: 'Movie', id: string, title: string, posterPath?: string | null, releaseDate?: string | null }> };
+
+export type GetProfileCountsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetProfileCountsQuery = { __typename?: 'Query', profileCounts: { __typename?: 'Counts', favouritePeople: number, watched: number, moviesLiked: number, watchlist: number } };
 
 export type GetWatchedMoviesQueryVariables = Exact<{
   offset?: InputMaybe<Scalars['Int']>;
@@ -360,6 +374,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  Counts: ResolverTypeWrapper<Counts>;
   Float: ResolverTypeWrapper<Scalars['Float']>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
@@ -381,6 +396,7 @@ export type ResolversTypes = ResolversObject<{
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean'];
+  Counts: Counts;
   Float: Scalars['Float'];
   ID: Scalars['ID'];
   Int: Scalars['Int'];
@@ -395,6 +411,14 @@ export type ResolversParentTypes = ResolversObject<{
   SearchResult: ResolversParentTypes['Movie'] | ResolversParentTypes['Person'];
   String: Scalars['String'];
   Tomatometer: Tomatometer;
+}>;
+
+export type CountsResolvers<ContextType = any, ParentType extends ResolversParentTypes['Counts'] = ResolversParentTypes['Counts']> = ResolversObject<{
+  favouritePeople?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  moviesLiked?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  watched?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  watchlist?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type MovieResolvers<ContextType = any, ParentType extends ResolversParentTypes['Movie'] = ResolversParentTypes['Movie']> = ResolversObject<{
@@ -476,6 +500,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   likedMovies?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
   movie?: Resolver<ResolversTypes['Movie'], ParentType, ContextType, RequireFields<QueryMovieArgs, 'id'>>;
   person?: Resolver<ResolversTypes['Person'], ParentType, ContextType, RequireFields<QueryPersonArgs, 'id'>>;
+  profileCounts?: Resolver<ResolversTypes['Counts'], ParentType, ContextType>;
   recommendedMovies?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
   search?: Resolver<Array<ResolversTypes['SearchResult']>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'query'>>;
   trending?: Resolver<Array<ResolversTypes['MovieInfo']>, ParentType, ContextType>;
@@ -496,6 +521,7 @@ export type TomatometerResolvers<ContextType = any, ParentType extends Resolvers
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
+  Counts?: CountsResolvers<ContextType>;
   Movie?: MovieResolvers<ContextType>;
   MovieCredit?: MovieCreditResolvers<ContextType>;
   MovieInfo?: MovieInfoResolvers<ContextType>;
@@ -583,6 +609,43 @@ export function useGetLikedMoviesLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type GetLikedMoviesQueryHookResult = ReturnType<typeof useGetLikedMoviesQuery>;
 export type GetLikedMoviesLazyQueryHookResult = ReturnType<typeof useGetLikedMoviesLazyQuery>;
 export type GetLikedMoviesQueryResult = Apollo.QueryResult<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>;
+export const GetProfileCountsDocument = gql`
+    query GetProfileCounts {
+  profileCounts {
+    favouritePeople
+    watched
+    moviesLiked
+    watchlist
+  }
+}
+    `;
+
+/**
+ * __useGetProfileCountsQuery__
+ *
+ * To run a query within a React component, call `useGetProfileCountsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProfileCountsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProfileCountsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetProfileCountsQuery(baseOptions?: Apollo.QueryHookOptions<GetProfileCountsQuery, GetProfileCountsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetProfileCountsQuery, GetProfileCountsQueryVariables>(GetProfileCountsDocument, options);
+      }
+export function useGetProfileCountsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProfileCountsQuery, GetProfileCountsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetProfileCountsQuery, GetProfileCountsQueryVariables>(GetProfileCountsDocument, options);
+        }
+export type GetProfileCountsQueryHookResult = ReturnType<typeof useGetProfileCountsQuery>;
+export type GetProfileCountsLazyQueryHookResult = ReturnType<typeof useGetProfileCountsLazyQuery>;
+export type GetProfileCountsQueryResult = Apollo.QueryResult<GetProfileCountsQuery, GetProfileCountsQueryVariables>;
 export const GetWatchedMoviesDocument = gql`
     query GetWatchedMovies($offset: Int, $limit: Int) {
   watched(offset: $offset, limit: $limit) {

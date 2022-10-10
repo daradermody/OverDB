@@ -53,7 +53,7 @@ async function createClient() {
     cache,
     defaultOptions: {
       query: {
-        fetchPolicy: navigator.onLine ? 'network-only' : 'cache-first'
+        fetchPolicy: 'cache-and-network'
       }
     }
   })

@@ -78,6 +78,13 @@ type Tomatometer {
   link: String!
 }
 
+type Counts {
+  favouritePeople: Int!
+  watched: Int!
+  moviesLiked: Int!
+  watchlist: Int!
+}
+
 type Query {
   favouritePeople: [Person!]!
   recommendedMovies: [Movie!]!
@@ -90,6 +97,7 @@ type Query {
   watched(offset: Int, limit: Int): PaginatedMovies!
   likedMovies: [Movie!]!
   trending: [MovieInfo!]!
+  profileCounts: Counts!
 }
 
 type Mutation {

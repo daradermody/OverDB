@@ -5,6 +5,8 @@ generates:
   types/graphql.ts:
     config:
       useIndexSignature: true
+      defaultBaseOptions:
+        fetchPolicy: 'cache-and-network'
     plugins:
       - "typescript"
       - "typescript-operations"

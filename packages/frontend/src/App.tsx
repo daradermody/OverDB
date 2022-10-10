@@ -46,7 +46,8 @@ function AppRoutes() {
       <Route path="/person/:id" element={authed(<PersonInfo/>)}/>
       <Route path="/movie/:id" element={authed(<MovieInfo/>)}/>
       <Route path="/profile" element={authed(<Profile/>)}/>
-      <Route path="/profile/favourites" element={authed(<Favourites/>)}/>
+      <Route path="/profile/favourites" element={authed(<Navigate to="/profile/favourite/people" replace/>)}/>
+      <Route path="/profile/favourite/:type" element={authed(<Favourites/>)}/>
       <Route path="/profile/watchlist" element={authed(<Watchlist/>)}/>
       <Route path="/profile/watched" element={authed(<WatchedMovies/>)}/>
     </Routes>
@@ -65,7 +66,7 @@ function Offline() {
   return (
     <StyledOfflineContainer fixed>
       <Typography variant="h1" fontSize="3rem">You are offline</Typography>
-      <img src="/offline.png" alt="offline" style={{ maxWidth: '100%'}}/>
+      <img src="/offline.png" alt="offline" style={{maxWidth: '100%'}}/>
     </StyledOfflineContainer>
   )
 }

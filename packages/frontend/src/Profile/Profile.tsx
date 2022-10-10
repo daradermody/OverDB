@@ -1,12 +1,13 @@
 import { Divider, Typography } from '@mui/material'
 import * as React from 'react'
-import { useGetWatchedMoviesQuery } from '../../types/graphql'
+import { useGetProfileCountsQuery, useGetWatchedMoviesQuery } from '../../types/graphql'
 import MovieCards from '../shared/cards/MovieCard'
 import Link from '../shared/general/Link'
 import useUser from '../useUser'
 import ApiErrorMessage from '../shared/ApiErrorMessage'
 import styled from '@emotion/styled'
 import PageWrapper from '../shared/PageWrapper'
+import { gql } from '@apollo/client'
 
 export default function Profile() {
   const {user} = useUser()
@@ -45,31 +46,33 @@ const StyledProfile = styled.div`
 `
 
 function Stats() {
+  const {data, loading} = useGetProfileCountsQuery()
+
   return (
     <div style={{display: 'flex', justifyContent: 'center', flexGrow: 1}}>
-      <Link to="/">
-        <Stat value={32} label="Favourite people"/>
+      <Link to="/profile/favourite/people">
+        <Stat value={data?.profileCounts?.favouritePeople} label="Favourite people" loading={loading}/>
       </Link>
       <Divider orientation="vertical" flexItem/>
       <Link to="/profile/watched">
-        <Stat value={512} label="Movies watched"/>
+        <Stat value={data?.profileCounts?.watched} label="Movies watched" loading={loading}/>
+      </Link>
+      <Divider orientation="vertical" flexItem/>
+      <Link to="/profile/favourite/movies">
+        <Stat value={data?.profileCounts?.moviesLiked} label="Movies liked" loading={loading}/>
       </Link>
       <Divider orientation="vertical" flexItem/>
       <Link to="/profile/watchlist">
-        <Stat value={22} label="In watchlist"/>
-      </Link>
-      <Divider orientation="vertical" flexItem/>
-      <Link to="/">
-        <Stat value={0} label="Lists"/>
+        <Stat value={data?.profileCounts?.watchlist} label="In watchlist" loading={loading}/>
       </Link>
     </div>
   )
 }
 
-function Stat({value, label}: { value: string | number; label: string }) {
+function Stat({value, label, loading}: { value?: string | number; label: string; loading?: boolean }) {
   return (
     <StatWrapper>
-      <Typography sx={{fontSize: '2rem'}}>{value}</Typography>
+      <Typography sx={{fontSize: '2rem'}}>{loading ? '...' : value}</Typography>
       <Typography variant="subtitle2" sx={{textAlign: 'center'}}>{label}</Typography>
     </StatWrapper>
   )
@@ -83,5 +86,16 @@ const StatWrapper = styled.div`
 
   &:hover {
     background-color: #ffffff10;
+  }
+`
+
+gql`
+  query GetProfileCounts {
+    profileCounts {
+      favouritePeople
+      watched
+      moviesLiked
+      watchlist
+    }
   }
 `

@@ -1,24 +1,32 @@
 import { Box, Tab, Tabs, Typography } from '@mui/material'
 import * as React from 'react'
-import { useState } from 'react'
 import PageWrapper from '../shared/PageWrapper'
 import { FavouritePeople } from './FavouritePeople'
 import { LikedMovies } from './LikedMovies'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useEffect } from 'react'
 
 export default function Favourites() {
-  const [tab, setTab] = useState(0)
+  const {type} = useParams<{ type: 'people' | 'movies' }>()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!['people', 'movies'].includes(type)) {
+      navigate('/profile/favourite/people', {replace: true})
+    }
+  })
 
   return (
     <PageWrapper>
       <Typography variant="h1">Favourites</Typography>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-        <Tabs value={tab} onChange={(e, value) => setTab(value)}>
-          <Tab label="People"/>
-          <Tab label="Movies"/>
+      <Box sx={{borderBottom: 1, borderColor: 'divider', mb: 2}}>
+        <Tabs value={type} onChange={(e, value) => navigate(`/profile/favourite/${value}`)}>
+          <Tab label="People" value="people"/>
+          <Tab label="Movies" value="movies"/>
         </Tabs>
       </Box>
-      {tab === 0 && <FavouritePeople/>}
-      {tab === 1 && <LikedMovies/>}
+      {type === 'people' && <FavouritePeople/>}
+      {type === 'movies' && <LikedMovies/>}
     </PageWrapper>
   )
 }

@@ -51,7 +51,7 @@ const index: Resolvers<{ user: User }> = {
     __resolveType: (obj: SearchResult) => isMovieSummary(obj) ? 'Movie' : 'Person'
   },
   Query: applyAuth({
-    favouritePeople: (_1, _2, {user}) => Promise.all(UserData.getFavourites(user.id).map(MovieDb.personInfo)) as any,
+    favouritePeople: (_1, _2, {user}) => Promise.all(UserData.getFavourites(user.id).slice().reverse().map(MovieDb.personInfo)) as any,
     recommendedMovies: (_1, _2, {user}) => recommendedMoviesResolver(user.id),
     movie: (_, args: QueryMovieArgs) => MovieDb.movieInfo(args.id) as any,
     creditsForMovie: (_, args: QueryCreditsForMovieArgs) => MovieDb.movieCredits(args.id),
@@ -68,12 +68,12 @@ const index: Resolvers<{ user: User }> = {
     },
     search: (_, args: QuerySearchArgs) => MovieDb.search(args.query) as any,
     person: (_, args: QueryPersonArgs) => MovieDb.personInfo(args.id) as any,
-    watchlist: (_1, _2, {user}) => Promise.all(UserData.getWatchlist(user.id).map(MovieDb.movieInfo)) as any,
-    likedMovies: (_1, _2, {user}) => Promise.all(UserData.getLikedMovies(user.id).map(MovieDb.movieInfo)) as any,
+    watchlist: (_1, _2, {user}) => Promise.all(UserData.getWatchlist(user.id).slice().reverse().map(MovieDb.movieInfo)) as any,
+    likedMovies: (_1, _2, {user}) => Promise.all(UserData.getLikedMovies(user.id).slice().reverse().map(MovieDb.movieInfo)) as any,
     watched: async (_, args: QueryWatchedArgs, {user}) => {
       const offset = args.offset || 0
       const limit = args.limit || 10
-      const watchedMovieIds = UserData.getWatched(user.id)
+      const watchedMovieIds = UserData.getWatched(user.id).slice().reverse()
       const movieIds = watchedMovieIds.slice(offset, offset + limit)
       return {
         offset,
@@ -83,6 +83,15 @@ const index: Resolvers<{ user: User }> = {
       }
     },
     trending: () => MovieDb.trending(),
+    profileCounts: async (_1: any, _2: any, {user}) => {
+      const [people, watched, liked, watchlist] = await Promise.all([
+        UserData.getFavourites(user.id),
+        UserData.getWatched(user.id),
+        UserData.getLikedMovies(user.id),
+        UserData.getWatchlist(user.id)
+      ])
+      return {favouritePeople: people.length, watched: watched.length, moviesLiked: liked.length, watchlist: watchlist.length}
+    }
   }),
   Mutation: {
     setFavourite: (_, args: MutationSetFavouriteArgs, {user}) => {

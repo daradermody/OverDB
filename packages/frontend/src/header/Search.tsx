@@ -1,19 +1,21 @@
 import { gql } from '@apollo/client'
 import SearchIcon from '@mui/icons-material/Search'
-import { Autocomplete, IconButton, InputAdornment, Modal, TextField, useMediaQuery, useTheme } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
+import { Autocomplete, Box, Fab, IconButton, InputAdornment, Modal, TextField, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { useThrottleCallback } from '@react-hook/throttle'
 import * as React from 'react'
-import { HTMLAttributes, useCallback, useState } from 'react'
+import { HTMLAttributes, KeyboardEvent, useCallback, useEffect, useState } from 'react'
 import { Movie, Person, SearchResult, useSearchLazyQuery } from '../../types/graphql'
 import { Poster } from '../shared/general/Poster'
+import styled from '@emotion/styled'
 
-interface PersonSearchProps {
+interface SearchProps {
   onSelect: (result: SearchResult) => void
   clearOnSelect?: boolean
   disabled?: boolean
 }
 
-export function Search(props: PersonSearchProps) {
+export function Search(props: SearchProps) {
   const theme = useTheme()
   const biggerDisplay = useMediaQuery(theme.breakpoints.up('md'))
 
@@ -28,7 +30,7 @@ export function Search(props: PersonSearchProps) {
   }
 }
 
-function SearchButton(props: PersonSearchProps) {
+function SearchButton(props: SearchProps) {
   const [showSearchInput, setShowSearchInput] = useState(false)
 
   const handleSelect = useCallback((...args: Parameters<typeof props.onSelect>) => {
@@ -38,31 +40,44 @@ function SearchButton(props: PersonSearchProps) {
 
   return (
     <>
-      <IconButton size="large" disabled={props.disabled} onClick={() => setShowSearchInput(true)}>
-        <SearchIcon fontSize="inherit"/>
-      </IconButton>
+      <Fab
+        sx={{position: 'fixed', bottom: 16, right: 16}}
+        color="primary"
+        aria-label="search"
+        disabled={props.disabled}
+        onClick={() => setShowSearchInput(true)}
+      >
+        <SearchIcon/>
+      </Fab>
       <Modal
-        sx={{backgroundColor: 'secondary.main', p: 1}}
+        sx={{backgroundColor: 'secondary.main', color: 'text.primary', p: 1, height: '100%'}}
         open={showSearchInput}
         onClose={() => setShowSearchInput(false)}
       >
-        <div>
-          <SearchInput onSelect={handleSelect} clearOnSelect={props.clearOnSelect} disabled={props.disabled}/>
+        <div style={{height: '100%'}}>
+          <MobileSearchInput onSelect={handleSelect} onCancel={() => setShowSearchInput(false)}/>
         </div>
       </Modal>
     </>
   )
 }
 
-function SearchInput(props: PersonSearchProps) {
+function SearchInput(props: SearchProps) {
   const [query, setQuery] = useState('')
   const [search, {data, loading}] = useSearchLazyQuery({notifyOnNetworkStatusChange: true})
+  const [isOpen, setIsOpen] = useState(false)
 
-  const handleKeyUp = useThrottleCallback(async e => {
-    if (e.target.value) {
-      await search({variables: {query: e.target.value}})
+  const handleKeyUp = useThrottleCallback(async (e: KeyboardEvent<HTMLInputElement>) => {
+    if ((e.target as HTMLInputElement).value) {
+      if (e.code === 'Escape') {
+        setIsOpen(false)
+      } else {
+        await search({variables: {query: (e.target as HTMLInputElement).value}})
+      }
     }
   }, 2, true)
+
+  useEffect(() => setIsOpen(!!data && !!query), [data, query, setIsOpen])
 
   return (
     <Autocomplete
@@ -72,7 +87,9 @@ function SearchInput(props: PersonSearchProps) {
       size="medium"
       blurOnSelect
       loading={loading}
-      open={!!data && !!query}
+      onFocus={() => setIsOpen(!!data && !!query)}
+      onBlur={() => setIsOpen(false)}
+      open={isOpen}
       isOptionEqualToValue={(option, value) => option.id === value.id}
       inputValue={query}
       disabled={props.disabled}
@@ -83,7 +100,7 @@ function SearchInput(props: PersonSearchProps) {
           setTimeout(() => setQuery(''), 0)
         }
       }}
-      getOptionLabel={(option) => option.__typename === 'Movie' ? option.title : option.name}
+      getOptionLabel={(option: SearchResult) => option.__typename === 'Movie' ? option.title : option.name}
       renderOption={(props, option) => {
         return option.__typename === 'Movie'
           ? <MovieResult key={option.id} liProps={props} movie={option}/>
@@ -110,37 +127,97 @@ function SearchInput(props: PersonSearchProps) {
   )
 }
 
-interface PersonResultProps {
-  person: Pick<Person, 'name' | 'profilePath'>
-  liProps: HTMLAttributes<HTMLLIElement>
+interface MobileSearchInputProps {
+  onSelect: (result: SearchResult) => void
+  onCancel: () => void
 }
 
-function PersonResult({person, liProps}: PersonResultProps) {
+function MobileSearchInput(props: MobileSearchInputProps) {
+  const [query, setQuery] = useState('')
+  const [search, {data, loading}] = useSearchLazyQuery({notifyOnNetworkStatusChange: true})
+
+  const handleKeyUp = useThrottleCallback(async e => {
+    if (e.target.value) {
+      await search({variables: {query: e.target.value}})
+    }
+  }, 2, true)
+
   return (
-    <li {...liProps}>
+    <Box display="flex" flexDirection="column" height="100%">
+      <TextField
+        sx={{position: 'fixed', top: 8, left: 8, right: 8}}
+        variant="outlined"
+        autoFocus
+        placeholder="Search for cast and crew you love..."
+        value={query}
+        onKeyUp={handleKeyUp}
+        onChange={e => setQuery(e.target.value)}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton onClick={props.onCancel}>
+                <CloseIcon/>
+              </IconButton>
+            </InputAdornment>
+          )
+        }}
+      />
+      <Box sx={{overflowY: 'scroll', mt: '64px'}}>
+        {data && data.search.map((item) => {
+          return item.__typename === 'Movie'
+            ? <MovieResult key={item.id} onClick={() => props.onSelect(item as SearchResult)} movie={item}/>
+            : <PersonResult key={item.id} onClick={() => props.onSelect(item as SearchResult)} person={item}/>
+        })}
+      </Box>
+    </Box>
+  )
+}
+
+interface PersonResultProps {
+  person: Pick<Person, 'name' | 'profilePath'>
+  liProps?: HTMLAttributes<HTMLLIElement>
+  onClick?: () => void
+}
+
+function PersonResult({person, liProps, onClick}: PersonResultProps) {
+  return (
+    <StyledSearchResult onClick={onClick} {...(liProps || {})}>
       <div style={{height: '80px'}}>
         <Poster path={person.profilePath}/>
       </div>
       <span style={{marginLeft: '8px'}}>{person.name}</span>
-    </li>
+    </StyledSearchResult>
   )
 }
 
 interface MovieResultProps {
-  movie: Pick<Movie, 'title' | 'posterPath'>
-  liProps: HTMLAttributes<HTMLLIElement>
+  movie: Pick<Movie, 'title' | 'posterPath' | 'releaseDate'>
+  liProps?: HTMLAttributes<HTMLLIElement>
+  onClick?: () => void
 }
 
-function MovieResult({movie, liProps}: MovieResultProps) {
+function MovieResult({movie, liProps, onClick}: MovieResultProps) {
   return (
-    <li {...liProps}>
+    <StyledSearchResult onClick={onClick} {...(liProps || {})}>
       <div style={{height: '80px'}}>
         <Poster path={movie.posterPath}/>
       </div>
-      <span style={{marginLeft: '8px'}}>{movie.title}</span>
-    </li>
+      <Box display="flex" gap="4px" alignItems="baseline" overflow="hidden">
+        <Typography variant="body1" sx={{ml: '8px', overflowX: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{movie.title}</Typography>
+        {movie.releaseDate && <Typography variant="subtitle1">({movie.releaseDate.split('-')[0]})</Typography>}
+      </Box>
+    </StyledSearchResult>
   )
 }
+
+const StyledSearchResult = styled.li`
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  cursor: pointer;
+  padding: 6px 16px;
+  list-style: none;
+`
 
 gql`
   query Search($query: String!) {
@@ -149,6 +226,7 @@ gql`
         id
         title
         posterPath
+        releaseDate
       }
       ... on Person {
         id

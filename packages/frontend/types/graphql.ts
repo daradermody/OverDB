@@ -194,7 +194,7 @@ export type SearchQueryVariables = Exact<{
 }>;
 
 
-export type SearchQuery = { __typename?: 'Query', search: Array<{ __typename?: 'Movie', id: string, title: string, posterPath?: string | null } | { __typename?: 'Person', id: string, name: string, profilePath?: string | null }> };
+export type SearchQuery = { __typename?: 'Query', search: Array<{ __typename?: 'Movie', id: string, title: string, posterPath?: string | null, releaseDate?: string | null } | { __typename?: 'Person', id: string, name: string, profilePath?: string | null }> };
 
 export type GetTrendingMoviesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -555,6 +555,7 @@ export const SearchDocument = gql`
       id
       title
       posterPath
+      releaseDate
     }
     ... on Person {
       id

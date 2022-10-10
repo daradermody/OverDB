@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import { MovieDb as MovieDbApi } from 'moviedb-promise'
 import { Crew, MovieResponse, Person as TmdbPerson, PersonMovieCreditsResponse } from 'moviedb-promise/dist/request-types'
-import { isMovieSummary, isPersonSummary, Movie, MovieCredit, MovieInfo, Person, PersonCredit, PersonInfo } from '../../types'
+import { isMovieSearchResult, isPersonSearchResult, Movie, MovieCredit, MovieInfo, Person, PersonCredit, PersonInfo } from '../../types'
 import axios from 'axios'
 import getToken from '../utils/getToken'
 import { dataDir } from './dataStorage'
@@ -89,14 +89,8 @@ export default class MovieDb {
   static async search(query: string): Promise<(MovieInfo | PersonInfo)[]> {
     const {results} = await this.movieDbApi.searchMulti({query})
     return results!
-      .filter(result => isMovieSummary(result) || isPersonSummary(result))
-      .map(result => {
-        if (isMovieSummary(result)) {
-          return pickMovieProperties(result)
-        } else {
-          return pickPersonProperties(result)
-        }
-      })
+      .filter(result => isMovieSearchResult(result) || isPersonSearchResult(result))
+      .map(result => isMovieSearchResult(result) ? pickMovieProperties(result) : pickPersonProperties(result))
   }
 
   static async trending(): Promise<MovieInfo[]> {

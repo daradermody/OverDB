@@ -50,6 +50,11 @@ async function createClient() {
   })
   return new ApolloClient({
     link: createHttpLink({uri: `${SERVER_URL}/graphql`, credentials: 'include'}),
-    cache
+    cache,
+    defaultOptions: {
+      query: {
+        fetchPolicy: navigator.onLine ? 'network-only' : 'cache-first'
+      }
+    }
   })
 }

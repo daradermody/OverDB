@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 import { AlarmAdd, AlarmOn } from '@mui/icons-material'
-import { Button, Tooltip } from '@mui/material'
+import { Button, Tooltip, Typography } from '@mui/material'
 import * as React from 'react'
 import { Movie, useSetInWatchlistMutation } from '../../../types/graphql'
 
@@ -36,7 +36,7 @@ export function WatchlistButton({id, inWatchlist, withLabel}: WatchlistButtonPro
     >
       <Button sx={{color: 'common.white'}} onClick={handleClick}>
         {inWatchlist ? <AlarmOn color="primary"/> : <AlarmAdd/>}
-        {withLabel && (inWatchlist ? 'Added to watchlist' : 'Add to watchlist')}
+        {withLabel && <Typography variant="button" sx={{ml: 1}}>{inWatchlist ? 'Added to watchlist' : 'Add to watchlist'}</Typography>}
       </Button>
     </Tooltip>
   )

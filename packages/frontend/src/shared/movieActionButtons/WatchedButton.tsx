@@ -1,8 +1,8 @@
-import {gql} from "@apollo/client";
-import {Visibility, VisibilityOff} from "@mui/icons-material";
-import {Button, Tooltip} from "@mui/material";
-import * as React from "react";
-import {Movie, useSetWatchedMutation} from "../../../types/graphql";
+import { gql } from '@apollo/client'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { Button, Tooltip, Typography } from '@mui/material'
+import * as React from 'react'
+import { Movie, useSetWatchedMutation } from '../../../types/graphql'
 
 interface WatchedButtonProps {
   id: Movie['id'];
@@ -36,7 +36,7 @@ export function WatchedButton({id, watched, withLabel}: WatchedButtonProps) {
     >
       <Button sx={{color: 'common.white'}} onClick={handleClick}>
         {watched ? <Visibility color="primary"/> : <VisibilityOff/>}
-        {withLabel && (watched ? 'Watched' : 'Unwatched')}
+        {withLabel && <Typography variant="button" sx={{ml: 1}}>{watched ? 'Watched' : 'Unwatched'}</Typography>}
       </Button>
     </Tooltip>
   )

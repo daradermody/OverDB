@@ -15,6 +15,7 @@ interface SentimentSelectProps {
 export function SentimentSelect({id, sentiment, withLabel, placement}: SentimentSelectProps) {
   const [setSentiment] = useSetSentimentMutation()
   const [setWatched] = useSetWatchedMutation()
+  const isTouchscreen = !!navigator.maxTouchPoints
 
   const [showOptions, setShowOptions] = useState(false)
 
@@ -50,24 +51,27 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
       <Tooltip
         placement={placement || 'right'}
         open={showOptions}
-        sx={{bgcolor: 'transparent', m: 0}}
+        sx={{bgcolor: 'transparent'}}
         onClose={() => setShowOptions(false)}
         onOpen={() => setShowOptions(true)}
         TransitionComponent={Fade}
         TransitionProps={{timeout: 0}}
+        componentsProps={{tooltip: {sx: {marginLeft: '0 !important', padding: '4px 8px'}}}}
+        disableHoverListener={isTouchscreen}
+        disableTouchListener={isTouchscreen}
         title={
           <div style={{
             display: 'flex',
             flexDirection: placement === 'top' ? 'column-reverse' : 'row',
-            backgroundColor: !withLabel ? 'rgba(0,0,0,0.8)' : undefined
+            backgroundColor: !withLabel ? 'rgba(0,0,0,0.8)' : undefined,
           }}>
-            <IconButton onClick={() => changeSentiment(Sentiment.Liked)} size="large">{getIconForSentiment(Sentiment.Liked)}</IconButton>
-            <IconButton onClick={() => changeSentiment(Sentiment.Disliked)} size="large">{getIconForSentiment(Sentiment.Disliked)}</IconButton>
-            <IconButton onClick={() => changeSentiment(Sentiment.None)} size="large"><Clear/></IconButton>
+            <IconButton onClick={() => changeSentiment(Sentiment.Liked)}>{getIconForSentiment(Sentiment.Liked)}</IconButton>
+            <IconButton onClick={() => changeSentiment(Sentiment.Disliked)}>{getIconForSentiment(Sentiment.Disliked)}</IconButton>
+            <IconButton onClick={() => changeSentiment(Sentiment.None)}><Clear/></IconButton>
           </div>
         }
       >
-        <IconButton color={sentiment === Sentiment.None ? undefined : 'primary'} disableRipple size="large">
+        <IconButton color={sentiment === Sentiment.None ? undefined : 'primary'} disableRipple size="medium" onClick={() => setShowOptions(true)}>
           {getIconForSentiment(sentiment)}
         </IconButton>
       </Tooltip>
@@ -78,7 +82,7 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
 
 function SentimentText(props: { sentiment: Sentiment, onClear(): void }) {
   if (props.sentiment === Sentiment.None) {
-    return <Typography>{getTextForSentiment(props.sentiment)}</Typography>
+    return <Typography variant="button" >{getTextForSentiment(props.sentiment)}</Typography>
   } else
     return (
       <Tooltip
@@ -87,7 +91,7 @@ function SentimentText(props: { sentiment: Sentiment, onClear(): void }) {
         TransitionComponent={Fade}
         title={<IconButton onClick={props.onClear} size="large"><Clear/></IconButton>}
       >
-        <Typography>{getTextForSentiment(props.sentiment)}</Typography>
+        <Typography variant="button" >{getTextForSentiment(props.sentiment)}</Typography>
       </Tooltip>
     )
 }

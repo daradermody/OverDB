@@ -23,4 +23,10 @@ export const users = [
     password: 'test',
     avatarUrl: 'https://avatars.githubusercontent.com/u/5167196 ',
   },
+  {
+    id: 4,
+    username: 'linda',
+    password: 'test',
+    avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png',
+  },
 ]

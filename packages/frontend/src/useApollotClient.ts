@@ -1,5 +1,5 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
-import { LocalForageWrapper, persistCache } from 'apollo3-cache-persist'
+import { CachePersistor, LocalForageWrapper } from 'apollo3-cache-persist'
 import * as localForage from 'localforage'
 import { useEffect, useState } from 'react'
 
@@ -44,17 +44,12 @@ export default function useApolloClient() {
 }
 
 async function createClient() {
-  await persistCache({
-    cache,
-    storage: new LocalForageWrapper(localForage),
-  })
+  const cachePersistor = new CachePersistor({ cache, storage: new LocalForageWrapper(localForage) });
+  if (!navigator.onLine) {
+    await cachePersistor.restore();
+  }
   return new ApolloClient({
     link: createHttpLink({uri: `${SERVER_URL}/graphql`, credentials: 'include'}),
     cache,
-    defaultOptions: {
-      query: {
-        fetchPolicy: 'cache-and-network'
-      }
-    }
   })
 }

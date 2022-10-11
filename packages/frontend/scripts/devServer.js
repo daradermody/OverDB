@@ -1,6 +1,7 @@
 const { createServer } = require('esbuild-server')
 
-const PORT = 4000
+const PORT = process.env.PORT || 4000
+const SERVER_PORT = process.env.SERVER_PORT || 3000
 
 const server = createServer(
   {
@@ -9,7 +10,7 @@ const server = createServer(
     bundle: true,
     sourcemap: true,
     define: {
-      SERVER_URL: '"http://localhost:3000"',
+      SERVER_URL: `"http://localhost:${SERVER_PORT}"`,
     },
   },
   {

@@ -1,10 +1,10 @@
 import { Box, Tab, Tabs, Typography } from '@mui/material'
 import * as React from 'react'
+import { useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import PageWrapper from '../shared/PageWrapper'
 import { FavouritePeople } from './FavouritePeople'
 import { LikedMovies } from './LikedMovies'
-import { useNavigate, useParams } from 'react-router-dom'
-import { useEffect } from 'react'
 
 export default function Favourites() {
   const {type} = useParams<{ type: 'people' | 'movies' }>()

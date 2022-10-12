@@ -1,13 +1,13 @@
 import { gql } from '@apollo/client'
+import styled from '@emotion/styled'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Button, Typography } from '@mui/material'
 import * as React from 'react'
 import { Person, useGetPersonInfoQuery, useSetFavouriteMutation } from '../../types/graphql'
+import ApiErrorMessage from '../shared/ApiErrorMessage'
 import LoadingSpinner from '../shared/general/LoadingSpinner'
 import { Poster } from '../shared/general/Poster'
-import ApiErrorMessage from '../shared/ApiErrorMessage'
-import styled from '@emotion/styled'
 
 
 export function PersonSummary({id}: { id: Person['id'] }) {
@@ -26,13 +26,13 @@ export function PersonSummary({id}: { id: Person['id'] }) {
   return (
     <StyledWrapper>
       <Poster
-        style={{height: '400px', width: '266.66px', backgroundColor: 'white', margin: '0 auto'}}
+        style={{height: '400px', width: '266.66px', backgroundColor: 'white'}}
         src={person.profilePath}
         alt={`image of ${person.name}`}
       />
-      <div>
+      <div style={{width: '100%'}}>
         <Typography variant="h1" sx={{mt: 0}}>{person.name}</Typography>
-        <Typography variant="body2" style={{ marginBottom: '20px'}}>Known for {person.knownForDepartment}</Typography>
+        <Typography variant="body2" style={{marginBottom: '20px'}}>Known for {person.knownForDepartment}</Typography>
         <Typography variant="body1">{person.biography}</Typography>
         <Button
           disabled={loadingFavourite}
@@ -51,13 +51,14 @@ export function PersonSummary({id}: { id: Person['id'] }) {
 const StyledWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 40px;
 
   ${({theme}) => theme.breakpoints.up('md')} {
     flex-direction: row;
+    align-items: start;
   }
 `
-
 
 gql`
   query GetPersonInfo($id: ID!) {

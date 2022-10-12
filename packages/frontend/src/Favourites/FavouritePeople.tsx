@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { Box, Link, Typography } from '@mui/material'
-import { LoadingPeople, PersonCard } from '../shared/cards/PersonCard'
 import { gql } from '@apollo/client'
+import { Box, Link, Typography } from '@mui/material'
+import * as React from 'react'
 import { useGetFavouritePeopleQuery } from '../../types/graphql'
 import ApiErrorMessage from '../shared/ApiErrorMessage'
+import { LoadingPeople, PersonCard } from '../shared/cards/PersonCard'
 import { StyledCardListWrapper } from '../shared/styledComponents'
 
 export function FavouritePeople() {

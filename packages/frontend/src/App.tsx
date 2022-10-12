@@ -1,21 +1,21 @@
-import * as React from 'react'
-import { ReactNode, useEffect, useState } from 'react'
+import styled from '@emotion/styled'
 import { Box, Container, Typography } from '@mui/material'
+import * as React from 'react'
+import { ReactNode } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import Favourites from './Favourites/Favourites'
 import Footer from './Footer/Footer'
-import { PersonInfo } from './personInfo/PersonInfo'
-import { Homepage } from './homepage/Homepage'
-import { MovieInfo } from './movieInfo/MovieInfo'
 import { Header } from './header/Header'
+import { Homepage } from './homepage/Homepage'
+import Login from './Login'
+import { MovieInfo } from './movieInfo/MovieInfo'
+import { PersonInfo } from './personInfo/PersonInfo'
 import Profile from './Profile/Profile'
 import ScrollToTop from './shared/general/ScrollToTop'
+import useIsOnline from './shared/useIsOnline'
+import { userSignal } from './useUser'
 import WatchedMovies from './WatchedMovies/WatchedMovies'
 import Watchlist from './watchlist/Watchlist'
-import Login from './Login'
-import { userSignal } from './useUser'
-import styled from '@emotion/styled'
-import useIsOnline from './shared/useIsOnline'
-import Favourites from './Favourites/Favourites'
 
 export default function App() {
   const isOnline = useIsOnline()
@@ -80,7 +80,9 @@ const StyledOfflineContainer = styled(Container)`
   gap: 50px;
 `
 
-const Root = styled('div')(({theme}) => ({
-  backgroundColor: theme.palette.background.default
-}))
+const Root = styled('div')(({theme}) => (
+  {
+    backgroundColor: theme.palette.background.default
+  }
+))
 

@@ -1,13 +1,13 @@
 import { gql } from '@apollo/client'
-import SearchIcon from '@mui/icons-material/Search'
+import styled from '@emotion/styled'
 import CloseIcon from '@mui/icons-material/Close'
+import SearchIcon from '@mui/icons-material/Search'
 import { Autocomplete, Box, Fab, IconButton, InputAdornment, Modal, TextField, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { useThrottleCallback } from '@react-hook/throttle'
 import * as React from 'react'
 import { HTMLAttributes, KeyboardEvent, useCallback, useEffect, useState } from 'react'
 import { Movie, Person, SearchResult, useSearchLazyQuery } from '../../types/graphql'
 import { Poster } from '../shared/general/Poster'
-import styled from '@emotion/styled'
 
 interface SearchProps {
   onSelect: (result: SearchResult) => void

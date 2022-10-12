@@ -1,4 +1,4 @@
-const { createServer } = require('esbuild-server')
+const {createServer} = require('esbuild-server')
 
 const PORT = process.env.PORT || 4000
 const SERVER_PORT = process.env.SERVER_PORT || 3000

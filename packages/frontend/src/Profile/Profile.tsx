@@ -1,13 +1,13 @@
+import { gql } from '@apollo/client'
+import styled from '@emotion/styled'
 import { Divider, Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetProfileCountsQuery, useGetWatchedMoviesQuery } from '../../types/graphql'
+import ApiErrorMessage from '../shared/ApiErrorMessage'
 import MovieCards from '../shared/cards/MovieCard'
 import Link from '../shared/general/Link'
-import useUser from '../useUser'
-import ApiErrorMessage from '../shared/ApiErrorMessage'
-import styled from '@emotion/styled'
 import PageWrapper from '../shared/PageWrapper'
-import { gql } from '@apollo/client'
+import useUser from '../useUser'
 
 export default function Profile() {
   const {user} = useUser()

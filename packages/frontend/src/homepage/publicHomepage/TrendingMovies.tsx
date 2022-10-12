@@ -1,9 +1,9 @@
-import { useGetTrendingMoviesQuery } from '../../../types/graphql'
-import PageWrapper from '../../shared/PageWrapper'
-import MovieCards from '../../shared/cards/MovieCard'
-import * as React from 'react'
 import { gql } from '@apollo/client'
 import { Box } from '@mui/material'
+import * as React from 'react'
+import { useGetTrendingMoviesQuery } from '../../../types/graphql'
+import MovieCards from '../../shared/cards/MovieCard'
+import PageWrapper from '../../shared/PageWrapper'
 
 export function TrendingMoves() {
   const {data, loading} = useGetTrendingMoviesQuery()

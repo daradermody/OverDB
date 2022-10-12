@@ -1,10 +1,10 @@
-import {gql} from "@apollo/client";
-import {Skeleton, ToggleButton, ToggleButtonGroup} from "@mui/material";
-import * as React from "react";
-import {useState} from "react";
-import {Person, PersonCredit, useGetPersonCreditsQuery} from "../../types/graphql";
-import MovieCards from "../shared/cards/MovieCard";
+import { gql } from '@apollo/client'
+import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import * as React from 'react'
+import { useState } from 'react'
+import { Person, PersonCredit, useGetPersonCreditsQuery } from '../../types/graphql'
 import ApiErrorMessage from '../shared/ApiErrorMessage'
+import MovieCards from '../shared/cards/MovieCard'
 
 export function MovieList({id}: { id: Person['id'] }) {
   const {data, error, loading} = useGetPersonCreditsQuery({variables: {id}})

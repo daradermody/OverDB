@@ -1,5 +1,5 @@
-import {Movie, Person} from "./graphql";
 import { MovieResult, PersonResult, TvResult } from 'moviedb-promise'
+import { Movie, Person } from './graphql'
 
 export type PersonInfo = Omit<Person, 'favourited'>
 

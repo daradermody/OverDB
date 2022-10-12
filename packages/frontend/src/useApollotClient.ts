@@ -44,9 +44,9 @@ export default function useApolloClient() {
 }
 
 async function createClient() {
-  const cachePersistor = new CachePersistor({ cache, storage: new LocalForageWrapper(localForage) });
+  const cachePersistor = new CachePersistor({ cache, storage: new LocalForageWrapper(localForage) })
   if (!navigator.onLine) {
-    await cachePersistor.restore();
+    await cachePersistor.restore()
   }
   return new ApolloClient({
     link: createHttpLink({uri: `${SERVER_URL}/graphql`, credentials: 'include'}),

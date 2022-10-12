@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { Box, Typography } from '@mui/material'
 import { gql } from '@apollo/client'
-import ApiErrorMessage from '../shared/ApiErrorMessage'
+import { Box, Typography } from '@mui/material'
+import * as React from 'react'
 import { useGetLikedMoviesQuery } from '../../types/graphql'
+import ApiErrorMessage from '../shared/ApiErrorMessage'
 import MovieCards from '../shared/cards/MovieCard'
 
 export function LikedMovies() {

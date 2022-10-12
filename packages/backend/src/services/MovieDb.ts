@@ -1,8 +1,8 @@
+import axios from 'axios'
 import * as fs from 'fs'
 import { MovieDb as MovieDbApi } from 'moviedb-promise'
 import { Crew, MovieResponse, Person as TmdbPerson, PersonMovieCreditsResponse } from 'moviedb-promise/dist/request-types'
 import { isMovieSearchResult, isPersonSearchResult, Movie, MovieCredit, MovieInfo, Person, PersonCredit, PersonInfo } from '../../types'
-import axios from 'axios'
 import getToken from '../utils/getToken'
 import { dataDir } from './dataStorage'
 
@@ -28,17 +28,9 @@ interface Cache {
 const key = getToken('TMDB_TOKEN')
 
 export default class MovieDb {
-  private static movieDbApi = new MovieDbApi(key)
   static FILE_PATH = `${dataDir}/moviedb_cache.json`
+  private static movieDbApi = new MovieDbApi(key)
   private static cache: Cache = MovieDb.readCache()
-
-  private static readCache(): Cache {
-    if (!fs.existsSync(MovieDb.FILE_PATH)) {
-      const initial: Cache = {personInfo: {}, movieCredits: {}, personMovieCredits: {}, movieInfo: {}}
-      fs.writeFileSync(MovieDb.FILE_PATH, JSON.stringify(initial))
-    }
-    return JSON.parse(fs.readFileSync(MovieDb.FILE_PATH, 'utf-8'))
-  }
 
   static async personMovieCredits(id: Person['id']): Promise<{ id: MovieCredit['id'], title: MovieCredit['title'], jobs: MovieCredit['jobs'] }[]> {
     if (!MovieDb.cache.personMovieCredits[id]) {
@@ -103,6 +95,14 @@ export default class MovieDb {
   static async save(): Promise<void> {
     fs.writeFileSync(MovieDb.FILE_PATH, JSON.stringify(MovieDb.cache))
   }
+
+  private static readCache(): Cache {
+    if (!fs.existsSync(MovieDb.FILE_PATH)) {
+      const initial: Cache = {personInfo: {}, movieCredits: {}, personMovieCredits: {}, movieInfo: {}}
+      fs.writeFileSync(MovieDb.FILE_PATH, JSON.stringify(initial))
+    }
+    return JSON.parse(fs.readFileSync(MovieDb.FILE_PATH, 'utf-8'))
+  }
 }
 
 function filterInvalidMovies<T extends { vote_count: number, job: string }>(credits: T[]): T[] {
@@ -156,14 +156,7 @@ function filterInsignificantPeople<T extends { job: string }>(crew: T[]): T[] {
 
 function sortByRole(creditA: PersonCredit, creditB: PersonCredit): number {
   const jobsByImportance = [
-    'Casting',
-    'Editor',
-    'Music',
-    'Sound',
-    'Producer',
-    'Cinematography',
-    'Writer',
-    'Director',
+    'Casting', 'Editor', 'Music', 'Sound', 'Producer', 'Cinematography', 'Writer', 'Director',
   ]
   const creditAPrecedence = Math.max(...creditA.jobs.map(job => jobsByImportance.findIndex(importantJob => job === importantJob)))
   const creditBPrecedence = Math.max(...creditB.jobs.map(job => jobsByImportance.findIndex(importantJob => job === importantJob)))

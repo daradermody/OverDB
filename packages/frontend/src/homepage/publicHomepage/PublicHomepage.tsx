@@ -1,10 +1,10 @@
-import PageWrapper from '../../shared/PageWrapper'
-import { Button, Typography } from '@mui/material'
-import Link from '../../shared/general/Link'
 import styled from '@emotion/styled'
+import { Button, Typography } from '@mui/material'
 import * as React from 'react'
-import { TrendingMoves } from './TrendingMovies'
+import Link from '../../shared/general/Link'
+import PageWrapper from '../../shared/PageWrapper'
 import HomepageCarousel from './HomepageCarousel'
+import { TrendingMoves } from './TrendingMovies'
 
 export function PublicHomepage() {
   return (

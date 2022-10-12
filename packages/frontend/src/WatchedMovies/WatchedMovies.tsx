@@ -3,8 +3,8 @@ import { LoadingButton } from '@mui/lab'
 import { Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetWatchedMoviesQuery } from '../../types/graphql'
-import MovieCards from '../shared/cards/MovieCard'
 import ApiErrorMessage from '../shared/ApiErrorMessage'
+import MovieCards from '../shared/cards/MovieCard'
 import PageWrapper from '../shared/PageWrapper'
 
 export default function WatchedMovies() {

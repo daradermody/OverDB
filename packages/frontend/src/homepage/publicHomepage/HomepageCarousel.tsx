@@ -1,8 +1,8 @@
-import PageWrapper from '../../shared/PageWrapper'
-import { Typography } from '@mui/material'
-import * as React from 'react'
 import { keyframes } from '@emotion/react'
 import styled from '@emotion/styled'
+import { Typography } from '@mui/material'
+import * as React from 'react'
+import PageWrapper from '../../shared/PageWrapper'
 
 export default function HomepageCarousel() {
   return (
@@ -21,7 +21,7 @@ export default function HomepageCarousel() {
   )
 }
 
-function JobList({order}: {order: number}) {
+function JobList({order}: { order: number }) {
   const roles = [
     'Actors',
     'Directors',
@@ -58,7 +58,7 @@ const StyledJob = styled(Typography)<{ index: number }>`
   overflow: hidden;
   animation-delay: ${({index}) => index * 2 - 5}s;
   ${({theme}) => theme.breakpoints.up('sm')} {
-    animation-delay: ${({index}) => index * 2  - 5.3}s;
+    animation-delay: ${({index}) => index * 2 - 5.3}s;
   }
   color: ${({index}) => index === 2 ? 'white' : 'inherit'};
 `

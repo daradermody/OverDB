@@ -1,5 +1,5 @@
-import {Facebook, Instagram, Twitter, YouTube} from "@mui/icons-material";
-import {Container, Link, styled, Typography} from "@mui/material";
+import { Facebook, Instagram, Twitter, YouTube } from '@mui/icons-material'
+import { Container, Link, styled, Typography } from '@mui/material'
 import * as React from 'react'
 
 export default function Footer() {

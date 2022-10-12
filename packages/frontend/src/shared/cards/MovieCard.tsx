@@ -1,3 +1,4 @@
+import styled from '@emotion/styled'
 import { Card, CardActionArea, CardContent, CardMedia, Skeleton, Tooltip, Typography } from '@mui/material'
 import { range } from 'lodash'
 import * as React from 'react'
@@ -9,7 +10,6 @@ import { SentimentSelect } from '../movieActionButtons/SentimentSelect'
 import { WatchedButton } from '../movieActionButtons/WatchedButton'
 import { WatchlistButton } from '../movieActionButtons/WatchlistButton'
 import { StyledCardListWrapper } from '../styledComponents'
-import styled from '@emotion/styled'
 
 interface MovieCardsProps {
   movies?: MovieCardProps['movie'][]

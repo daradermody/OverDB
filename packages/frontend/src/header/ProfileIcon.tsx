@@ -1,10 +1,10 @@
-import { AccountCircle, AlarmOn, Logout, Visibility, Favorite } from '@mui/icons-material'
+import { AccountCircle, AlarmOn, Favorite, Logout, Visibility } from '@mui/icons-material'
 import { Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material'
 import * as React from 'react'
 import Link from '../shared/general/Link'
 import useUser from '../useUser'
 
-export function ProfileIcon({disabled}: {disabled?: boolean}) {
+export function ProfileIcon({disabled}: { disabled?: boolean }) {
   const {user, logout} = useUser()
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
 

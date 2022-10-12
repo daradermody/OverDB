@@ -20,17 +20,10 @@ const emptyObject: Data[number] = {
 
 export class UserData {
   static FILE_PATH = `${dataDir}/user_data.json`
-  private static data: Data = UserData.readCache();
-
-  private static readCache(): Data {
-    if (!fs.existsSync(UserData.FILE_PATH)) {
-      fs.writeFileSync(UserData.FILE_PATH, '{}');
-    }
-    return JSON.parse(fs.readFileSync(UserData.FILE_PATH, 'utf-8'));
-  }
+  private static data: Data = UserData.readCache()
 
   public static getFavourites(userId: User['id']): Person['id'][] {
-    return UserData.forUser(userId).favourites;
+    return UserData.forUser(userId).favourites
   }
 
   public static setFavourite(userId: User['id'], personId: Person['id'], favourite: boolean): void {
@@ -44,12 +37,12 @@ export class UserData {
     UserData.data[userId] = {
       ...UserData.forUser(userId),
       favourites,
-    };
-    UserData.save();
+    }
+    UserData.save()
   }
 
   public static isFavourited(userId: User['id'], personId: Person['id']): boolean {
-    return UserData.forUser(userId).favourites.includes(personId);
+    return UserData.forUser(userId).favourites.includes(personId)
   }
 
   static getLikedMovies(userId: User['id']): Movie['id'][] {
@@ -105,8 +98,15 @@ export class UserData {
     UserData.save()
   }
 
+  private static readCache(): Data {
+    if (!fs.existsSync(UserData.FILE_PATH)) {
+      fs.writeFileSync(UserData.FILE_PATH, '{}')
+    }
+    return JSON.parse(fs.readFileSync(UserData.FILE_PATH, 'utf-8'))
+  }
+
   private static save() {
-    fs.writeFileSync(UserData.FILE_PATH, JSON.stringify(UserData.data));
+    fs.writeFileSync(UserData.FILE_PATH, JSON.stringify(UserData.data))
   }
 
   private static forUser(id: User['id']) {

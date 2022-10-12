@@ -1,8 +1,10 @@
 import { gql } from '@apollo/client'
+import styled from '@emotion/styled'
 import { Typography } from '@mui/material'
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import { Movie, useGetCreditsQuery, useGetMovieInfoQuery } from '../../types/graphql'
+import ApiErrorMessage from '../shared/ApiErrorMessage'
 import { PersonCard } from '../shared/cards/PersonCard'
 import { InterestingDivider } from '../shared/general/InterestingDivider'
 import Link from '../shared/general/Link'
@@ -11,12 +13,10 @@ import { Poster } from '../shared/general/Poster'
 import { SentimentSelect } from '../shared/movieActionButtons/SentimentSelect'
 import { WatchedButton } from '../shared/movieActionButtons/WatchedButton'
 import { WatchlistButton } from '../shared/movieActionButtons/WatchlistButton'
+import PageWrapper from '../shared/PageWrapper'
+import { StyledCardListWrapper } from '../shared/styledComponents'
 import RottenTomatoesReview from './RottenTomatoesReview'
 import { TmdbRating } from './TmdbRating'
-import ApiErrorMessage from '../shared/ApiErrorMessage'
-import styled from '@emotion/styled'
-import { StyledCardListWrapper } from '../shared/styledComponents'
-import PageWrapper from '../shared/PageWrapper'
 
 export function MovieInfo() {
   const {id} = useParams<{ id: string }>()
@@ -45,10 +45,10 @@ function MovieSummary({id}: { id: Movie['id'] }) {
 
   return (
     <StyledWrapper>
-      <div style={{height: '400px', width: '267px', margin: '0 auto'}}>
+      <StyledPoster>
         <Poster style={{height: '400px'}} src={movie.posterPath} alt={`poster of ${movie.title}`}/>
         <TmdbRating id={movie.id} vote={movie.voteAverage} release={movie.releaseDate}/>
-      </div>
+      </StyledPoster>
       <div>
         <div>
           <Typography variant="h1" sx={{display: 'inline'}}>{movie.title}</Typography>
@@ -74,11 +74,19 @@ function MovieSummary({id}: { id: Movie['id'] }) {
 const StyledWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 40px;
 
   ${({theme}) => theme.breakpoints.up('md')} {
     flex-direction: row;
+    align-items: start;
   }
+`
+
+const StyledPoster = styled.div`
+  height: 400px;
+  width: 267px;
+  flex-shrink: 0;
 `
 
 const StyledActionsAndReview = styled.div`
@@ -131,14 +139,7 @@ function CrewList({id}: { id: Movie['id'] }) {
 }
 
 const importantJobs = [
-  'Screenplay',
-  'Director',
-  'Producer',
-  'Sound',
-  'Music',
-  'Cinematography',
-  'Editor',
-  'Casting',
+  'Screenplay', 'Director', 'Producer', 'Sound', 'Music', 'Cinematography', 'Editor', 'Casting',
 ]
 
 gql`

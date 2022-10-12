@@ -1,10 +1,10 @@
 import { ApolloProvider } from '@apollo/client'
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles'
 import * as React from 'react'
-import App from './App'
-import theme from './theme'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
+import App from './App'
+import theme from './theme'
 import useApolloClient from './useApollotClient'
 
 document.body.style.fontFamily = 'Roboto'

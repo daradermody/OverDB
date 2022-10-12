@@ -82,8 +82,8 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
 
 function SentimentText(props: { sentiment: Sentiment, onClear(): void }) {
   if (props.sentiment === Sentiment.None) {
-    return <Typography variant="button" >{getTextForSentiment(props.sentiment)}</Typography>
-  } else
+    return <Typography variant="button">{getTextForSentiment(props.sentiment)}</Typography>
+  } else {
     return (
       <Tooltip
         placement="right"
@@ -91,9 +91,10 @@ function SentimentText(props: { sentiment: Sentiment, onClear(): void }) {
         TransitionComponent={Fade}
         title={<IconButton onClick={props.onClear} size="large"><Clear/></IconButton>}
       >
-        <Typography variant="button" >{getTextForSentiment(props.sentiment)}</Typography>
+        <Typography variant="button">{getTextForSentiment(props.sentiment)}</Typography>
       </Tooltip>
     )
+  }
 }
 
 function getIconForSentiment(sentiment: Sentiment): JSX.Element {

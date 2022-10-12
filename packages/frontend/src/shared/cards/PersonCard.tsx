@@ -1,10 +1,10 @@
+import styled from '@emotion/styled'
 import { Card, CardActionArea, CardContent, CardMedia, Skeleton, Tooltip, Typography } from '@mui/material'
 import { range } from 'lodash'
 import * as React from 'react'
 import { PersonCredit } from '../../../types/graphql'
 import Link from '../general/Link'
 import { getPosterUrl, handlePosterError } from '../general/Poster'
-import styled from '@emotion/styled'
 
 interface PersonCardProps {
   person: Pick<PersonCredit, 'id' | 'profilePath' | 'name'> & { jobs?: PersonCredit['jobs'] }

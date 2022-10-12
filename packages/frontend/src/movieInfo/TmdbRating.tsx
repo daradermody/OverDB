@@ -1,6 +1,6 @@
-import * as React from "react";
-import {Box, CircularProgress, Tooltip, Typography} from "@mui/material";
-import {Movie} from "../../types/graphql";
+import { Box, CircularProgress, Tooltip, Typography } from '@mui/material'
+import * as React from 'react'
+import { Movie } from '../../types/graphql'
 
 interface TmdbRatingProps {
   id: Movie['id']
@@ -65,7 +65,7 @@ function CircularProgressWithLabel(props: { value: number }) {
         value={props.value}
       />
     </Box>
-  );
+  )
 }
 
 function getColor(rating: number) {

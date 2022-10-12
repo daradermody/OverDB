@@ -1,6 +1,6 @@
-import axios from 'axios';
-import {JSDOM} from 'jsdom';
-import {Tomatometer, TomatometerState} from '../../types';
+import axios from 'axios'
+import { JSDOM } from 'jsdom'
+import { Tomatometer, TomatometerState } from '../../types'
 
 export default class RottenTomatoes {
   static async getScore(title: string, year: number): Promise<Tomatometer | null> {
@@ -39,7 +39,7 @@ export default class RottenTomatoes {
     const score = parseInt(scoreboard!.getAttribute('tomatometerscore') as string, 10)
     const consensus = dom.window.document.querySelector<HTMLSpanElement>('[data-qa="critics-consensus"]')?.innerHTML
 
-    return state ?? score ? { state, score, consensus, link } : null
+    return state ?? score ? {state, score, consensus, link} : null
   }
 }
 

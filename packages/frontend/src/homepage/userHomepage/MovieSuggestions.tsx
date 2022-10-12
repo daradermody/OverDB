@@ -3,8 +3,8 @@ import { Loop } from '@mui/icons-material'
 import { CircularProgress, IconButton, Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetRecommendedMoviesQuery } from '../../../types/graphql'
-import MovieCards from '../../shared/cards/MovieCard'
 import ApiErrorMessage from '../../shared/ApiErrorMessage'
+import MovieCards from '../../shared/cards/MovieCard'
 
 export function MovieSuggestions() {
   const {data, loading, error, refetch} = useGetRecommendedMoviesQuery({notifyOnNetworkStatusChange: true})

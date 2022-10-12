@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from 'react'
-import * as cookie from 'cookie'
+import { useApolloClient } from '@apollo/client'
+import { User } from '@overdb/backend/types'
 import { effect, signal } from '@preact/signals'
-import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import * as cookie from 'cookie'
 // @ts-ignore
 import Cookies from 'js-cookie'
-import { User } from '@overdb/backend/types'
-import { useApolloClient } from '@apollo/client'
+import { useCallback, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 declare const SERVER_URL: string
 
@@ -27,7 +27,7 @@ export default function useUser({redirectIfNoAuth} = {redirectIfNoAuth: false}) 
 
   const login = useCallback(async (username: string, password: string) => {
     const {data} = await axios.post(`${SERVER_URL}/login`, {username, password}, {withCredentials: true})
-    Cookies.set('user', JSON.stringify(data), { expires: 7 })
+    Cookies.set('user', JSON.stringify(data), {expires: 7})
     userSignal.value = data
   }, [])
 

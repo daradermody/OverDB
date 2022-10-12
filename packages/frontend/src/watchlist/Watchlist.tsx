@@ -2,8 +2,8 @@ import { gql } from '@apollo/client'
 import { Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetWatchlistQuery } from '../../types/graphql'
-import MovieCards from '../shared/cards/MovieCard'
 import ApiErrorMessage from '../shared/ApiErrorMessage'
+import MovieCards from '../shared/cards/MovieCard'
 import PageWrapper from '../shared/PageWrapper'
 
 export default function Watchlist() {

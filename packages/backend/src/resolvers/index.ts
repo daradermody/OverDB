@@ -1,3 +1,4 @@
+import { GraphQLResolveInfo } from 'graphql/type'
 import {
   isMovieSummary,
   Movie,
@@ -23,7 +24,6 @@ import MovieDb from '../services/MovieDb'
 import RottenTomatoes from '../services/RottenTomatoes'
 import { UserData } from '../services/UserData'
 import recommendedMoviesResolver from './recommendedMovies'
-import { GraphQLResolveInfo } from 'graphql/type'
 
 const unauthedQueries: (keyof Query)[] = ['trending']
 const index: Resolvers<{ user: User }> = {
@@ -85,10 +85,7 @@ const index: Resolvers<{ user: User }> = {
     trending: () => MovieDb.trending(),
     profileCounts: async (_1: any, _2: any, {user}) => {
       const [people, watched, liked, watchlist] = await Promise.all([
-        UserData.getFavourites(user.id),
-        UserData.getWatched(user.id),
-        UserData.getLikedMovies(user.id),
-        UserData.getWatchlist(user.id)
+        UserData.getFavourites(user.id), UserData.getWatched(user.id), UserData.getLikedMovies(user.id), UserData.getWatchlist(user.id)
       ])
       return {favouritePeople: people.length, watched: watched.length, moviesLiked: liked.length, watchlist: watchlist.length}
     }

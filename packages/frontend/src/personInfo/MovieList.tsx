@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client'
+import styled from '@emotion/styled'
 import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import * as React from 'react'
 import { useState } from 'react'
@@ -46,16 +47,30 @@ function ToggleFilter({options, value, onChange, loading}: ToggleFilterProps) {
     )
   } else {
     return (
-      <ToggleButtonGroup
-        sx={{mb: 2}}
-        value={value}
-        onChange={(_, values) => onChange(values)}
-      >
+      <StyledButtonGroup value={value} onChange={(_, values) => onChange(values)}>
         {options.map(option => <ToggleButton key={option} value={option}>{option}</ToggleButton>)}
-      </ToggleButtonGroup>
+      </StyledButtonGroup>
     )
   }
 }
+
+const StyledButtonGroup = styled(ToggleButtonGroup)`
+  margin-bottom: 16px;
+  overflow-x: auto;
+
+  @media(pointer: fine) {
+    &::-webkit-scrollbar {
+      background-color: ${({theme}) => theme.palette.background.default};
+      border-radius: 3px;
+      -webkit-box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.4);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 3px;
+      background-color: rgba(255, 255, 255, 0.4);
+    }
+  }
+`
 
 function extractUniqueRoles(movies: { jobs: PersonCredit['jobs'] }[]): string[] {
   const roles = new Set<string>()

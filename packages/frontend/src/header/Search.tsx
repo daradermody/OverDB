@@ -7,6 +7,7 @@ import { useThrottleCallback } from '@react-hook/throttle'
 import * as React from 'react'
 import { HTMLAttributes, KeyboardEvent, useCallback, useEffect, useState } from 'react'
 import { Movie, Person, SearchResult, useSearchLazyQuery } from '../../types/graphql'
+import { useMutationErrorHandler } from '../shared/errorHandlers'
 import { Poster } from '../shared/general/Poster'
 
 interface SearchProps {
@@ -64,8 +65,9 @@ function SearchButton(props: SearchProps) {
 
 function SearchInput(props: SearchProps) {
   const [query, setQuery] = useState('')
-  const [search, {data, loading}] = useSearchLazyQuery({notifyOnNetworkStatusChange: true})
   const [isOpen, setIsOpen] = useState(false)
+  const [search, {data, loading, error}] = useSearchLazyQuery({notifyOnNetworkStatusChange: true})
+  useMutationErrorHandler('Could not search', error)
 
   const handleKeyUp = useThrottleCallback(async (e: KeyboardEvent<HTMLInputElement>) => {
     if ((e.target as HTMLInputElement).value) {
@@ -135,7 +137,8 @@ interface MobileSearchInputProps {
 
 function MobileSearchInput(props: MobileSearchInputProps) {
   const [query, setQuery] = useState('')
-  const [search, {data}] = useSearchLazyQuery({notifyOnNetworkStatusChange: true})
+  const [search, {data, error}] = useSearchLazyQuery({notifyOnNetworkStatusChange: true})
+  useMutationErrorHandler('Could not search', error)
 
   const handleKeyUp = useThrottleCallback(async e => {
     if (e.target.value) {

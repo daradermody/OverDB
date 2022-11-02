@@ -11,6 +11,7 @@ import Login from './Login'
 import { MovieInfo } from './movieInfo/MovieInfo'
 import { PersonInfo } from './personInfo/PersonInfo'
 import Profile from './Profile/Profile'
+import { ErrorBoundary } from './shared/errorHandlers'
 import ScrollToTop from './shared/general/ScrollToTop'
 import useIsOnline from './shared/useIsOnline'
 import { userSignal } from './useUser'
@@ -30,7 +31,9 @@ export default function App() {
       <Root>
         <Header/>
         <Box sx={{minHeight: 'calc(100vh - 276px)', color: 'text.primary', pt: 4}}>
-          {true ? <AppRoutes/> : <Offline/>}
+          <ErrorBoundary>
+            <AppRoutes/>
+          </ErrorBoundary>
         </Box>
         <Footer/>
       </Root>
@@ -61,24 +64,6 @@ function authed(children: ReactNode) {
   }
   return <div>{children}</div>
 }
-
-function Offline() {
-  return (
-    <StyledOfflineContainer fixed>
-      <Typography variant="h1" fontSize="3rem">You are offline</Typography>
-      <img src="/offline.png" alt="offline" style={{maxWidth: '100%'}}/>
-    </StyledOfflineContainer>
-  )
-}
-
-const StyledOfflineContainer = styled(Container)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  max-width: 95%;
-  gap: 50px;
-`
 
 const Root = styled('div')(({theme}) => (
   {

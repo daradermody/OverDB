@@ -5,17 +5,18 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Button, Typography } from '@mui/material'
 import * as React from 'react'
 import { Person, useGetPersonInfoQuery, useSetFavouriteMutation } from '../../types/graphql'
-import ApiErrorMessage from '../shared/ApiErrorMessage'
+import { ErrorMessage, useMutationErrorHandler } from '../shared/errorHandlers'
 import LoadingSpinner from '../shared/general/LoadingSpinner'
 import { Poster } from '../shared/general/Poster'
 
 
 export function PersonSummary({id}: { id: Person['id'] }) {
-  const {data, error, loading: loadingPerson} = useGetPersonInfoQuery({variables: {id}})
-  const [setFavourite, {loading: loadingFavourite}] = useSetFavouriteMutation({variables: {id, favourite: true}})
+  const {data, error: fetchError, loading: loadingPerson, refetch} = useGetPersonInfoQuery({variables: {id}})
+  const [setFavourite, {loading: loadingFavourite, error: mutationError}] = useSetFavouriteMutation({variables: {id, favourite: true}})
+  useMutationErrorHandler(`Could not ${data?.person?.favourited ? 'unfavourite' : 'favourite'}`, mutationError)
 
-  if (error) {
-    return <ApiErrorMessage error={error}/>
+  if (fetchError) {
+    return <ErrorMessage error={fetchError} onRetry={refetch}/>
   }
 
   if (loadingPerson) {

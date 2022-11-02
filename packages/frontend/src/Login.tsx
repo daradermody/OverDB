@@ -8,13 +8,18 @@ import PageWrapper from './shared/PageWrapper'
 import useUser from './useUser'
 
 export default function Login() {
-  const {user, login} = useUser()
+  const {user, login, logout} = useUser()
   const navigate = useNavigate()
   const [error, setError] = useState<string>()
 
   useEffect(() => {
     if (user) {
-      navigate('/')
+      const redirect = queryString.parse(location.search).andWeWillGetYouTo as string
+      if (redirect) {
+        logout({preventRedirect: true})
+      } else {
+        navigate('/')
+      }
     }
   }, [])
 

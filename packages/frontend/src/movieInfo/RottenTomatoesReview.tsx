@@ -3,13 +3,13 @@ import styled from '@emotion/styled'
 import { Skeleton, Typography } from '@mui/material'
 import * as React from 'react'
 import { Movie, Tomatometer, TomatometerState, useGetRottenTomatoesScoreQuery } from '../../types/graphql'
-import ApiErrorMessage from '../shared/ApiErrorMessage'
+import { ErrorMessage } from '../shared/errorHandlers'
 
 export default function RottenTomatoesReview({id}: { id: Movie['id'] }) {
-  const {data, error, loading} = useGetRottenTomatoesScoreQuery({variables: {id}})
+  const {data, error, loading, refetch} = useGetRottenTomatoesScoreQuery({variables: {id}})
 
   if (error) {
-    return <ApiErrorMessage error={error}/>
+    return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
   if (loading) {

@@ -4,6 +4,7 @@ import { Fade, IconButton, Tooltip, Typography } from '@mui/material'
 import * as React from 'react'
 import { useState } from 'react'
 import { Movie, Sentiment, useSetSentimentMutation, useSetWatchedMutation } from '../../../types/graphql'
+import { useMutationErrorHandler } from '../errorHandlers'
 
 interface SentimentSelectProps {
   id: Movie['id'];
@@ -13,8 +14,10 @@ interface SentimentSelectProps {
 }
 
 export function SentimentSelect({id, sentiment, withLabel, placement}: SentimentSelectProps) {
-  const [setSentiment] = useSetSentimentMutation()
-  const [setWatched] = useSetWatchedMutation()
+  const [setSentiment, {error: sentimentError}] = useSetSentimentMutation()
+  const [setWatched, {error: watchedError}] = useSetWatchedMutation()
+  useMutationErrorHandler('Could not set sentiment', sentimentError)
+  useMutationErrorHandler('Could not set watched status', watchedError)
   const isTouchscreen = !!navigator.maxTouchPoints
 
   const [showOptions, setShowOptions] = useState(false)

@@ -3,6 +3,7 @@ import { AlarmAdd, AlarmOn } from '@mui/icons-material'
 import { Button, Tooltip, Typography } from '@mui/material'
 import * as React from 'react'
 import { Movie, useSetInWatchlistMutation } from '../../../types/graphql'
+import { useMutationErrorHandler } from '../errorHandlers'
 
 interface WatchlistButtonProps {
   id: Movie['id'];
@@ -11,7 +12,8 @@ interface WatchlistButtonProps {
 }
 
 export function WatchlistButton({id, inWatchlist, withLabel}: WatchlistButtonProps) {
-  const [setInWatchlist] = useSetInWatchlistMutation()
+  const [setInWatchlist, {error}] = useSetInWatchlistMutation()
+  useMutationErrorHandler(`Could not ${inWatchlist ? 'remove from' : 'add to'} watchlist`, error)
 
   function handleClick() {
     return setInWatchlist({

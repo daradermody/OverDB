@@ -1,4 +1,5 @@
-import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
+import { ApolloClient, createHttpLink, from, InMemoryCache } from '@apollo/client'
+import { onError } from '@apollo/client/link/error'
 import { CachePersistor, LocalForageWrapper } from 'apollo3-cache-persist'
 import * as localForage from 'localforage'
 import { useEffect, useState } from 'react'
@@ -44,12 +45,17 @@ export default function useApolloClient() {
 }
 
 async function createClient() {
-  const cachePersistor = new CachePersistor({ cache, storage: new LocalForageWrapper(localForage) })
+  const cachePersistor = new CachePersistor({cache, storage: new LocalForageWrapper(localForage)})
   if (!navigator.onLine) {
     await cachePersistor.restore()
   }
-  return new ApolloClient({
-    link: createHttpLink({uri: `${SERVER_URL}/graphql`, credentials: 'include'}),
-    cache,
-  })
+  return new ApolloClient({link: from([errorLink, httpLink]), cache})
 }
+
+const errorLink = onError(error => {
+  if (error.graphQLErrors?.[0].extensions.code === 'UNAUTHENTICATED') {
+    window.location.href = `${window.location.origin}/login?andWeWillGetYouTo=${window.location.pathname}`
+  }
+})
+
+const httpLink = createHttpLink({uri: `${SERVER_URL}/graphql`, credentials: 'include'})

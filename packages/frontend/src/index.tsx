@@ -1,5 +1,6 @@
 import { ApolloProvider } from '@apollo/client'
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles'
+import { SnackbarProvider } from 'notistack'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
@@ -24,9 +25,11 @@ function Root() {
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
         <ApolloProvider client={apolloClient}>
-          <BrowserRouter>
-            <App/>
-          </BrowserRouter>
+          <SnackbarProvider>
+            <BrowserRouter>
+              <App/>
+            </BrowserRouter>
+          </SnackbarProvider>
         </ApolloProvider>
       </ThemeProvider>
     </StyledEngineProvider>

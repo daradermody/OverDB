@@ -34,11 +34,13 @@ export default function useUser({redirectIfNoAuth} = {redirectIfNoAuth: false}) 
   return {
     user,
     login,
-    logout: () => {
+    logout: ({preventRedirect} = {preventRedirect: false}) => {
       void client.clearStore()
       Cookies.remove('user')
       userSignal.value = null
-      navigate('/')
+      if (!preventRedirect) {
+        navigate('/')
+      }
     }
   }
 }

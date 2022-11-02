@@ -3,19 +3,14 @@ import styled from '@emotion/styled'
 import { Divider, Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetProfileCountsQuery, useGetWatchedMoviesQuery } from '../../types/graphql'
-import ApiErrorMessage from '../shared/ApiErrorMessage'
 import MovieCards from '../shared/cards/MovieCard'
+import { ErrorMessage } from '../shared/errorHandlers'
 import Link from '../shared/general/Link'
 import PageWrapper from '../shared/PageWrapper'
 import useUser from '../useUser'
 
 export default function Profile() {
   const {user} = useUser()
-  const {data, error, loading} = useGetWatchedMoviesQuery({variables: {limit: 8}})
-
-  if (error) {
-    return <ApiErrorMessage error={error}/>
-  }
 
   return (
     <PageWrapper>
@@ -24,10 +19,7 @@ export default function Profile() {
           <img style={{width: 300, aspectRatio: '1', clipPath: 'circle()'}} src={user.avatarUrl} alt="profile photo"/>
           <Stats/>
         </div>
-        <div style={{width: '100%'}}>
-          <Typography variant="h1">Recently Watched</Typography>
-          <MovieCards movies={data?.watched?.results} loading={loading} loadingCount={3}/>
-        </div>
+        <RecentlyWatchedMovies/>
       </StyledProfile>
     </PageWrapper>
   )
@@ -46,7 +38,11 @@ const StyledProfile = styled.div`
 `
 
 function Stats() {
-  const {data, loading} = useGetProfileCountsQuery()
+  const {data, loading, error, refetch} = useGetProfileCountsQuery()
+
+  if (error) {
+    return <ErrorMessage error={error} onRetry={refetch}/>
+  }
 
   return (
     <div style={{display: 'flex', justifyContent: 'center', flexGrow: 1}}>
@@ -88,6 +84,21 @@ const StatWrapper = styled.div`
     background-color: #ffffff10;
   }
 `
+
+function RecentlyWatchedMovies() {
+  const {data, error, loading, refetch} = useGetWatchedMoviesQuery({variables: {limit: 8}})
+
+  if (error) {
+    return <ErrorMessage error={error} onRetry={refetch}/>
+  }
+
+  return (
+    <div style={{width: '100%'}}>
+      <Typography variant="h1">Recently Watched</Typography>
+      <MovieCards movies={data?.watched?.results} loading={loading} loadingCount={3}/>
+    </div>
+  )
+}
 
 gql`
   query GetProfileCounts {

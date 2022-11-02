@@ -4,8 +4,8 @@ import { Typography } from '@mui/material'
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import { Movie, useGetCreditsQuery, useGetMovieInfoQuery } from '../../types/graphql'
-import ApiErrorMessage from '../shared/ApiErrorMessage'
 import { PersonCard } from '../shared/cards/PersonCard'
+import { ErrorMessage } from '../shared/errorHandlers'
 import { InterestingDivider } from '../shared/general/InterestingDivider'
 import Link from '../shared/general/Link'
 import LoadingSpinner from '../shared/general/LoadingSpinner'
@@ -31,10 +31,10 @@ export function MovieInfo() {
 }
 
 function MovieSummary({id}: { id: Movie['id'] }) {
-  const {data, error, loading} = useGetMovieInfoQuery({variables: {id}})
+  const {data, error, loading, refetch} = useGetMovieInfoQuery({variables: {id}})
 
   if (error) {
-    return <ApiErrorMessage error={error}/>
+    return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
   if (loading) {
@@ -102,10 +102,10 @@ const StyledActionsAndReview = styled.div`
 `
 
 function CrewList({id}: { id: Movie['id'] }) {
-  const {data, error, loading} = useGetCreditsQuery({variables: {id}})
+  const {data, error, loading, refetch} = useGetCreditsQuery({variables: {id}})
 
   if (error) {
-    return <ApiErrorMessage error={error}/>
+    return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
   if (loading) {

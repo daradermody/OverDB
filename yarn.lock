@@ -2240,6 +2240,7 @@ __metadata:
     js-cookie: ^3.0.1
     localforage: ^1.10.0
     lodash: ^4.17.21
+    notistack: alpha
     preact: ^10.11.1
     query-string: ^7.1.1
     react: ^18.2.0
@@ -3881,7 +3882,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clsx@npm:^1.2.1":
+"clsx@npm:^1.1.0, clsx@npm:^1.2.1":
   version: 1.2.1
   resolution: "clsx@npm:1.2.1"
   checksum: 30befca8019b2eb7dbad38cff6266cf543091dae2825c856a62a8ccf2c3ab9c2907c4d12b288b73101196767f66812365400a227581484a05f968b0307cfaf12
@@ -5637,6 +5638,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"goober@npm:^2.0.33":
+  version: 2.1.11
+  resolution: "goober@npm:2.1.11"
+  peerDependencies:
+    csstype: ^3.0.10
+  checksum: c37c14f476f65f7c66d94ac1a1686a130b4fa42fc512175444e3c708fa1815f6ea579e1b23567e57d41de2e62ff8b5913915ec829f05a3b995d1a7a0016c0bdf
+  languageName: node
+  linkType: hard
+
 "got@npm:^11.8.2":
   version: 11.8.5
   resolution: "got@npm:11.8.5"
@@ -7340,6 +7350,19 @@ __metadata:
   version: 6.1.0
   resolution: "normalize-url@npm:6.1.0"
   checksum: 4a4944631173e7d521d6b80e4c85ccaeceb2870f315584fa30121f505a6dfd86439c5e3fdd8cd9e0e291290c41d0c3599f0cb12ab356722ed242584c30348e50
+  languageName: node
+  linkType: hard
+
+"notistack@npm:alpha":
+  version: 3.0.0-alpha.11
+  resolution: "notistack@npm:3.0.0-alpha.11"
+  dependencies:
+    clsx: ^1.1.0
+    goober: ^2.0.33
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: c7883349e47a9ef16c8f89eaf4a4f62682133607fe970ffa80fa922d32f6b62af842d329f418189957b71db7aeebe07bff15637d7f5222e806c26e2246598a4f
   languageName: node
   linkType: hard
 

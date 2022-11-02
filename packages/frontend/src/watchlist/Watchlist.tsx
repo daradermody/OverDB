@@ -2,15 +2,15 @@ import { gql } from '@apollo/client'
 import { Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetWatchlistQuery } from '../../types/graphql'
-import ApiErrorMessage from '../shared/ApiErrorMessage'
 import MovieCards from '../shared/cards/MovieCard'
+import { ErrorMessage } from '../shared/errorHandlers'
 import PageWrapper from '../shared/PageWrapper'
 
 export default function Watchlist() {
-  const {data, error, loading} = useGetWatchlistQuery()
+  const {data, error, loading, refetch} = useGetWatchlistQuery()
 
   if (error) {
-    return <ApiErrorMessage error={error}/>
+    return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
   return (

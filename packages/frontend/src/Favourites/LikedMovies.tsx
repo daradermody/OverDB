@@ -2,14 +2,14 @@ import { gql } from '@apollo/client'
 import { Box, Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetLikedMoviesQuery } from '../../types/graphql'
-import ApiErrorMessage from '../shared/ApiErrorMessage'
 import MovieCards from '../shared/cards/MovieCard'
+import { ErrorMessage } from '../shared/errorHandlers'
 
 export function LikedMovies() {
-  const {data, error, loading} = useGetLikedMoviesQuery()
+  const {data, error, loading, refetch} = useGetLikedMoviesQuery()
 
   if (error) {
-    return <ApiErrorMessage error={error}/>
+    return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
   if (data && !data.likedMovies.length) {

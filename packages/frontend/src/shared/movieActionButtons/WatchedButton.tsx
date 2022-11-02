@@ -3,6 +3,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { Button, Tooltip, Typography } from '@mui/material'
 import * as React from 'react'
 import { Movie, useSetWatchedMutation } from '../../../types/graphql'
+import { useMutationErrorHandler } from '../errorHandlers'
 
 interface WatchedButtonProps {
   id: Movie['id'];
@@ -11,7 +12,8 @@ interface WatchedButtonProps {
 }
 
 export function WatchedButton({id, watched, withLabel}: WatchedButtonProps) {
-  const [setWatched] = useSetWatchedMutation()
+  const [setWatched, {error}] = useSetWatchedMutation()
+  useMutationErrorHandler(`Could not set as ${watched ? 'unwatched' : 'watched'}`, error)
 
   function handleClick() {
     return setWatched({

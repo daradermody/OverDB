@@ -3,19 +3,19 @@ import { LoadingButton } from '@mui/lab'
 import { Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetWatchedMoviesQuery } from '../../types/graphql'
-import ApiErrorMessage from '../shared/ApiErrorMessage'
 import MovieCards from '../shared/cards/MovieCard'
+import { ErrorMessage } from '../shared/errorHandlers'
 import PageWrapper from '../shared/PageWrapper'
 
 export default function WatchedMovies() {
-  const {data, error, loading, fetchMore} = useGetWatchedMoviesQuery({
+  const {data, error, loading, refetch, fetchMore} = useGetWatchedMoviesQuery({
     variables: {offset: 0, limit: 24},
     notifyOnNetworkStatusChange: true,
   })
   const initialLoading = loading && !data
 
   if (error) {
-    return <ApiErrorMessage error={error}/>
+    return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
   return (

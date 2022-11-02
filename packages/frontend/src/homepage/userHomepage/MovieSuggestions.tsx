@@ -3,14 +3,14 @@ import { Loop } from '@mui/icons-material'
 import { CircularProgress, IconButton, Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetRecommendedMoviesQuery } from '../../../types/graphql'
-import ApiErrorMessage from '../../shared/ApiErrorMessage'
 import MovieCards from '../../shared/cards/MovieCard'
+import { ErrorMessage } from '../../shared/errorHandlers'
 
 export function MovieSuggestions() {
   const {data, loading, error, refetch} = useGetRecommendedMoviesQuery({notifyOnNetworkStatusChange: true})
 
   if (error) {
-    return <ApiErrorMessage error={error}/>
+    return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
   return (

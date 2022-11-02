@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql/error'
 import { GraphQLResolveInfo } from 'graphql/type'
 import {
   isMovieSummary,
@@ -78,7 +79,7 @@ const index: Resolvers<{ user: User }> = {
       return {
         offset,
         limit,
-        endReached: !args.limit || offset + args.limit >= watchedMovieIds.length,
+        endReached: !args.limit || offset + limit >= watchedMovieIds.length,
         results: await Promise.all(movieIds.map(MovieDb.movieInfo)) as any
       }
     },
@@ -123,7 +124,12 @@ function applyAuth<TResult, TParent, TContext, TArgs>(resolvers: Resolvers['Quer
 function withUser<TResult, TParent, TContext extends { user?: User }, TArgs>(resolver: ResolverFn<TResult, TParent, TContext, TArgs>): ResolverFn<TResult, TParent, TContext, TArgs> {
   return (parent: TParent, args: TArgs, context: TContext, info: GraphQLResolveInfo): TResult | Promise<TResult> => {
     if (!context.user) {
-      throw new Error('You must be logged in')
+      throw new GraphQLError('You must be logged in', {
+        extensions: {
+          code: 'UNAUTHENTICATED',
+          http: {status: 401},
+        },
+      })
     }
     return resolver(parent, args, context, info)
   }

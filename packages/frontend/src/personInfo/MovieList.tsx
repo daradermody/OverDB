@@ -3,15 +3,15 @@ import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import * as React from 'react'
 import { useState } from 'react'
 import { Person, PersonCredit, useGetPersonCreditsQuery } from '../../types/graphql'
-import ApiErrorMessage from '../shared/ApiErrorMessage'
 import MovieCards from '../shared/cards/MovieCard'
+import { ErrorMessage } from '../shared/errorHandlers'
 
 export function MovieList({id}: { id: Person['id'] }) {
-  const {data, error, loading} = useGetPersonCreditsQuery({variables: {id}})
+  const {data, error, loading, refetch} = useGetPersonCreditsQuery({variables: {id}})
   const [selectedRoles, setSelectedRoles] = useState<string[]>([])
 
   if (error) {
-    return <ApiErrorMessage error={error}/>
+    return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
   const roles = loading ? [] : extractUniqueRoles(data.creditsForPerson)

@@ -1,5 +1,4 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { gql } from '@apollo/client';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -420,20 +419,3 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   Tomatometer?: TomatometerResolvers<ContextType>;
 }>;
 
-
-
-      export interface PossibleTypesResultData {
-        possibleTypes: {
-          [key: string]: string[]
-        }
-      }
-      const result: PossibleTypesResultData = {
-  "possibleTypes": {
-    "SearchResult": [
-      "Movie",
-      "Person"
-    ]
-  }
-};
-      export default result;
-    

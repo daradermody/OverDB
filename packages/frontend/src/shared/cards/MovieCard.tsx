@@ -49,16 +49,19 @@ interface MovieCardProps {
 function MovieCard({movie}: MovieCardProps) {
   return (
     <StyledCard>
-      <MovieImage movie={movie}/>
-      <CardContent style={{marginTop: -10}}>
-        <MovieSummary movie={movie}/>
-      </CardContent>
+      <Link to={`/movie/${movie.id}`}>
+        <MovieImage movie={movie}/>
+        <CardContent style={{marginTop: -10}}>
+          <MovieSummary movie={movie}/>
+        </CardContent>
+      </Link>
     </StyledCard>
   )
 }
 
 const StyledCard = styled(Card)`
   width: 100%;
+
   ${({theme}) => theme.breakpoints.up('sm')} {
     max-width: 200px;
   }
@@ -82,21 +85,19 @@ function MovieImage({movie}: MovieCardProps) {
       onMouseEnter={() => setShowButtons(true)}
       onMouseLeave={() => setShowButtons(false)}
     >
-      <Link to={`/movie/${movie.id}`}>
-        <CardActionArea>
-          <CardMedia
-            component="img"
-            image={getPosterUrl(movie.posterPath)}
-            onError={handlePosterError}
-            alt={`${movie.title} poster`}
-            height="256px"
-            style={{
-              objectFit: 'contain',
-              backgroundColor: movie.posterPath ? 'black' : 'white',
-            }}
-          />
-        </CardActionArea>
-      </Link>
+      <CardActionArea>
+        <CardMedia
+          component="img"
+          image={getPosterUrl(movie.posterPath)}
+          onError={handlePosterError}
+          alt={`${movie.title} poster`}
+          height="256px"
+          style={{
+            objectFit: 'contain',
+            backgroundColor: movie.posterPath ? 'black' : 'white',
+          }}
+        />
+      </CardActionArea>
       {
         (movie.watched ?? movie.inWatchlist ?? movie.sentiment) && (
           <div style={{
@@ -145,5 +146,7 @@ function MovieSummary({movie}: MovieCardProps) {
 }
 
 function isCredit(movie: { jobs?: any }): movie is MovieCredit {
-  return !!(movie as MovieCredit).jobs
+  return !!(
+    movie as MovieCredit
+  ).jobs
 }

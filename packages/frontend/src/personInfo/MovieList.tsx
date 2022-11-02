@@ -2,14 +2,17 @@ import { gql } from '@apollo/client'
 import styled from '@emotion/styled'
 import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import * as React from 'react'
-import { useState } from 'react'
+import { useLocation } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { Person, PersonCredit, useGetPersonCreditsQuery } from '../../types/graphql'
 import MovieCards from '../shared/cards/MovieCard'
 import { ErrorMessage } from '../shared/errorHandlers'
 
 export function MovieList({id}: { id: Person['id'] }) {
   const {data, error, loading, refetch} = useGetPersonCreditsQuery({variables: {id}})
-  const [selectedRoles, setSelectedRoles] = useState<string[]>([])
+  const navigate = useNavigate()
+  const location = useLocation()
+  const selectedRoles: string[] = location.state?.roles || []
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>
@@ -22,7 +25,11 @@ export function MovieList({id}: { id: Person['id'] }) {
   return (
     <div>
       <div style={{display: 'flex', marginBottom: 10, justifyContent: 'right'}}>
-        <ToggleFilter options={roles} value={selectedRoles} onChange={setSelectedRoles}/>
+        <ToggleFilter
+          options={roles}
+          value={selectedRoles}
+          onChange={roles => navigate(location, {state: {roles}, replace: true})}
+        />
       </div>
       <MovieCards movies={filteredMovies} loading={loading}/>
     </div>
@@ -58,7 +65,7 @@ const StyledButtonGroup = styled(ToggleButtonGroup)`
   margin-bottom: 16px;
   overflow-x: auto;
 
-  @media(pointer: fine) {
+  @media (pointer: fine) {
     &::-webkit-scrollbar {
       background-color: ${({theme}) => theme.palette.background.default};
       border-radius: 3px;

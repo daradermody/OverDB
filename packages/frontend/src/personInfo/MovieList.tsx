@@ -15,7 +15,7 @@ export function MovieList({id}: { id: Person['id'] }) {
     return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
-  const roles = loading ? [] : extractUniqueRoles(data.creditsForPerson)
+  const roles = loading ? [] : extractUniqueRoles(data.creditsForPerson).sort(sortJobs)
   const filteredMovies = loading ? [] : data.creditsForPerson
     .filter(movie => !selectedRoles.length || selectedRoles.every(role => movie.jobs.includes(role)))
 
@@ -72,14 +72,15 @@ const StyledButtonGroup = styled(ToggleButtonGroup)`
   }
 `
 
-function extractUniqueRoles(movies: { jobs: PersonCredit['jobs'] }[]): string[] {
-  const roles = new Set<string>()
-  for (let movie of movies) {
-    for (let job of movie.jobs) {
-      roles.add(job)
-    }
-  }
-  return Array.from(roles)
+function extractUniqueRoles(movies: { jobs: PersonCredit['jobs'] }[]): PersonCredit['jobs'] {
+  return Array.from(new Set(movies.map(m => m.jobs).flat()))
+}
+
+function sortJobs(jobA: PersonCredit['jobs'][number], jobB: PersonCredit['jobs'][number]): number {
+  const jobsByImportance = ['Casting', 'Editor', 'Music', 'Sound', 'Producer', 'Cinematography', 'Writer', 'Director']
+  const jobAPrecedence = jobsByImportance.findIndex(importantJob => jobA === importantJob)
+  const jobBPrecedence = jobsByImportance.findIndex(importantJob => jobB === importantJob)
+  return jobAPrecedence > jobBPrecedence ? -1 : 1
 }
 
 gql`

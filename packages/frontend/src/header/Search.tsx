@@ -82,12 +82,11 @@ function SearchInput(props: SearchProps) {
   useEffect(() => setIsOpen(!!data && !!query), [data, query, setIsOpen])
 
   return (
-    <Autocomplete
+    <Autocomplete<SearchResult, false, false, true>
       options={data?.search || []}
       autoHighlight
       freeSolo
       size="medium"
-      blurOnSelect
       filterOptions={x => x}
       loading={loading}
       onFocus={() => setIsOpen(!!data && !!query)}
@@ -98,12 +97,15 @@ function SearchInput(props: SearchProps) {
       disabled={props.disabled}
       onInputChange={(e, value) => setQuery(value)}
       onChange={(e, result) => {
-        props.onSelect(result as SearchResult)
-        if (props.clearOnSelect) {
-          setTimeout(() => setQuery(''), 0)
+        if (typeof result !== 'string') {
+          (e.target as HTMLInputElement).blur()
+          props.onSelect(result)
+          if (props.clearOnSelect) {
+            setTimeout(() => setQuery(''), 0)
+          }
         }
       }}
-      getOptionLabel={(option: SearchResult) => option.__typename === 'Movie' ? option.title : option.name}
+      getOptionLabel={(option: SearchResult | string) => (option as Movie).title || (option as Person).name || (option as string)}
       renderOption={(props, option) => {
         return option.__typename === 'Movie'
           ? <MovieResult key={option.id} liProps={props} movie={option}/>

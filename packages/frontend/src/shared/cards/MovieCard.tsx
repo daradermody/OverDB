@@ -77,13 +77,9 @@ export function LoadingMovieCard() {
 }
 
 function MovieImage({movie}: MovieCardProps) {
-  const [showButtons, setShowButtons] = useState(false)
-
   return (
-    <div
+    <StyledMovieImage
       style={{position: 'relative'}}
-      onMouseEnter={() => setShowButtons(true)}
-      onMouseLeave={() => setShowButtons(false)}
     >
       <CardActionArea>
         <CardMedia
@@ -99,24 +95,38 @@ function MovieImage({movie}: MovieCardProps) {
         />
       </CardActionArea>
       {
-        (movie.watched ?? movie.inWatchlist ?? movie.sentiment) && (
-          <div style={{
-            display: 'flex',
-            marginTop: -56,
-            padding: '4px 0',
-            position: 'absolute',
-            visibility: showButtons ? 'visible' : 'hidden',
-            backgroundColor: 'rgba(0,0,0,0.8)'
-          }}>
+        ((movie.watched ?? movie.inWatchlist ?? movie.sentiment) !== undefined) && (
+          <StyledActions className="show-on-hover" onClick={e => e.preventDefault()}>
             <WatchedButton id={movie.id} watched={movie.watched}/>
             <WatchlistButton id={movie.id} inWatchlist={movie.inWatchlist}/>
             <SentimentSelect id={movie.id} sentiment={movie.sentiment} placement="top"/>
-          </div>
+          </StyledActions>
         )
       }
-    </div>
+    </StyledMovieImage>
   )
 }
+
+const StyledActions = styled.div`
+  display: flex;
+  margin-top: -48px;
+  width: 100%;
+  padding: 4px 0;
+  position: absolute;
+  visibility: hidden;
+  background-color: rgba(0, 0, 0, 0.8);
+
+  @media (pointer: coarse) {
+    visibility: visible;
+  }
+`
+
+const StyledMovieImage = styled.div`
+  position: relative;
+  &:hover .show-on-hover {
+    visibility: visible;
+  }
+`
 
 function MovieSummary({movie}: MovieCardProps) {
   return (

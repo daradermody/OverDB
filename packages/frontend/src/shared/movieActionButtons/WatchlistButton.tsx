@@ -18,7 +18,7 @@ export function WatchlistButton({id, inWatchlist, withLabel}: WatchlistButtonPro
   function handleClick() {
     return setInWatchlist({
       variables: {id, inWatchlist: !inWatchlist},
-      refetchQueries: ['GetWatchedMovies', 'GetWatchlist', 'GetRecommendedMovies'],
+      refetchQueries: ['GetPersonCredits', 'GetWatchedMovies', 'GetWatchlist', 'GetRecommendedMovies'],
       optimisticResponse: {
         setInWatchlist: {
           __typename: 'Movie',
@@ -34,6 +34,7 @@ export function WatchlistButton({id, inWatchlist, withLabel}: WatchlistButtonPro
       placement="top"
       disableHoverListener={withLabel}
       disableFocusListener={withLabel}
+      PopperProps={{disablePortal: true}}
       title={(inWatchlist ? 'Added to watchlist' : 'Add to watchlist')}
     >
       <Button sx={{color: 'common.white'}} onClick={handleClick}>

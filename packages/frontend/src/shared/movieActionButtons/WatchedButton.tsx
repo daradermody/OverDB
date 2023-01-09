@@ -18,7 +18,7 @@ export function WatchedButton({id, watched, withLabel}: WatchedButtonProps) {
   function handleClick() {
     return setWatched({
       variables: {id, watched: !watched},
-      refetchQueries: ['GetWatchedMovies', 'GetWatchlist', 'GetRecommendedMovies'],
+      refetchQueries: ['GetPersonCredits', 'GetWatchedMovies', 'GetWatchlist', 'GetRecommendedMovies'],
       optimisticResponse: {
         setWatched: {
           __typename: "Movie",
@@ -34,6 +34,7 @@ export function WatchedButton({id, watched, withLabel}: WatchedButtonProps) {
       placement="top"
       disableHoverListener={withLabel}
       disableFocusListener={withLabel}
+      PopperProps={{disablePortal: true}}
       title={(watched ? 'Watched' : 'Unwatched')}
     >
       <Button sx={{color: 'common.white'}} onClick={handleClick}>

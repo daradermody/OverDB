@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 import { Clear, ThumbDown, ThumbsUpDown, ThumbUp } from '@mui/icons-material'
-import { Fade, IconButton, Tooltip, Typography } from '@mui/material'
+import { Button, ClickAwayListener, Fade, IconButton, Tooltip, Typography } from '@mui/material'
 import * as React from 'react'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Movie, Sentiment, useSetSentimentMutation, useSetWatchedMutation } from '../../../types/graphql'
 import { useMutationErrorHandler } from '../errorHandlers'
 
@@ -18,7 +18,6 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
   const [setWatched, {error: watchedError}] = useSetWatchedMutation()
   useMutationErrorHandler('Could not set sentiment', sentimentError)
   useMutationErrorHandler('Could not set watched status', watchedError)
-  const isTouchscreen = !!navigator.maxTouchPoints
 
   const [showOptions, setShowOptions] = useState(false)
 
@@ -26,7 +25,7 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
     setShowOptions(false)
     void setSentiment({
       variables: {id, sentiment},
-      refetchQueries: ['GetWatchedMovies', 'GetWatchlist', 'GetRecommendedMovies'],
+      refetchQueries: ['GetPersonCredits', 'GetWatchedMovies', 'GetWatchlist', 'GetRecommendedMovies'],
       optimisticResponse: {
         setSentiment: {
           __typename: 'Movie',
@@ -50,54 +49,46 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
   }
 
   return (
-    <div style={{display: 'flex', alignItems: 'center'}}>
-      <Tooltip
-        placement={placement || 'right'}
-        open={showOptions}
-        sx={{bgcolor: 'transparent'}}
-        onClose={() => setShowOptions(false)}
-        onOpen={() => setShowOptions(true)}
-        TransitionComponent={Fade}
-        TransitionProps={{timeout: 0}}
-        componentsProps={{tooltip: {sx: {marginLeft: '0 !important', padding: '4px 8px'}}}}
-        disableHoverListener={isTouchscreen}
-        disableTouchListener={isTouchscreen}
-        title={
-          <div style={{
-            display: 'flex',
-            flexDirection: placement === 'top' ? 'column-reverse' : 'row',
-            backgroundColor: !withLabel ? 'rgba(0,0,0,0.8)' : undefined,
-          }}>
-            <IconButton onClick={() => changeSentiment(Sentiment.Liked)}>{getIconForSentiment(Sentiment.Liked)}</IconButton>
-            <IconButton onClick={() => changeSentiment(Sentiment.Disliked)}>{getIconForSentiment(Sentiment.Disliked)}</IconButton>
-            <IconButton onClick={() => changeSentiment(Sentiment.None)}><Clear/></IconButton>
-          </div>
-        }
-      >
-        <IconButton color={sentiment === Sentiment.None ? undefined : 'primary'} disableRipple size="medium" onClick={() => setShowOptions(true)}>
-          {getIconForSentiment(sentiment)}
-        </IconButton>
-      </Tooltip>
-      {showOptions || !withLabel || <SentimentText sentiment={sentiment} onClear={() => changeSentiment(Sentiment.None)}/>}
-    </div>
+    <ClickAwayListener onClickAway={() => setShowOptions(false)}>
+      <Button color={sentiment === Sentiment.None ? 'inherit' : 'primary'} disableRipple size="medium" onClick={() => setShowOptions(true)}>
+        <Tooltip
+          placement={placement || 'right'}
+          open={showOptions}
+          sx={{bgcolor: 'transparent'}}
+          onClose={() => setShowOptions(false)}
+          onOpen={() => setShowOptions(true)}
+          TransitionComponent={Fade}
+          TransitionProps={{timeout: 0}}
+          componentsProps={{tooltip: {sx: {marginLeft: '0 !important', padding: '4px 8px'}}}}
+          disableHoverListener
+          disableTouchListener
+          title={
+            <div style={{
+              display: 'flex',
+              flexDirection: placement === 'top' ? 'column-reverse' : 'row',
+              backgroundColor: !withLabel ? 'rgba(0,0,0,0.8)' : undefined,
+            }}>
+              <IconButton onClick={() => changeSentiment(Sentiment.Liked)}>{getIconForSentiment(Sentiment.Liked)}</IconButton>
+              <IconButton onClick={() => changeSentiment(Sentiment.Disliked)}>{getIconForSentiment(Sentiment.Disliked)}</IconButton>
+              <IconButton onClick={() => changeSentiment(Sentiment.None)}><Clear/></IconButton>
+            </div>
+          }
+        >
+          <span/>
+        </Tooltip>
+        {getIconForSentiment(sentiment)}
+        {!withLabel || <SentimentText invisible={showOptions} sentiment={sentiment} onClear={() => changeSentiment(Sentiment.None)}/>}
+      </Button>
+    </ClickAwayListener>
   )
 }
 
-function SentimentText(props: { sentiment: Sentiment, onClear(): void }) {
-  if (props.sentiment === Sentiment.None) {
-    return <Typography variant="button">{getTextForSentiment(props.sentiment)}</Typography>
-  } else {
-    return (
-      <Tooltip
-        placement="right"
-        sx={{bgcolor: 'transparent', m: 0}}
-        TransitionComponent={Fade}
-        title={<IconButton onClick={props.onClear} size="large"><Clear/></IconButton>}
-      >
-        <Typography variant="button">{getTextForSentiment(props.sentiment)}</Typography>
-      </Tooltip>
-    )
-  }
+function SentimentText(props: { invisible: boolean, sentiment: Sentiment, onClear(): void }) {
+  return (
+    <Typography variant="button" sx={{ml: 1, visibility: props.invisible ? 'hidden' : 'visible'}}>
+      {getTextForSentiment(props.sentiment)}
+    </Typography>
+  )
 }
 
 function getIconForSentiment(sentiment: Sentiment): JSX.Element {

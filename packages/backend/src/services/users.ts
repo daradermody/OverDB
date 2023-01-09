@@ -29,4 +29,16 @@ export const users = [
     password: 'test',
     avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png',
   },
+  {
+    id: 5,
+    username: 'nikhil',
+    password: 'test',
+    avatarUrl: 'https://ca.slack-edge.com/T0ST06F7X-UN5AHT5H6-31ab940bed12-512',
+  },
+  {
+    id: 6,
+    username: 'akhilesh',
+    password: 'test',
+    avatarUrl: 'https://ca.slack-edge.com/T0ST06F7X-UMY0S1ZJ9-4b77820534f7-512',
+  },
 ]

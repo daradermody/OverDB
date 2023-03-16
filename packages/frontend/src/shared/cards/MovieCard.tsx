@@ -109,7 +109,8 @@ function MovieImage({movie}: MovieCardProps) {
 
 const StyledActions = styled.div`
   display: flex;
-  margin-top: -48px;
+  justify-content: space-evenly;
+  margin-top: -44px;
   width: 100%;
   padding: 4px 0;
   position: absolute;

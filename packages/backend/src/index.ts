@@ -15,6 +15,8 @@ import { users } from './services/users'
 dotenv.config()
 const PORT = process.env.PORT || 3000
 
+const SIX_MONTHS_IN_MILLIS = 6 * 30 * 24 * 60 * 60 * 1000
+
 const corsOptions = {
   origin: ['http://localhost:4000', 'https://d11msqkk13y61p.cloudfront.net'],
   credentials: true,
@@ -57,7 +59,7 @@ async function main() {
 function login(req: Request, res: Response) {
   const user = users.find(u => u.username === req.body.username && u.password === req.body.password)
   if (user) {
-    res.cookie('user', JSON.stringify(user), {maxAge: 900000000, sameSite: 'none', signed: true, secure: true})
+    res.cookie('user', JSON.stringify(user), {maxAge: SIX_MONTHS_IN_MILLIS, sameSite: 'none', signed: true, secure: true})
     const {password, ...userWithoutPassword} = user
     res.json(userWithoutPassword)
   } else {

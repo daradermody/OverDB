@@ -37,7 +37,7 @@ export function WatchlistButton({id, inWatchlist, withLabel}: WatchlistButtonPro
       PopperProps={{disablePortal: true}}
       title={(inWatchlist ? 'Added to watchlist' : 'Add to watchlist')}
     >
-      <Button sx={{color: 'common.white'}} onClick={handleClick}>
+      <Button sx={{color: 'common.white', minWidth: 'unset'}} onClick={handleClick}>
         {inWatchlist ? <AlarmOn color="primary"/> : <AlarmAdd/>}
         {withLabel && <Typography variant="button" sx={{ml: 1}}>{inWatchlist ? 'Added to watchlist' : 'Add to watchlist'}</Typography>}
       </Button>

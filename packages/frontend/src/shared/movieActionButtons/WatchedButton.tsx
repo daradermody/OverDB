@@ -37,7 +37,7 @@ export function WatchedButton({id, watched, withLabel}: WatchedButtonProps) {
       PopperProps={{disablePortal: true}}
       title={(watched ? 'Watched' : 'Unwatched')}
     >
-      <Button sx={{color: 'common.white'}} onClick={handleClick}>
+      <Button sx={{color: 'common.white', minWidth: 'unset'}} onClick={handleClick}>
         {watched ? <Visibility color="primary"/> : <VisibilityOff/>}
         {withLabel && <Typography variant="button" sx={{ml: 1}}>{watched ? 'Watched' : 'Unwatched'}</Typography>}
       </Button>

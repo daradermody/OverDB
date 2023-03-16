@@ -50,7 +50,7 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
 
   return (
     <ClickAwayListener onClickAway={() => setShowOptions(false)}>
-      <Button color={sentiment === Sentiment.None ? 'inherit' : 'primary'} disableRipple size="medium" onClick={() => setShowOptions(true)}>
+      <Button sx={{minWidth: 'unset'}} color={sentiment === Sentiment.None ? 'inherit' : 'primary'} disableRipple size="medium" onClick={() => setShowOptions(true)}>
         <Tooltip
           placement={placement || 'right'}
           open={showOptions}

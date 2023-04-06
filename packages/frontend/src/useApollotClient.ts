@@ -4,8 +4,6 @@ import { CachePersistor, LocalForageWrapper } from 'apollo3-cache-persist'
 import * as localForage from 'localforage'
 import { useEffect, useState } from 'react'
 
-declare const SERVER_URL: string
-
 const cache = new InMemoryCache({
   typePolicies: {
     Query: {
@@ -58,4 +56,4 @@ const errorLink = onError(error => {
   }
 })
 
-const httpLink = createHttpLink({uri: `${SERVER_URL}/graphql`, credentials: 'include'})
+const httpLink = createHttpLink({uri: `/graphql`, credentials: 'include'})

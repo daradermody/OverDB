@@ -8,15 +8,16 @@ const server = createServer(
     entryPoints: ['src/index.tsx', 'src/serviceWorker.ts'],
     outdir: 'public/static',
     bundle: true,
-    sourcemap: true,
-    define: {
-      SERVER_URL: `"http://localhost:${SERVER_PORT}"`,
-    },
+    sourcemap: true
   },
   {
     static: 'public',
     port: PORT,
     historyApiFallback: true,
+    proxy: {
+      '/loginWithPassword': 'http://localhost:3000',
+      '/graphql': 'http://localhost:3000'
+    }
   }
 )
 

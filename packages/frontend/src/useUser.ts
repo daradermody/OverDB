@@ -8,9 +8,8 @@ import Cookies from 'js-cookie'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-declare const SERVER_URL: string
-
-export const userSignal = signal<User>(JSON.parse(cookie.parse(document.cookie).user || null))
+const userCookie = cookie.parse(document.cookie).user?.match(/^s:(.*)\..*$/)?.[1]
+export const userSignal = signal<User>(JSON.parse(userCookie || null))
 
 export default function useUser({redirectIfNoAuth} = {redirectIfNoAuth: false}) {
   const navigate = useNavigate()
@@ -26,8 +25,7 @@ export default function useUser({redirectIfNoAuth} = {redirectIfNoAuth: false}) 
   }, [])
 
   const login = useCallback(async (username: string, password: string) => {
-    const {data} = await axios.post(`${SERVER_URL}/login`, {username, password}, {withCredentials: true})
-    Cookies.set('user', JSON.stringify(data), {expires: 6 * 30})
+    const {data} = await axios.post(`/loginWithPassword`, {username, password})
     userSignal.value = data
   }, [])
 

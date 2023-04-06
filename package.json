@@ -8,6 +8,12 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "dev": "concurrently -n client,server -c green,cyan 'yarn workspace @overdb/frontend dev' 'yarn workspace @overdb/backend dev'",
+    "graphql-type-gen": "yarn workspaces foreach run graphql-type-gen",
+    "build": "NODE_ENV=production scripts/build.sh",
+    "deploy": "sudo systemctl stop overdb.service && sudo cp build/overdb /usr/local/bin/overdb && sudo systemctl restart overdb.service"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/daradermody/OverDB.git"
@@ -21,14 +27,9 @@
   "bugs": {
     "url": "https://github.com/daradermody/OverDB/issues"
   },
-  "scripts": {
-    "dev": "concurrently -n client,server -c green,cyan 'yarn workspace @overdb/frontend dev' 'yarn workspace @overdb/backend dev'",
-    "graphql-type-gen": "yarn workspaces foreach run graphql-type-gen",
-    "build": "yarn workspaces foreach run build",
-    "deploy": "yarn workspaces foreach run deploy"
-  },
   "private": true,
   "devDependencies": {
-    "concurrently": "^7.4.0"
+    "concurrently": "^7.4.0",
+    "nexe": "^4.0.0-rc.2"
   }
 }

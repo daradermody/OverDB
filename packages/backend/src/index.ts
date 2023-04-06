@@ -7,32 +7,27 @@ import * as dotenv from 'dotenv'
 import express, { Request, Response } from 'express'
 import * as fs from 'fs'
 import * as http from 'http'
+import { join } from 'path'
 import { User } from '../types'
 import resolvers from './resolvers'
 import { setupDataDir } from './services/dataStorage'
 import { users } from './services/users'
+import getToken from './utils/getToken'
 
 dotenv.config()
 const PORT = process.env.PORT || 3000
 
 const SIX_MONTHS_IN_MILLIS = 6 * 30 * 24 * 60 * 60 * 1000
 
-const corsOptions = {
-  origin: ['http://localhost:4000', 'https://d11msqkk13y61p.cloudfront.net'],
-  credentials: true,
-  allowedHeaders: ['Content-Type'],
-}
-
 async function main() {
   setupDataDir()
 
   const app = express()
-  app.use(cors(corsOptions))
+  app.use(cors({allowedHeaders: ['Content-Type']}))
   app.use(express.json())
-  app.use(cookieParser('secret'))
-  app.get('/', (req, res) => res.send('OK'))
-  app.use(express.static('../../client/build'))
-  app.post('/login', login)
+  app.use(cookieParser(getToken('COOKIE_SECRET')))
+  app.use(express.static(join(__dirname, 'static')))
+  app.post('/loginWithPassword', login)
   const httpServer = http.createServer(app)
   const server = new ApolloServer({
     typeDefs: gql(fs.readFileSync(__dirname + '/schema.graphql', 'utf-8')),
@@ -44,6 +39,7 @@ async function main() {
     csrfPrevention: true,
     cache: 'bounded',
     context: authContext,
+    introspection: true,
     plugins: [
       ApolloServerPluginDrainHttpServer({httpServer}),
       ApolloServerPluginLandingPageLocalDefault({embed: true}),
@@ -51,7 +47,8 @@ async function main() {
   })
 
   await server.start()
-  server.applyMiddleware({app, cors: corsOptions})
+  server.applyMiddleware({app, cors: {allowedHeaders: ['Content-Type']}})
+  app.get('*', (req, res) => res.sendFile(join(__dirname, 'static/index.html')))
   await new Promise<void>(resolve => httpServer.listen({port: PORT}, resolve))
   console.log(`🚀 Backend ready at http://localhost:${PORT}`)
 }
@@ -59,7 +56,7 @@ async function main() {
 function login(req: Request, res: Response) {
   const user = users.find(u => u.username === req.body.username && u.password === req.body.password)
   if (user) {
-    res.cookie('user', JSON.stringify(user), {maxAge: SIX_MONTHS_IN_MILLIS, sameSite: 'none', signed: true, secure: true})
+    res.cookie('user', JSON.stringify(user), {maxAge: SIX_MONTHS_IN_MILLIS, signed: true, secure: true})
     const {password, ...userWithoutPassword} = user
     res.json(userWithoutPassword)
   } else {
@@ -68,7 +65,7 @@ function login(req: Request, res: Response) {
 }
 
 function authContext({req}: ExpressContext) {
-  const user = JSON.parse(req.signedCookies.user || null) as User || JSON.parse(req.cookies.user || null) as User
+  const user = JSON.parse(req.signedCookies.user || null) as User
   return {user}
 }
 

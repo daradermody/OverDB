@@ -1,7 +1,8 @@
+#!/usr/bin/env sh
+set -e
+
 rm -rf build/*
-mkdir -p build/unbundled
 yarn graphql-type-gen
-yarn esbuild --bundle --platform=node src/index.ts --define:process.env.NODE_ENV=\"production\" --external:canvas --external:./xhr-sync-worker.js > build/unbundled/overdb-backend.js
-touch build/unbundled/xhr-sync-worker.js
-cp src/schema.graphql build/unbundled
-yarn nexe --input build/unbundled/overdb-backend.js --output build/overdb-backend --target linux-x64-14.15.3 --resource build/unbundled/schema.graphql --resource build/unbundled/xhr-sync-worker.js
+yarn esbuild --bundle --platform=node src/index.ts --outfile=build/backend.js --define:process.env.NODE_ENV=\"production\" --external:canvas --external:./xhr-sync-worker.js
+touch build/xhr-sync-worker.js
+cp src/schema.graphql build

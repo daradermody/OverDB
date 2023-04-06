@@ -19,5 +19,7 @@ packages/frontend/public/static
 packages/frontend/build/
 packages/backend/.env
 packages/backend/build
+build
 packages/backend/data/*
 
+.vercel

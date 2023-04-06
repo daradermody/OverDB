@@ -3,9 +3,8 @@
   "packageManager": "yarn@3.2.2",
   "scripts": {
     "dev": "node scripts/devServer.js",
-    "build": "scripts/build.sh",
-    "graphql-type-gen": "graphql-codegen --config codegen.yml",
-    "deploy": "aws s3 sync build s3://serverless-website-dara --exact-timestamps --delete && aws cloudfront create-invalidation --distribution-id E1UPTX47GL3PH1 --paths '/*'"
+    "build": "NODE_ENV=production scripts/build.sh",
+    "graphql-type-gen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
     "@apollo/client": "^3.7.0",

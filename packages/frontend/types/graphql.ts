@@ -15,12 +15,29 @@ export type Scalars = {
   Float: number;
 };
 
+export type CastCredit = Person & {
+  __typename?: 'CastCredit';
+  character: Scalars['String'];
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  order: Scalars['Int'];
+  profilePath?: Maybe<Scalars['String']>;
+};
+
 export type Counts = {
   __typename?: 'Counts';
   favouritePeople: Scalars['Int'];
   moviesLiked: Scalars['Int'];
   watched: Scalars['Int'];
   watchlist: Scalars['Int'];
+};
+
+export type CrewCredit = Person & {
+  __typename?: 'CrewCredit';
+  id: Scalars['ID'];
+  jobs: Array<Scalars['String']>;
+  name: Scalars['String'];
+  profilePath?: Maybe<Scalars['String']>;
 };
 
 export type Movie = {
@@ -40,6 +57,7 @@ export type Movie = {
 
 export type MovieCredit = {
   __typename?: 'MovieCredit';
+  character?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   inWatchlist: Scalars['Boolean'];
   jobs: Array<Scalars['String']>;
@@ -64,7 +82,7 @@ export type MovieInfo = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  setFavourite: Person;
+  setFavourite: PersonInfo;
   setInWatchlist: Movie;
   setSentiment: Movie;
   setWatched: Movie;
@@ -103,7 +121,13 @@ export type PaginatedMovies = {
 };
 
 export type Person = {
-  __typename?: 'Person';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  profilePath?: Maybe<Scalars['String']>;
+};
+
+export type PersonInfo = Person & {
+  __typename?: 'PersonInfo';
   biography?: Maybe<Scalars['String']>;
   favourited: Scalars['Boolean'];
   id: Scalars['ID'];
@@ -112,22 +136,15 @@ export type Person = {
   profilePath?: Maybe<Scalars['String']>;
 };
 
-export type PersonCredit = {
-  __typename?: 'PersonCredit';
-  id: Scalars['ID'];
-  jobs: Array<Scalars['String']>;
-  name: Scalars['String'];
-  profilePath?: Maybe<Scalars['String']>;
-};
-
 export type Query = {
   __typename?: 'Query';
-  creditsForMovie: Array<PersonCredit>;
+  castForMovie: Array<CastCredit>;
   creditsForPerson: Array<MovieCredit>;
-  favouritePeople: Array<Person>;
+  crewForMovie: Array<CrewCredit>;
+  favouritePeople: Array<PersonInfo>;
   likedMovies: Array<Movie>;
   movie: Movie;
-  person: Person;
+  person: PersonInfo;
   profileCounts: Counts;
   recommendedMovies: Array<Movie>;
   search: Array<SearchResult>;
@@ -137,12 +154,17 @@ export type Query = {
 };
 
 
-export type QueryCreditsForMovieArgs = {
+export type QueryCastForMovieArgs = {
   id: Scalars['ID'];
 };
 
 
 export type QueryCreditsForPersonArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryCrewForMovieArgs = {
   id: Scalars['ID'];
 };
 
@@ -167,7 +189,7 @@ export type QueryWatchedArgs = {
   offset?: InputMaybe<Scalars['Int']>;
 };
 
-export type SearchResult = Movie | Person;
+export type SearchResult = Movie | PersonInfo;
 
 export enum Sentiment {
   Disliked = 'DISLIKED',
@@ -354,7 +376,7 @@ export const SearchDocument = gql`
       posterPath
       releaseDate
     }
-    ... on Person {
+    ... on PersonInfo {
       id
       name
       profilePath
@@ -511,9 +533,9 @@ export function useGetMovieInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type GetMovieInfoQueryHookResult = ReturnType<typeof useGetMovieInfoQuery>;
 export type GetMovieInfoLazyQueryHookResult = ReturnType<typeof useGetMovieInfoLazyQuery>;
 export type GetMovieInfoQueryResult = Apollo.QueryResult<GetMovieInfoQuery, GetMovieInfoQueryVariables>;
-export const GetCreditsDocument = gql`
-    query GetCredits($id: ID!) {
-  creditsForMovie(id: $id) {
+export const GetCrewDocument = gql`
+    query GetCrew($id: ID!) {
+  crewForMovie(id: $id) {
     id
     name
     profilePath
@@ -523,32 +545,71 @@ export const GetCreditsDocument = gql`
     `;
 
 /**
- * __useGetCreditsQuery__
+ * __useGetCrewQuery__
  *
- * To run a query within a React component, call `useGetCreditsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetCreditsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetCrewQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCrewQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetCreditsQuery({
+ * const { data, loading, error } = useGetCrewQuery({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useGetCreditsQuery(baseOptions: Apollo.QueryHookOptions<GetCreditsQuery, GetCreditsQueryVariables>) {
+export function useGetCrewQuery(baseOptions: Apollo.QueryHookOptions<GetCrewQuery, GetCrewQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetCreditsQuery, GetCreditsQueryVariables>(GetCreditsDocument, options);
+        return Apollo.useQuery<GetCrewQuery, GetCrewQueryVariables>(GetCrewDocument, options);
       }
-export function useGetCreditsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCreditsQuery, GetCreditsQueryVariables>) {
+export function useGetCrewLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCrewQuery, GetCrewQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetCreditsQuery, GetCreditsQueryVariables>(GetCreditsDocument, options);
+          return Apollo.useLazyQuery<GetCrewQuery, GetCrewQueryVariables>(GetCrewDocument, options);
         }
-export type GetCreditsQueryHookResult = ReturnType<typeof useGetCreditsQuery>;
-export type GetCreditsLazyQueryHookResult = ReturnType<typeof useGetCreditsLazyQuery>;
-export type GetCreditsQueryResult = Apollo.QueryResult<GetCreditsQuery, GetCreditsQueryVariables>;
+export type GetCrewQueryHookResult = ReturnType<typeof useGetCrewQuery>;
+export type GetCrewLazyQueryHookResult = ReturnType<typeof useGetCrewLazyQuery>;
+export type GetCrewQueryResult = Apollo.QueryResult<GetCrewQuery, GetCrewQueryVariables>;
+export const GetCastDocument = gql`
+    query GetCast($id: ID!) {
+  castForMovie(id: $id) {
+    character
+    id
+    name
+    order
+    profilePath
+  }
+}
+    `;
+
+/**
+ * __useGetCastQuery__
+ *
+ * To run a query within a React component, call `useGetCastQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCastQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCastQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetCastQuery(baseOptions: Apollo.QueryHookOptions<GetCastQuery, GetCastQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCastQuery, GetCastQueryVariables>(GetCastDocument, options);
+      }
+export function useGetCastLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCastQuery, GetCastQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCastQuery, GetCastQueryVariables>(GetCastDocument, options);
+        }
+export type GetCastQueryHookResult = ReturnType<typeof useGetCastQuery>;
+export type GetCastLazyQueryHookResult = ReturnType<typeof useGetCastLazyQuery>;
+export type GetCastQueryResult = Apollo.QueryResult<GetCastQuery, GetCastQueryVariables>;
 export const GetRottenTomatoesScoreDocument = gql`
     query GetRottenTomatoesScore($id: ID!) {
   movie(id: $id) {
@@ -601,6 +662,7 @@ export const GetPersonCreditsDocument = gql`
     posterPath
     releaseDate
     jobs
+    character
   }
 }
     `;

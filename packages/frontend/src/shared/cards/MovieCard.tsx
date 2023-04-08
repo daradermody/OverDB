@@ -15,9 +15,10 @@ interface MovieCardsProps {
   movies?: MovieCardProps['movie'][]
   loading?: boolean
   loadingCount?: number
+  showCharactersOnly?: boolean
 }
 
-export default function MovieCards({movies, loading, loadingCount}: MovieCardsProps) {
+export default function MovieCards({movies, loading, loadingCount, showCharactersOnly}: MovieCardsProps) {
   if (loading) {
     return (
       <StyledCardListWrapper>
@@ -27,7 +28,7 @@ export default function MovieCards({movies, loading, loadingCount}: MovieCardsPr
   } else {
     return (
       <StyledCardListWrapper>
-        {movies?.map(movie => <MovieCard key={movie.id} movie={movie}/>)}
+        {movies?.map(movie => <MovieCard key={movie.id} movie={movie} showCharactersOnly={showCharactersOnly}/>)}
       </StyledCardListWrapper>
     )
   }
@@ -43,16 +44,18 @@ interface MovieCardProps {
     inWatchlist?: Movie['inWatchlist'];
     sentiment?: Movie['sentiment'];
     jobs?: MovieCredit['jobs'];
+    character?: MovieCredit['character'];
   }
+  showCharactersOnly?: boolean
 }
 
-function MovieCard({movie}: MovieCardProps) {
+function MovieCard({movie, showCharactersOnly}: MovieCardProps) {
   return (
     <StyledCard>
       <Link to={`/movie/${movie.id}`}>
         <MovieImage movie={movie}/>
         <CardContent style={{marginTop: -10}}>
-          <MovieSummary movie={movie}/>
+          <MovieSummary movie={movie} showCharactersOnly={showCharactersOnly}/>
         </CardContent>
       </Link>
     </StyledCard>
@@ -129,7 +132,11 @@ const StyledMovieImage = styled.div`
   }
 `
 
-function MovieSummary({movie}: MovieCardProps) {
+function MovieSummary({movie, showCharactersOnly}: MovieCardProps) {
+  let roles
+  if (isCredit(movie)) {
+    roles = showCharactersOnly ? movie.character : movie.jobs.join(', ')
+  }
   return (
     <>
       <Tooltip placement="top" title={<Typography>{movie.title}</Typography>}>
@@ -140,15 +147,15 @@ function MovieSummary({movie}: MovieCardProps) {
       <Typography gutterBottom variant="caption" component="div">
         {movie.releaseDate ? movie.releaseDate.split('-')[0] : ''}
       </Typography>
-      {isCredit(movie) && (
-        <Tooltip placement="top" title={<Typography>{movie.jobs.join(', ')}</Typography>}>
+      {roles && (
+        <Tooltip placement="top" title={<Typography>{roles}</Typography>}>
           <Typography
             gutterBottom
             variant="subtitle2"
             component="div"
             style={{textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}
           >
-            {movie.jobs.join(', ')}
+            {roles}
           </Typography>
         </Tooltip>
       )}

@@ -8,10 +8,11 @@ import {
   MutationSetInWatchlistArgs,
   MutationSetSentimentArgs,
   MutationSetWatchedArgs,
-  Person,
+  PersonWithoutFav,
   Query,
-  QueryCreditsForMovieArgs,
+  QueryCastForMovieArgs,
   QueryCreditsForPersonArgs,
+  QueryCrewForMovieArgs,
   QueryMovieArgs,
   QueryPersonArgs,
   QuerySearchArgs,
@@ -45,17 +46,18 @@ const index: Resolvers<{ user: User }> = {
     watched: (parent: MovieCredit, _, {user}) => UserData.isWatched(user.id, parent.id),
     inWatchlist: (parent: MovieCredit, _, {user}) => UserData.inWatchlist(user.id, parent.id),
   },
-  Person: {
-    favourited: (parent: Person, _, {user}) => UserData.isFavourited(user.id, parent.id)
+  PersonInfo: {
+    favourited: (parent: PersonWithoutFav, _, {user}) => UserData.isFavourited(user.id, parent.id)
   },
   SearchResult: {
-    __resolveType: (obj: SearchResult) => isMovieSummary(obj) ? 'Movie' : 'Person'
+    __resolveType: (obj: SearchResult) => isMovieSummary(obj) ? 'Movie' : 'PersonInfo'
   },
   Query: applyAuth({
     favouritePeople: (_1, _2, {user}) => Promise.all(UserData.getFavourites(user.id).slice().reverse().map(MovieDb.personInfo)) as any,
     recommendedMovies: (_1, _2, {user}) => recommendedMoviesResolver(user.id),
     movie: (_, args: QueryMovieArgs) => MovieDb.movieInfo(args.id) as any,
-    creditsForMovie: (_, args: QueryCreditsForMovieArgs) => MovieDb.movieCredits(args.id),
+    crewForMovie: (_, args: QueryCrewForMovieArgs) => MovieDb.movieCrew(args.id),
+    castForMovie: (_, args: QueryCastForMovieArgs) => MovieDb.movieCast(args.id),
     creditsForPerson: async (_, args: QueryCreditsForPersonArgs) => {
       try {
         const credits = await MovieDb.personMovieCredits(args.id)

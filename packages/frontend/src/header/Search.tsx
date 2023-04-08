@@ -6,7 +6,7 @@ import { Autocomplete, Box, Fab, IconButton, InputAdornment, Modal, TextField, T
 import { useThrottleCallback } from '@react-hook/throttle'
 import * as React from 'react'
 import { HTMLAttributes, KeyboardEvent, useCallback, useEffect, useState } from 'react'
-import { Movie, Person, SearchResult, useSearchLazyQuery } from '../../types/graphql'
+import { Movie, PersonInfo, SearchResult, useSearchLazyQuery } from '../../types/graphql'
 import { useMutationErrorHandler } from '../shared/errorHandlers'
 import { Poster } from '../shared/general/Poster'
 
@@ -105,7 +105,7 @@ function SearchInput(props: SearchProps) {
           }
         }
       }}
-      getOptionLabel={(option: SearchResult | string) => (option as Movie).title || (option as Person).name || (option as string)}
+      getOptionLabel={(option: SearchResult | string) => (option as Movie).title || (option as PersonInfo).name || (option as string)}
       renderOption={(props, option) => {
         return option.__typename === 'Movie'
           ? <MovieResult key={option.id} liProps={props} movie={option}/>
@@ -180,7 +180,7 @@ function MobileSearchInput(props: MobileSearchInputProps) {
 }
 
 interface PersonResultProps {
-  person: Pick<Person, 'name' | 'profilePath'>
+  person: Pick<PersonInfo, 'name' | 'profilePath'>
   liProps?: HTMLAttributes<HTMLLIElement>
   onClick?: () => void
 }
@@ -234,7 +234,7 @@ gql`
         posterPath
         releaseDate
       }
-      ... on Person {
+      ... on PersonInfo {
         id
         name
         profilePath

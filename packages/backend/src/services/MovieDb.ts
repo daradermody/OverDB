@@ -1,8 +1,8 @@
 import axios from 'axios'
 import * as fs from 'fs'
-import { MovieDb as MovieDbApi } from 'moviedb-promise'
+import { Cast, MovieDb as MovieDbApi } from 'moviedb-promise'
 import { Crew, MovieResponse, Person as TmdbPerson, PersonMovieCreditsResponse } from 'moviedb-promise/dist/request-types'
-import { isMovieSearchResult, isPersonSearchResult, Movie, MovieCredit, MovieInfo, Person, PersonCredit, PersonInfo } from '../../types'
+import { CastCredit, CrewCredit, isMovieSearchResult, isPersonSearchResult, Movie, MovieCredit, MovieInfo, Person, PersonWithoutFav } from '../../types'
 import getToken from '../utils/getToken'
 import { dataDir } from './dataStorage'
 
@@ -10,18 +10,17 @@ interface Cache {
   movieInfo: {
     [id: Movie['id']]: MovieInfo;
   }
-  movieCredits: {
-    [id: Movie['id']]: PersonCredit[];
+  movieCrew: {
+    [id: Movie['id']]: CrewCredit[];
+  }
+  movieCast: {
+    [id: Movie['id']]: CastCredit[];
   }
   personMovieCredits: {
-    [id: Person['id']]: {
-      id: MovieCredit['id']
-      title: MovieCredit['title']
-      jobs: MovieCredit['jobs']
-    }[];
+    [id: Person['id']]: Pick<MovieCredit, 'id' | 'title' | 'jobs' | 'character'>[];
   }
   personInfo: {
-    [id: Person['id']]: PersonInfo
+    [id: Person['id']]: PersonWithoutFav
   },
 }
 
@@ -32,21 +31,30 @@ export default class MovieDb {
   private static movieDbApi = new MovieDbApi(key)
   private static cache: Cache = MovieDb.readCache()
 
-  static async personMovieCredits(id: Person['id']): Promise<{ id: MovieCredit['id'], title: MovieCredit['title'], jobs: MovieCredit['jobs'] }[]> {
+  static async personMovieCredits(id: Person['id']): Promise<Pick<MovieCredit, 'id' | 'title' | 'jobs' | 'character'>[]> {
     if (!MovieDb.cache.personMovieCredits[id]) {
       const {data} = await axios.get<PersonMovieCreditsResponse>(`https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${key}`)
       const crew = data.crew as Required<NonNullable<PersonMovieCreditsResponse['crew']>[0]>[]
-      const filteredMovies = filterInvalidMovies(crew)
-      MovieDb.cache.personMovieCredits[id] = aggregateAndNormalizeJobs(filteredMovies)
+      const cast = data.cast as Required<NonNullable<PersonMovieCreditsResponse['cast']>[0]>[]
+      const crewMovies = filterInvalidMovies(crew)
+      const castMovies = cast.map(c => ({...c, job: 'Actor'}))
+      const movies = aggregateAndNormalizeJobs([...castMovies, ...crewMovies])
+      MovieDb.cache.personMovieCredits[id] = movies
         .sort((m1, m2) => m1.release_date < m2.release_date ? 1 : -1)
-        .map(m => ({id: `${m.id}`, jobs: m.jobs, title: m.title}))
+        .map(m => {
+          const movie: Pick<MovieCredit, 'id' | 'title' | 'jobs' | 'character'> = {id: `${m.id}`, jobs: m.jobs, title: m.title}
+          if ('character' in m) {
+            movie.character = m.character
+          }
+          return movie
+        })
       MovieDb.save()
         .catch(console.error)
     }
     return MovieDb.cache.personMovieCredits[id]
   }
 
-  static async personInfo(id: Person['id']): Promise<PersonInfo> {
+  static async personInfo(id: Person['id']): Promise<PersonWithoutFav> {
     if (!MovieDb.cache.personInfo[id]) {
       const {data: person} = await axios.get(`https://api.themoviedb.org/3/person/${id}?api_key=${key}`)
       MovieDb.cache.personInfo[id] = pickPersonProperties(person)
@@ -64,21 +72,33 @@ export default class MovieDb {
     return MovieDb.cache.movieInfo[id]
   }
 
-  static async movieCredits(id: Movie['id']): Promise<PersonCredit[]> {
-    if (!MovieDb.cache.movieCredits[id]) {
+  static async movieCrew(id: Movie['id']): Promise<CrewCredit[]> {
+    if (!MovieDb.cache.movieCrew[id]) {
       const {crew} = await MovieDb.movieDbApi.movieCredits(id) as { crew: Required<Crew>[] }
       const filteredCredits = filterInsignificantPeople(crew)
       const aggregatedCredits = aggregateAndNormalizeJobs(filteredCredits)
-      MovieDb.cache.movieCredits[id] = aggregatedCredits
-        .map(pickPersonCreditForMovieProperties)
+      MovieDb.cache.movieCrew[id] = aggregatedCredits
+        .map(pickCrewCreditForMovieProperties)
         .sort(sortByRole)
       MovieDb.save()
         .catch(console.error)
     }
-    return MovieDb.cache.movieCredits[id]
+    return MovieDb.cache.movieCrew[id]
   }
 
-  static async search(query: string): Promise<(MovieInfo | PersonInfo)[]> {
+  static async movieCast(id: Movie['id']): Promise<CastCredit[]> {
+    if (!MovieDb.cache.movieCast[id]) {
+      const {cast} = await MovieDb.movieDbApi.movieCredits(id) as { cast: Required<Cast>[] }
+      MovieDb.cache.movieCast[id] = cast
+        .map(pickCastCreditForMovieProperties)
+        .sort((a, b) => a.order - b.order)
+      MovieDb.save()
+        .catch(console.error)
+    }
+    return MovieDb.cache.movieCast[id]
+  }
+
+  static async search(query: string): Promise<(MovieInfo | PersonWithoutFav)[]> {
     const {results} = await this.movieDbApi.searchMulti({query})
     return results!
       .filter(result => isMovieSearchResult(result) || isPersonSearchResult(result))
@@ -98,7 +118,7 @@ export default class MovieDb {
 
   private static readCache(): Cache {
     if (!fs.existsSync(MovieDb.FILE_PATH)) {
-      const initial: Cache = {personInfo: {}, movieCredits: {}, personMovieCredits: {}, movieInfo: {}}
+      const initial: Cache = {personInfo: {}, movieCrew: {}, movieCast: {}, personMovieCredits: {}, movieInfo: {}}
       fs.writeFileSync(MovieDb.FILE_PATH, JSON.stringify(initial))
     }
     return JSON.parse(fs.readFileSync(MovieDb.FILE_PATH, 'utf-8'))
@@ -117,11 +137,14 @@ function aggregateAndNormalizeJobs<T extends { id: number }>(credits: (T & { job
       .replace('Executive ', '')
       .replace('Associate ', '')
       .replace('Special Guest ', '')
+      .replace('Co-Director', 'Director')
       .replace('Co-Producer', 'Producer')
       .replace('Assistant Director', 'Music')
       .replace('Music Producer', 'Music')
       .replace('Orchestrator', 'Music')
+      .replace('Music Arranger', 'Music')
       .replace('Conductor', 'Music')
+      .replace('Theme Song Performance', 'Music')
       .replace('Original Music Composer', 'Music')
       .replace('Sound Designer', 'Sound')
       .replace('Sound Editor', 'Sound')
@@ -140,6 +163,9 @@ function aggregateAndNormalizeJobs<T extends { id: number }>(credits: (T & { job
       .replace('Story', 'Writer')
       .replace('Author', 'Writer')
       .replace('Script', 'Writer')
+      .replace('Theme Song Performance', 'Writer')
+      .replace('Additional Writing', 'Writer')
+      .replace('Idea', 'Writer')
       .replace('Technical Advisor', 'Advisor')
       .replace('Script Consultant', 'Advisor')
       .replace('Creative Consultant', 'Advisor')
@@ -165,7 +191,7 @@ function filterInsignificantPeople<T extends { job: string }>(crew: T[]): T[] {
   return crew.filter(personCredit => !ignoredRoles.includes(personCredit.job))
 }
 
-function sortByRole(creditA: PersonCredit, creditB: PersonCredit): number {
+function sortByRole(creditA: CrewCredit, creditB: CrewCredit): number {
   const jobsByImportance = [
     'Casting', 'Editor', 'Music', 'Sound', 'Producer', 'Cinematography', 'Writer', 'Director',
   ]
@@ -174,12 +200,22 @@ function sortByRole(creditA: PersonCredit, creditB: PersonCredit): number {
   return creditAPrecedence > creditBPrecedence ? -1 : 1
 }
 
-function pickPersonCreditForMovieProperties(credit: Pick<Crew, 'id' | 'name' | 'profile_path'> & { jobs: string[] }): PersonCredit {
+function pickCrewCreditForMovieProperties(credit: Pick<Crew, 'id' | 'name' | 'profile_path'> & { jobs: string[] }): CrewCredit {
   return {
     id: `${credit.id}`,
     name: credit.name || 'Name unknown',
     profilePath: credit.profile_path,
     jobs: credit.jobs,
+  }
+}
+
+function pickCastCreditForMovieProperties(credit: Pick<Cast, 'id' | 'name' | 'profile_path' | 'character' | 'order'>): CastCredit {
+  return {
+    id: `${credit.id}`,
+    name: credit.name || 'Name unknown',
+    profilePath: credit.profile_path,
+    character: credit.character || '',
+    order: credit.order ?? 9999
   }
 }
 
@@ -191,16 +227,16 @@ function pickMovieProperties(movie: MovieResponse): MovieInfo {
     releaseDate: movie.release_date,
     voteAverage: movie.vote_average!,
     overview: movie.overview!,
-    tagline: movie.tagline || '', // TODO: Fix
+    tagline: movie.tagline || '',
   }
 }
 
-function pickPersonProperties(person: TmdbPerson): PersonInfo {
-  return ({
+function pickPersonProperties(person: TmdbPerson): PersonWithoutFav {
+  return {
     id: `${person.id}`,
     name: person.name || 'Name unknown',
-    biography: person.biography,
+    biography: person.biography || '',
     knownForDepartment: person.known_for_department,
     profilePath: person.profile_path,
-  })
+  }
 }

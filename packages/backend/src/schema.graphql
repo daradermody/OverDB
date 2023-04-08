@@ -1,17 +1,31 @@
-type Person {
+interface Person {
   id: ID!
   name: String!
-  knownForDepartment: String
   profilePath: String
+}
+
+type PersonInfo implements Person {
+  id: ID!
+  name: String!
+  profilePath: String
+  knownForDepartment: String
   biography: String
   favourited: Boolean!
 }
 
-type PersonCredit {
+type CrewCredit implements Person {
   id: ID!
   name: String!
   jobs: [String!]!
   profilePath: String
+}
+
+type CastCredit implements Person {
+  id: ID!
+  name: String!
+  character: String!
+  profilePath: String
+  order: Int!
 }
 
 type MovieInfo {
@@ -48,9 +62,10 @@ type MovieCredit {
   inWatchlist: Boolean!
   sentiment: Sentiment!
   jobs: [String!]!
+  character: String
 }
 
-union SearchResult = Movie | Person
+union SearchResult = Movie | PersonInfo
 
 enum Sentiment {
   NONE
@@ -86,11 +101,12 @@ type Counts {
 }
 
 type Query {
-  favouritePeople: [Person!]!
+  favouritePeople: [PersonInfo!]!
   recommendedMovies: [Movie!]!
   movie(id: ID!): Movie!
-  creditsForMovie(id: ID!): [PersonCredit!]!
-  person(id: ID!): Person!
+  crewForMovie(id: ID!): [CrewCredit!]!
+  castForMovie(id: ID!): [CastCredit!]!
+  person(id: ID!): PersonInfo!
   creditsForPerson(id: ID!): [MovieCredit!]!
   search(query: String!): [SearchResult!]!
   watchlist: [Movie!]!
@@ -101,7 +117,7 @@ type Query {
 }
 
 type Mutation {
-  setFavourite(id: ID!, favourited: Boolean!): Person!
+  setFavourite(id: ID!, favourited: Boolean!): PersonInfo!
   setWatched(id: ID!, watched: Boolean!): Movie!
   setInWatchlist(id: ID!, inWatchlist: Boolean!): Movie!
   setSentiment(id: ID!, sentiment: Sentiment!): Movie!

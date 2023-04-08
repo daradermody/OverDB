@@ -29,7 +29,7 @@
   },
   "private": true,
   "devDependencies": {
-    "concurrently": "^7.4.0",
+    "concurrently": "^8.0.1",
     "nexe": "^4.0.0-rc.2"
   }
 }

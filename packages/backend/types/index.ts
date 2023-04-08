@@ -1,13 +1,13 @@
 import { MovieResult, PersonResult, TvResult } from 'moviedb-promise'
-import { Movie, Person } from './graphql'
+import { Movie, PersonInfo } from './graphql'
 
-export type PersonInfo = Omit<Person, 'favourited'>
+export type PersonWithoutFav = Omit<PersonInfo, 'favourited'>
 
-export function isMovieSummary(result: Movie | Person): result is Movie {
+export function isMovieSummary(result: Movie | PersonInfo): result is Movie {
   return 'releaseDate' in result
 }
 
-export function isPersonSummary(result: Movie | Person): result is Person {
+export function isPersonSummary(result: Movie | PersonInfo): result is PersonInfo {
   return 'biography' in result
 }
 

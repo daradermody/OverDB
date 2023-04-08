@@ -1,69 +1,66 @@
 import { gql } from '@apollo/client'
 import styled from '@emotion/styled'
-import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { Box } from '@mui/material'
 import * as React from 'react'
 import { useLocation } from 'react-router'
 import { useNavigate } from 'react-router-dom'
-import { Person, PersonCredit, useGetPersonCreditsQuery } from '../../types/graphql'
+import { CrewCredit, Person, useGetPersonCreditsQuery } from '../../types/graphql'
 import MovieCards from '../shared/cards/MovieCard'
 import { ErrorMessage } from '../shared/errorHandlers'
+import ToggleFilter from '../shared/ToggleFilter'
 
 export function MovieList({id}: { id: Person['id'] }) {
   const {data, error, loading, refetch} = useGetPersonCreditsQuery({variables: {id}})
   const navigate = useNavigate()
   const location = useLocation()
-  const selectedRoles: string[] = location.state?.roles || []
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
   const roles = loading ? [] : extractUniqueRoles(data.creditsForPerson).sort(sortJobs)
+  const onlyActed = roles.length === 1 && roles[0] === 'Actor'
+  const selectedRoles: string[] = location.state?.roles || (
+    onlyActed ? ['Actor'] : []
+  )
   const filteredMovies = loading ? [] : data.creditsForPerson
     .filter(movie => !selectedRoles.length || selectedRoles.every(role => movie.jobs.includes(role)))
 
   return (
     <div>
-      <div style={{display: 'flex', marginBottom: 10, justifyContent: 'right'}}>
-        <ToggleFilter
-          options={roles}
-          value={selectedRoles}
-          onChange={roles => navigate(location, {state: {roles}, replace: true})}
-        />
-      </div>
-      <MovieCards movies={filteredMovies} loading={loading}/>
+      <Scrollable>
+        <Box flexGrow="1"/>
+        <Filters>
+          <ToggleFilter
+            loading={loading}
+            options={roles.filter(r => r !== 'Actor')}
+            value={selectedRoles}
+            onChange={(_, roles) => {
+              navigate(location, {state: {roles: roles.filter(r => r !== 'Actor')}, replace: true})
+            }}
+          />
+          {roles.includes('Actor') && (
+            <ToggleFilter
+              disabled={onlyActed}
+              options={['Actor']}
+              value={selectedRoles}
+              onChange={(_, roles) => {
+                const newRoles = roles.includes('Actor') ? ['Actor'] : roles
+                navigate(location, {state: {roles: newRoles}, replace: true})
+              }}
+            />
+          )}
+        </Filters>
+      </Scrollable>
+      <MovieCards movies={filteredMovies} loading={loading} showCharactersOnly={selectedRoles.includes('Actor')}/>
     </div>
   )
 }
 
-interface ToggleFilterProps {
-  options: string[]
-  value: string[]
-  onChange: (value: string[]) => void
-  loading?: boolean
-}
-
-function ToggleFilter({options, value, onChange, loading}: ToggleFilterProps) {
-  if (loading) {
-    return (
-      <div style={{gap: 1, display: 'flex', borderRadius: 4}}>
-        <Skeleton variant="rectangular" height={48} width={93}/>
-        <Skeleton variant="rectangular" height={48} width={93}/>
-        <Skeleton variant="rectangular" height={48} width={93}/>
-      </div>
-    )
-  } else {
-    return (
-      <StyledButtonGroup value={value} onChange={(_, values) => onChange(values)}>
-        {options.map(option => <ToggleButton key={option} value={option}>{option}</ToggleButton>)}
-      </StyledButtonGroup>
-    )
-  }
-}
-
-const StyledButtonGroup = styled(ToggleButtonGroup)`
-  margin-bottom: 16px;
+const Scrollable = styled.div`
+  display: flex;
   overflow-x: auto;
+  margin-bottom: 16px;
 
   @media (pointer: fine) {
     &::-webkit-scrollbar {
@@ -79,11 +76,18 @@ const StyledButtonGroup = styled(ToggleButtonGroup)`
   }
 `
 
-function extractUniqueRoles(movies: { jobs: PersonCredit['jobs'] }[]): PersonCredit['jobs'] {
+const Filters = styled.div`
+  display: flex;
+  justify-content: right;
+  gap: 20px;
+  width: fit-content;
+`
+
+function extractUniqueRoles(movies: { jobs: CrewCredit['jobs'] }[]): CrewCredit['jobs'] {
   return Array.from(new Set(movies.map(m => m.jobs).flat()))
 }
 
-function sortJobs(jobA: PersonCredit['jobs'][number], jobB: PersonCredit['jobs'][number]): number {
+function sortJobs(jobA: CrewCredit['jobs'][number], jobB: CrewCredit['jobs'][number]): number {
   const jobsByImportance = ['Casting', 'Editor', 'Music', 'Sound', 'Producer', 'Cinematography', 'Writer', 'Director']
   const jobAPrecedence = jobsByImportance.findIndex(importantJob => jobA === importantJob)
   const jobBPrecedence = jobsByImportance.findIndex(importantJob => jobB === importantJob)
@@ -101,6 +105,7 @@ gql`
       posterPath
       releaseDate
       jobs
+      character
     }
   }
 `

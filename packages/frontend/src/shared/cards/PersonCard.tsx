@@ -2,12 +2,12 @@ import styled from '@emotion/styled'
 import { Card, CardActionArea, CardContent, CardMedia, Skeleton, Tooltip, Typography } from '@mui/material'
 import { range } from 'lodash'
 import * as React from 'react'
-import { PersonCredit } from '../../../types/graphql'
+import { CastCredit, CrewCredit, Person } from '../../../types/graphql'
 import Link from '../general/Link'
 import { getPosterUrl, handlePosterError } from '../general/Poster'
 
 interface PersonCardProps {
-  person: Pick<PersonCredit, 'id' | 'profilePath' | 'name'> & { jobs?: PersonCredit['jobs'] }
+  person: Person & { jobs?: CrewCredit['jobs'] } & { character?: CastCredit['character'] }
 }
 
 export function PersonCard({person}: PersonCardProps) {
@@ -32,15 +32,15 @@ export function PersonCard({person}: PersonCardProps) {
                 {person.name}
               </Typography>
             </Tooltip>
-            {isCredit(person) && (
-              <Tooltip placement="top" title={<Typography>{person.jobs.join(', ')}</Typography>}>
+            {(isCredit(person) || isCast(person)) && (
+              <Tooltip placement="top" title={<Typography>{person.jobs?.join?.(', ') || person.character}</Typography>}>
                 <Typography
                   gutterBottom
                   variant="subtitle2"
                   component="div"
                   style={{textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}
                 >
-                  {person.jobs.join(', ')}
+                  {person.jobs?.join?.(', ') || person.character}
                 </Typography>
               </Tooltip>
             )}
@@ -77,4 +77,8 @@ const StyledCard = styled(Card)`
 
 function isCredit<T extends { jobs: string[] }>(person: any): person is T {
   return !!(person as any).jobs
+}
+
+function isCast<T extends { character: string }>(person: any): person is T {
+  return !!(person as any).character
 }

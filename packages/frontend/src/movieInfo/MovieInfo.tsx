@@ -1,9 +1,10 @@
 import { gql } from '@apollo/client'
 import styled from '@emotion/styled'
-import { Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import * as React from 'react'
-import { useParams } from 'react-router-dom'
-import { Movie, useGetCreditsQuery, useGetMovieInfoQuery } from '../../types/graphql'
+import { useLocation } from 'react-router'
+import { useNavigate, useParams } from 'react-router-dom'
+import { CastCredit, Movie, useGetCastQuery, useGetCrewQuery, useGetMovieInfoQuery } from '../../types/graphql'
 import { PersonCard } from '../shared/cards/PersonCard'
 import { ErrorMessage } from '../shared/errorHandlers'
 import { InterestingDivider } from '../shared/general/InterestingDivider'
@@ -15,17 +16,36 @@ import { WatchedButton } from '../shared/movieActionButtons/WatchedButton'
 import { WatchlistButton } from '../shared/movieActionButtons/WatchlistButton'
 import PageWrapper from '../shared/PageWrapper'
 import { StyledCardListWrapper } from '../shared/styledComponents'
+import ToggleFilter from '../shared/ToggleFilter'
 import RottenTomatoesReview from './RottenTomatoesReview'
 import { TmdbRating } from './TmdbRating'
 
 export function MovieInfo() {
   const {id} = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const peopleType: 'Crew' | 'Cast' = location.state?.peopleType || 'Crew'
 
   return (
     <PageWrapper>
       <MovieSummary id={id}/>
       <InterestingDivider/>
-      <CrewList id={id}/>
+      <Box display="flex" justifyContent="center">
+        <ToggleFilter
+          size="small"
+          fullWidth
+          sx={{ maxWidth: 400 }}
+          exclusive
+          options={['Crew', 'Cast']}
+          value={peopleType}
+          onChange={(e, peopleType) => {
+            if ((e.target as any).value !== null) {
+              navigate(location, {state: {peopleType: (e.target as any).value}, replace: true})
+            }
+          }}
+        />
+      </Box>
+      {peopleType === 'Crew' ? <CrewList id={id}/> : <CastList id={id}/>}
     </PageWrapper>
   )
 }
@@ -102,7 +122,7 @@ const StyledActionsAndReview = styled.div`
 `
 
 function CrewList({id}: { id: Movie['id'] }) {
-  const {data, error, loading, refetch} = useGetCreditsQuery({variables: {id}})
+  const {data, error, loading, refetch} = useGetCrewQuery({variables: {id}})
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>
@@ -112,10 +132,10 @@ function CrewList({id}: { id: Movie['id'] }) {
     return <LoadingSpinner/>
   }
 
-  const importantCrew = data.creditsForMovie
+  const importantCrew = data.crewForMovie
     .filter(person => person.jobs.find(job => importantJobs.includes(job)))
     .slice(0, 12)
-  const unimportantCrew = data.creditsForMovie
+  const unimportantCrew = data.crewForMovie
     .filter(person => !importantCrew.includes(person))
 
   return (
@@ -130,6 +150,42 @@ function CrewList({id}: { id: Movie['id'] }) {
           <div key={person.id}>
             <Link to={`/person/${person.id}`}>
               {person.name} - {person.jobs.join(', ')}
+            </Link>
+          </div>
+        ))}
+      </div>
+    </>
+  )
+}
+
+function CastList({id}: { id: Movie['id'] }) {
+  const {data, error, loading, refetch} = useGetCastQuery({variables: {id}})
+
+  if (error) {
+    return <ErrorMessage error={error} onRetry={refetch}/>
+  }
+
+  if (loading) {
+    return <LoadingSpinner/>
+  }
+
+  const importantCast = data.castForMovie
+    .filter((person: CastCredit) => person.order < 12)
+  const unimportantCrew = data.castForMovie
+    .filter((person: CastCredit) => person.order >= 12)
+
+  return (
+    <>
+      <Typography variant="h1">Main Crew</Typography>
+      <StyledCardListWrapper>
+        {importantCast.map(person => <PersonCard key={person.id} person={person}/>)}
+      </StyledCardListWrapper>
+      <Typography variant="h1" style={{marginTop: 20}}>Other Crew</Typography>
+      <div>
+        {unimportantCrew.map(person => (
+          <div key={person.id}>
+            <Link to={`/person/${person.id}`}>
+              {person.name} - {person.character}
             </Link>
           </div>
         ))}
@@ -160,12 +216,24 @@ gql`
 `
 
 gql`
-  query GetCredits($id: ID!) {
-    creditsForMovie(id: $id) {
+  query GetCrew($id: ID!) {
+    crewForMovie(id: $id) {
       id
       name
       profilePath
       jobs
+    }
+  }
+`
+
+gql`
+  query GetCast($id: ID!) {
+    castForMovie(id: $id) {
+      character
+      id
+      name
+      order
+      profilePath
     }
   }
 `

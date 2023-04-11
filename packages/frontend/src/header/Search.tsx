@@ -2,10 +2,12 @@ import { gql } from '@apollo/client'
 import styled from '@emotion/styled'
 import CloseIcon from '@mui/icons-material/Close'
 import SearchIcon from '@mui/icons-material/Search'
-import { Autocomplete, Box, Fab, IconButton, InputAdornment, Modal, TextField, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Autocomplete, Box, Fab, IconButton, InputAdornment, Modal, Skeleton, TextField, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { useThrottleCallback } from '@react-hook/throttle'
 import * as React from 'react'
 import { HTMLAttributes, KeyboardEvent, useCallback, useEffect, useState } from 'react'
+import { useLocation } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { Movie, PersonInfo, SearchResult, useSearchLazyQuery } from '../../types/graphql'
 import { useMutationErrorHandler } from '../shared/errorHandlers'
 import { Poster } from '../shared/general/Poster'
@@ -32,12 +34,18 @@ export function Search(props: SearchProps) {
 }
 
 function SearchButton(props: SearchProps) {
-  const [showSearchInput, setShowSearchInput] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const showSearchInput: boolean = location.state?.showSearchInput
+
+  const setShowSearchInput = useCallback((showSearchInput) => {
+    navigate(location, {state: {showSearchInput}, replace: !showSearchInput})
+  }, [navigate, location])
 
   const handleSelect = useCallback((...args: Parameters<typeof props.onSelect>) => {
     setShowSearchInput(false)
     props.onSelect(...args)
-  }, [setShowSearchInput, props.onSelect])
+  }, [props.onSelect])
 
   return (
     <>
@@ -72,24 +80,28 @@ function SearchInput(props: SearchProps) {
   const handleKeyUp = useThrottleCallback(async (e: KeyboardEvent<HTMLInputElement>) => {
     if ((e.target as HTMLInputElement).value) {
       if (e.code === 'Escape') {
+        (e.target as HTMLInputElement).blur()
         setIsOpen(false)
       } else {
         await search({variables: {query: (e.target as HTMLInputElement).value.trim()}})
       }
     }
-  }, 2, true)
+  }, 4, true)
 
-  useEffect(() => setIsOpen(!!data && !!query), [data, query, setIsOpen])
+  useEffect(() => setIsOpen(!!query), [query, setIsOpen])
 
   return (
     <Autocomplete<SearchResult, false, false, true>
       options={data?.search || []}
       autoHighlight
-      freeSolo
+      noOptionsText="No results found"
+      loadingText={<div style={{ maxHeight: 'calc(40vh - 16px)', margin: '-6px -16px' }}><LoadingResults/></div>}
       size="medium"
+      clearOnBlur={false}
+      clearOnEscape
       filterOptions={x => x}
       loading={loading}
-      onFocus={() => setIsOpen(!!data && !!query)}
+      onFocus={() => setIsOpen(!!query)}
       onBlur={() => setIsOpen(false)}
       open={isOpen}
       isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -139,7 +151,7 @@ interface MobileSearchInputProps {
 
 function MobileSearchInput(props: MobileSearchInputProps) {
   const [query, setQuery] = useState('')
-  const [search, {data, error}] = useSearchLazyQuery({notifyOnNetworkStatusChange: true})
+  const [search, {data, loading, error}] = useSearchLazyQuery({notifyOnNetworkStatusChange: true})
   useMutationErrorHandler('Could not search', error)
 
   const handleKeyUp = useThrottleCallback(async e => {
@@ -169,13 +181,41 @@ function MobileSearchInput(props: MobileSearchInputProps) {
         }}
       />
       <Box sx={{overflowY: 'scroll', mt: '64px'}}>
-        {data && data.search.map((item) => {
+        {data?.search.length === 0 && <Typography variant="subtitle1" sx={{ textAlign: 'center', mt: 2}}>No results found</Typography>}
+        {loading && <LoadingResults/>}
+        {data?.search.map((item) => {
           return item.__typename === 'Movie'
             ? <MovieResult key={item.id} onClick={() => props.onSelect(item as SearchResult)} movie={item}/>
             : <PersonResult key={item.id} onClick={() => props.onSelect(item as SearchResult)} person={item}/>
         })}
       </Box>
     </Box>
+  )
+}
+
+function LoadingResults() {
+  return (
+    <>
+      <LoadingResult titleWidth={80}/>
+      <LoadingResult titleWidth={100}/>
+      <LoadingResult titleWidth={60}/>
+      <LoadingResult titleWidth={130}/>
+      <LoadingResult titleWidth={100}/>
+      <LoadingResult titleWidth={90}/>
+      <LoadingResult titleWidth={80}/>
+    </>
+  )
+}
+
+function LoadingResult({titleWidth}: { titleWidth: number }) {
+  return (
+    <StyledSearchResult>
+      <div style={{height: '80px', marginRight: '8px'}}>
+        <Skeleton variant="rectangular" animation="wave" height={80} width={54}/>
+      </div>
+      <Skeleton variant="rectangular" animation="wave" height={28} width={titleWidth} sx={{marginRight: '4px'}}/>
+      <Skeleton variant="rectangular" animation="wave" height={28} width={47}/>
+    </StyledSearchResult>
   )
 }
 
@@ -189,7 +229,7 @@ function PersonResult({person, liProps, onClick}: PersonResultProps) {
   return (
     <StyledSearchResult onClick={onClick} {...liProps}>
       <div style={{height: '80px'}}>
-        <Poster src={person.profilePath} style={{height: '81px', width: '54px'}}/>
+        <Poster src={person.profilePath} style={{height: '80px', width: '54px'}}/>
       </div>
       <span style={{marginLeft: '8px'}}>{person.name}</span>
     </StyledSearchResult>
@@ -206,7 +246,7 @@ function MovieResult({movie, liProps, onClick}: MovieResultProps) {
   return (
     <StyledSearchResult onClick={onClick} {...liProps}>
       <div style={{height: '80px'}}>
-        <Poster src={movie.posterPath} style={{height: '81px', width: '54px'}}/>
+        <Poster src={movie.posterPath} style={{height: '80px', width: '54px'}}/>
       </div>
       <Box display="flex" gap="4px" alignItems="baseline" overflow="hidden">
         <Typography variant="body1" sx={{ml: '8px', overflowX: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{movie.title}</Typography>

@@ -41,4 +41,22 @@ export const users = [
     password: 'test',
     avatarUrl: 'https://ca.slack-edge.com/T0ST06F7X-UMY0S1ZJ9-4b77820534f7-512',
   },
+  {
+    id: 7,
+    username: 'jane',
+    password: 'test',
+    avatarUrl: 'https://cdn.discordapp.com/avatars/749060246387032106/065d8fd98ad276ec49cb306f81f890ec.webp',
+  },
+  {
+    id: 8,
+    username: 'mike',
+    password: 'test',
+    avatarUrl: 'https://cdn.discordapp.com/avatars/203832153845399552/8a5e8ade7234c3f095a5fd8f81200c60.webp',
+  },
+  {
+    id: 9,
+    username: 'ariel',
+    password: 'test',
+    avatarUrl: 'https://cdn.discordapp.com/avatars/276912882304811009/04af342bb1597003065a331a74b07a07.webp',
+  }
 ]

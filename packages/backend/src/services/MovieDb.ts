@@ -31,7 +31,7 @@ export default class MovieDb {
   private static movieDbApi = new MovieDbApi(key)
   private static cache: Cache = MovieDb.readCache()
 
-  static async personMovieCredits(id: Person['id']): Promise<Pick<MovieCredit, 'id' | 'title' | 'jobs' | 'character'>[]> {
+  static async personMovieCredits(id: Person['id']): Promise<Pick<MovieCredit, 'id' | 'title' | 'jobs' | 'character' | 'releaseDate'>[]> {
     if (!MovieDb.cache.personMovieCredits[id]) {
       const {data} = await axios.get<PersonMovieCreditsResponse>(`https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${key}`)
       const crew = data.crew as Required<NonNullable<PersonMovieCreditsResponse['crew']>[0]>[]
@@ -42,7 +42,12 @@ export default class MovieDb {
       MovieDb.cache.personMovieCredits[id] = movies
         .sort((m1, m2) => m1.release_date < m2.release_date ? 1 : -1)
         .map(m => {
-          const movie: Pick<MovieCredit, 'id' | 'title' | 'jobs' | 'character'> = {id: `${m.id}`, jobs: m.jobs, title: m.title}
+          const movie: Pick<MovieCredit, 'id' | 'title' | 'jobs' | 'character' | 'releaseDate'> = {
+            id: `${m.id}`,
+            title: m.title,
+            jobs: m.jobs,
+            releaseDate: m.release_date || null
+          }
           if ('character' in m) {
             movie.character = m.character
           }
@@ -224,7 +229,7 @@ function pickMovieProperties(movie: MovieResponse): MovieInfo {
     id: `${movie.id}`,
     title: movie.title!,
     posterPath: movie.poster_path,
-    releaseDate: movie.release_date,
+    releaseDate: movie.release_date || null,
     voteAverage: movie.vote_average!,
     overview: movie.overview!,
     tagline: movie.tagline || '',

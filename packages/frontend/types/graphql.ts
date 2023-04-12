@@ -149,6 +149,7 @@ export type Query = {
   recommendedMovies: Array<Movie>;
   search: Array<SearchResult>;
   trending: Array<MovieInfo>;
+  upcoming: Array<Movie>;
   watched: PaginatedMovies;
   watchlist: Array<Movie>;
 };
@@ -874,6 +875,43 @@ export function useSetInWatchlistMutation(baseOptions?: Apollo.MutationHookOptio
 export type SetInWatchlistMutationHookResult = ReturnType<typeof useSetInWatchlistMutation>;
 export type SetInWatchlistMutationResult = Apollo.MutationResult<SetInWatchlistMutation>;
 export type SetInWatchlistMutationOptions = Apollo.BaseMutationOptions<SetInWatchlistMutation, SetInWatchlistMutationVariables>;
+export const GetUpcomingMoviesDocument = gql`
+    query GetUpcomingMovies {
+  upcoming {
+    id
+    title
+    posterPath
+    releaseDate
+  }
+}
+    `;
+
+/**
+ * __useGetUpcomingMoviesQuery__
+ *
+ * To run a query within a React component, call `useGetUpcomingMoviesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUpcomingMoviesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUpcomingMoviesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUpcomingMoviesQuery(baseOptions?: Apollo.QueryHookOptions<GetUpcomingMoviesQuery, GetUpcomingMoviesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUpcomingMoviesQuery, GetUpcomingMoviesQueryVariables>(GetUpcomingMoviesDocument, options);
+      }
+export function useGetUpcomingMoviesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUpcomingMoviesQuery, GetUpcomingMoviesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUpcomingMoviesQuery, GetUpcomingMoviesQueryVariables>(GetUpcomingMoviesDocument, options);
+        }
+export type GetUpcomingMoviesQueryHookResult = ReturnType<typeof useGetUpcomingMoviesQuery>;
+export type GetUpcomingMoviesLazyQueryHookResult = ReturnType<typeof useGetUpcomingMoviesLazyQuery>;
+export type GetUpcomingMoviesQueryResult = Apollo.QueryResult<GetUpcomingMoviesQuery, GetUpcomingMoviesQueryVariables>;
 export const GetWatchlistDocument = gql`
     query GetWatchlist {
   watchlist {

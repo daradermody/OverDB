@@ -72,7 +72,9 @@ function MovieSummary({id}: { id: Movie['id'] }) {
       <div>
         <div>
           <Typography variant="h1" sx={{display: 'inline'}}>{movie.title}</Typography>
-          <Typography variant="subtitle1" sx={{display: 'inline', ml: 1}}>({movie.releaseDate?.split('-')?.[0]})</Typography>
+          {movie.releaseDate && (
+            <Typography variant="subtitle1" sx={{display: 'inline', ml: 1}}>({movie.releaseDate?.split('-')?.[0]})</Typography>
+          )}
         </div>
 
         <Typography variant="body2" sx={{m: '10px 0 20px'}}><i>{movie.tagline}</i></Typography>

@@ -1,4 +1,4 @@
-import { AccountCircle, AlarmOn, Favorite, Logout, Visibility } from '@mui/icons-material'
+import { AccountCircle, AlarmOn, Favorite, Logout, Visibility, Event } from '@mui/icons-material'
 import { Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material'
 import * as React from 'react'
 import Link from '../shared/general/Link'
@@ -60,6 +60,15 @@ export function ProfileIcon({disabled}: { disabled?: boolean }) {
               <AlarmOn fontSize="small"/>
             </ListItemIcon>
             <ListItemText>Watchlist</ListItemText>
+          </MenuItem>
+        </Link>
+
+        <Link to="/upcoming">
+          <MenuItem onClick={handleClose}>
+            <ListItemIcon>
+              <Event fontSize="small"/>
+            </ListItemIcon>
+            <ListItemText>Upcoming movies</ListItemText>
           </MenuItem>
         </Link>
 

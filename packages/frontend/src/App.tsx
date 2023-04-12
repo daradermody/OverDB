@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { Box, Container, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
@@ -14,6 +14,7 @@ import Profile from './Profile/Profile'
 import { ErrorBoundary } from './shared/errorHandlers'
 import ScrollToTop from './shared/general/ScrollToTop'
 import useIsOnline from './shared/useIsOnline'
+import UpcomingMovies from './upcomingMovies/UpcomingMovies'
 import { userSignal } from './useUser'
 import WatchedMovies from './WatchedMovies/WatchedMovies'
 import Watchlist from './watchlist/Watchlist'
@@ -53,6 +54,7 @@ function AppRoutes() {
       <Route path="/profile/favourite/:type" element={authed(<Favourites/>)}/>
       <Route path="/profile/watchlist" element={authed(<Watchlist/>)}/>
       <Route path="/profile/watched" element={authed(<WatchedMovies/>)}/>
+      <Route path="/upcoming" element={authed(<UpcomingMovies/>)}/>
     </Routes>
   )
 }

@@ -25,7 +25,7 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
     setShowOptions(false)
     void setSentiment({
       variables: {id, sentiment},
-      refetchQueries: ['GetPersonCredits', 'GetWatchedMovies', 'GetWatchlist', 'GetRecommendedMovies'],
+      refetchQueries: ['GetPersonCredits', 'GetWatchedMovies', 'GetWatchlist', 'GetRecommendedMovies', 'GetUpcomingMovies'],
       optimisticResponse: {
         setSentiment: {
           __typename: 'Movie',

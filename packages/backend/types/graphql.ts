@@ -148,6 +148,7 @@ export type Query = {
   recommendedMovies: Array<Movie>;
   search: Array<SearchResult>;
   trending: Array<MovieInfo>;
+  upcoming: Array<Movie>;
   watched: PaginatedMovies;
   watchlist: Array<Movie>;
 };
@@ -433,6 +434,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   recommendedMovies?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
   search?: Resolver<Array<ResolversTypes['SearchResult']>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'query'>>;
   trending?: Resolver<Array<ResolversTypes['MovieInfo']>, ParentType, ContextType>;
+  upcoming?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
   watched?: Resolver<ResolversTypes['PaginatedMovies'], ParentType, ContextType, Partial<QueryWatchedArgs>>;
   watchlist?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
 }>;

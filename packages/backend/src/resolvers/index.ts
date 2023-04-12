@@ -26,6 +26,7 @@ import MovieDb from '../services/MovieDb'
 import RottenTomatoes from '../services/RottenTomatoes'
 import { UserData } from '../services/UserData'
 import recommendedMoviesResolver from './recommendedMovies'
+import upcomingMoviesResolver from './upcomingMoviesResolver'
 
 const unauthedQueries: (keyof Query)[] = ['trending']
 const index: Resolvers<{ user: User }> = {
@@ -91,7 +92,8 @@ const index: Resolvers<{ user: User }> = {
         UserData.getFavourites(user.id), UserData.getWatched(user.id), UserData.getLikedMovies(user.id), UserData.getWatchlist(user.id)
       ])
       return {favouritePeople: people.length, watched: watched.length, moviesLiked: liked.length, watchlist: watchlist.length}
-    }
+    },
+    upcoming: async (_1, _2, {user}) => await upcomingMoviesResolver(user.id) as any
   }),
   Mutation: {
     setFavourite: (_, args: MutationSetFavouriteArgs, {user}) => {

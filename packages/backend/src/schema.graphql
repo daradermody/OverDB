@@ -114,6 +114,7 @@ type Query {
   likedMovies: [Movie!]!
   trending: [MovieInfo!]!
   profileCounts: Counts!
+  upcoming: [Movie!]!
 }
 
 type Mutation {

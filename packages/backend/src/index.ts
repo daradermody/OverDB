@@ -16,7 +16,6 @@ import getToken from './utils/getToken'
 
 dotenv.config()
 const PORT = process.env.PORT || 3000
-
 const SIX_MONTHS_IN_MILLIS = 6 * 30 * 24 * 60 * 60 * 1000
 
 async function main() {
@@ -56,8 +55,9 @@ async function main() {
 function login(req: Request, res: Response) {
   const user = users.find(u => u.username === req.body.username && u.password === req.body.password)
   if (user) {
-    res.cookie('user', JSON.stringify(user), {maxAge: SIX_MONTHS_IN_MILLIS, signed: true, secure: true})
     const {password, ...userWithoutPassword} = user
+    const cookie = JSON.stringify(userWithoutPassword)
+    res.cookie('user', cookie, {maxAge: SIX_MONTHS_IN_MILLIS, signed: true, secure: process.env.NODE_ENV === 'production'})
     res.json(userWithoutPassword)
   } else {
     res.sendStatus(401)

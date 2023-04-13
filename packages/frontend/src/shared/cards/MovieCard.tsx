@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { Card, CardActionArea, CardContent, CardMedia, Skeleton, Tooltip, Typography } from '@mui/material'
+import { Card, CardContent, CardMedia, Skeleton, Tooltip, Typography } from '@mui/material'
 import { range } from 'lodash'
 import * as React from 'react'
 import { useState } from 'react'
@@ -65,6 +65,7 @@ function MovieCard({movie, showCharactersOnly}: MovieCardProps) {
 const StyledCard = styled(Card)`
   width: 100%;
 
+  -webkit-tap-highlight-color: transparent;
   ${({theme}) => theme.breakpoints.up('sm')} {
     max-width: 200px;
   }
@@ -84,19 +85,17 @@ function MovieImage({movie}: MovieCardProps) {
     <StyledMovieImage
       style={{position: 'relative'}}
     >
-      <CardActionArea>
-        <CardMedia
-          component="img"
-          image={getPosterUrl(movie.posterPath)}
-          onError={handlePosterError}
-          alt={`${movie.title} poster`}
-          height="256px"
-          style={{
-            objectFit: 'contain',
-            backgroundColor: movie.posterPath ? 'black' : 'white',
-          }}
-        />
-      </CardActionArea>
+      <CardMedia
+        component="img"
+        image={getPosterUrl(movie.posterPath)}
+        onError={handlePosterError}
+        alt={`${movie.title} poster`}
+        height="256px"
+        style={{
+          objectFit: 'contain',
+          backgroundColor: movie.posterPath ? 'black' : 'white',
+        }}
+      />
       {
         ((movie.watched ?? movie.inWatchlist ?? movie.sentiment) !== undefined) && (
           <StyledActions className="show-on-hover" onClick={e => e.preventDefault()}>

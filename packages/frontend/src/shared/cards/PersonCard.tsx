@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { Card, CardActionArea, CardContent, CardMedia, Skeleton, Tooltip, Typography } from '@mui/material'
+import { Card, CardContent, CardMedia, Skeleton, Tooltip, Typography } from '@mui/material'
 import { range } from 'lodash'
 import * as React from 'react'
 import { CastCredit, CrewCredit, Person } from '../../../types/graphql'
@@ -14,38 +14,36 @@ export function PersonCard({person}: PersonCardProps) {
   return (
     <StyledCard>
       <Link to={`/person/${person.id}`}>
-        <CardActionArea>
-          <CardMedia
-            component="img"
-            image={getPosterUrl(person.profilePath)}
-            onError={handlePosterError}
-            alt={`${person.name} photo`}
-            height="256px"
-            style={{
-              objectFit: 'contain',
-              backgroundColor: person.profilePath ? 'black' : 'white',
-            }}
-          />
-          <CardContent style={{marginTop: -10}}>
-            <Tooltip placement="top" title={<Typography>{person.name}</Typography>}>
-              <Typography gutterBottom variant="body1" component="div" style={{textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}>
-                {person.name}
+        <CardMedia
+          component="img"
+          image={getPosterUrl(person.profilePath)}
+          onError={handlePosterError}
+          alt={`${person.name} photo`}
+          height="256px"
+          style={{
+            objectFit: 'contain',
+            backgroundColor: person.profilePath ? 'black' : 'white',
+          }}
+        />
+        <CardContent style={{marginTop: -10}}>
+          <Tooltip placement="top" title={<Typography>{person.name}</Typography>}>
+            <Typography gutterBottom variant="body1" component="div" style={{textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}>
+              {person.name}
+            </Typography>
+          </Tooltip>
+          {(isCredit(person) || isCast(person)) && (
+            <Tooltip placement="top" title={<Typography>{person.jobs?.join?.(', ') || person.character}</Typography>}>
+              <Typography
+                gutterBottom
+                variant="subtitle2"
+                component="div"
+                style={{textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}
+              >
+                {person.jobs?.join?.(', ') || person.character}
               </Typography>
             </Tooltip>
-            {(isCredit(person) || isCast(person)) && (
-              <Tooltip placement="top" title={<Typography>{person.jobs?.join?.(', ') || person.character}</Typography>}>
-                <Typography
-                  gutterBottom
-                  variant="subtitle2"
-                  component="div"
-                  style={{textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}
-                >
-                  {person.jobs?.join?.(', ') || person.character}
-                </Typography>
-              </Tooltip>
-            )}
-          </CardContent>
-        </CardActionArea>
+          )}
+        </CardContent>
       </Link>
     </StyledCard>
   )
@@ -70,6 +68,8 @@ export function LoadingPeople() {
 
 const StyledCard = styled(Card)`
   width: 100%;
+  -webkit-tap-highlight-color: transparent;
+
   ${({theme}) => theme.breakpoints.up('sm')} {
     max-width: 200px;
   }

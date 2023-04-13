@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 import { Clear, ThumbDown, ThumbsUpDown, ThumbUp } from '@mui/icons-material'
-import { Button, ClickAwayListener, Fade, IconButton, Tooltip, Typography } from '@mui/material'
+import { Button, IconButton, Popover, Typography } from '@mui/material'
 import * as React from 'react'
-import { useCallback, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Movie, Sentiment, useSetSentimentMutation, useSetWatchedMutation } from '../../../types/graphql'
 import { useMutationErrorHandler } from '../errorHandlers'
 
@@ -20,12 +20,15 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
   useMutationErrorHandler('Could not set watched status', watchedError)
 
   const [showOptions, setShowOptions] = useState(false)
+  const [anchor, setAnchor] = useState(null)
+  const anchorRef = useRef(null)
 
   function changeSentiment(sentiment: Sentiment) {
     setShowOptions(false)
+    setAnchor(null)
     void setSentiment({
       variables: {id, sentiment},
-      refetchQueries: ['GetPersonCredits', 'GetWatchedMovies', 'GetWatchlist', 'GetRecommendedMovies', 'GetUpcomingMovies'],
+      refetchQueries: ['GetPersonCredits', 'GetWatchedMovies', 'GetWatchlist'],
       optimisticResponse: {
         setSentiment: {
           __typename: 'Movie',
@@ -49,43 +52,51 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
   }
 
   return (
-    <ClickAwayListener onClickAway={() => setShowOptions(false)}>
-      <Button sx={{minWidth: 'unset'}} color={sentiment === Sentiment.None ? 'inherit' : 'primary'} disableRipple size="medium" onClick={() => setShowOptions(true)}>
-        <Tooltip
-          placement={placement || 'right'}
-          open={showOptions}
-          sx={{bgcolor: 'transparent'}}
-          onClose={() => setShowOptions(false)}
-          onOpen={() => setShowOptions(true)}
-          TransitionComponent={Fade}
-          TransitionProps={{timeout: 0}}
-          componentsProps={{tooltip: {sx: {marginLeft: '0 !important', padding: '4px 8px'}}}}
-          disableHoverListener
-          disableTouchListener
-          title={
-            <div style={{
-              display: 'flex',
-              flexDirection: placement === 'top' ? 'column-reverse' : 'row',
-              backgroundColor: !withLabel ? 'rgba(0,0,0,0.8)' : undefined,
-            }}>
-              <IconButton onClick={() => changeSentiment(Sentiment.Liked)}>{getIconForSentiment(Sentiment.Liked)}</IconButton>
-              <IconButton onClick={() => changeSentiment(Sentiment.Disliked)}>{getIconForSentiment(Sentiment.Disliked)}</IconButton>
-              <IconButton onClick={() => changeSentiment(Sentiment.None)}><Clear/></IconButton>
-            </div>
-          }
-        >
-          <span/>
-        </Tooltip>
-        {getIconForSentiment(sentiment)}
-        {!withLabel || <SentimentText invisible={showOptions} sentiment={sentiment} onClear={() => changeSentiment(Sentiment.None)}/>}
+    <>
+      <Button
+        ref={anchorRef}
+        sx={{minWidth: 'unset', visibility: anchor ? 'hidden' : 'inherit'}}
+        color="inherit"
+        disableRipple
+        size="medium"
+        onClick={e => {
+          e.stopPropagation()
+          e.preventDefault()
+          setAnchor(e.currentTarget)}
+        }
+      >
+        <Typography color={sentiment === Sentiment.None ? 'inherit' : 'primary'}>{getIconForSentiment(sentiment)}</Typography>
+        {!withLabel || <SentimentText sentiment={sentiment} onClear={() => changeSentiment(Sentiment.None)}/>}
       </Button>
-    </ClickAwayListener>
+
+      <Popover
+        open={!!anchor}
+        anchorEl={anchorRef.current}
+        onClose={() => setAnchor(null)}
+        anchorOrigin={placement === 'top' ? { vertical: 'bottom', horizontal: 'center', } : {vertical: 'center', horizontal: 'left'}}
+        transformOrigin={placement === 'top' ? {vertical: 'bottom',horizontal: 'center',} : {vertical: 'center', horizontal: 'left'}}
+      >
+        <div style={{
+          display: 'flex',
+          flexDirection: placement === 'top' ? 'column' : 'row',
+          justifyContent: 'space-evenly',
+          backgroundColor: !withLabel ? 'rgba(0,0,0,0.8)' : undefined,
+        }}>
+          <IconButton onClick={() => {
+            console.log('liked')
+            changeSentiment(Sentiment.Liked)
+          }}>{getIconForSentiment(Sentiment.Liked)}</IconButton>
+          <IconButton onClick={() => changeSentiment(Sentiment.Disliked)}>{getIconForSentiment(Sentiment.Disliked)}</IconButton>
+          <IconButton onClick={() => changeSentiment(Sentiment.None)}><Clear/></IconButton>
+        </div>
+      </Popover>
+    </>
   )
 }
 
-function SentimentText(props: { invisible: boolean, sentiment: Sentiment, onClear(): void }) {
+function SentimentText(props: { sentiment: Sentiment, onClear(): void }) {
   return (
-    <Typography variant="button" sx={{ml: 1, visibility: props.invisible ? 'hidden' : 'visible'}}>
+    <Typography variant="button" sx={{ml: 1}}>
       {getTextForSentiment(props.sentiment)}
     </Typography>
   )

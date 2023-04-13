@@ -3,7 +3,7 @@
   "packageManager": "yarn@3.2.2",
   "scripts": {
     "start": "ts-node src",
-    "dev": "nodemon",
+    "dev": "NODE_ENV=development nodemon",
     "graphql-type-gen": "graphql-codegen --config codegen.yml",
     "build": "NODE_ENV=production scripts/build.sh"
   },

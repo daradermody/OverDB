@@ -34,7 +34,7 @@ export function MovieInfo() {
         <ToggleFilter
           size="small"
           fullWidth
-          sx={{ maxWidth: 400 }}
+          sx={{maxWidth: 400}}
           exclusive
           options={['Crew', 'Cast']}
           value={peopleType}
@@ -146,16 +146,20 @@ function CrewList({id}: { id: Movie['id'] }) {
       <StyledCardListWrapper>
         {importantCrew.map(person => <PersonCard key={person.id} person={person}/>)}
       </StyledCardListWrapper>
-      <Typography variant="h1" style={{marginTop: 20}}>Other Crew</Typography>
-      <div>
-        {unimportantCrew.map(person => (
-          <div key={person.id}>
-            <Link to={`/person/${person.id}`}>
-              {person.name} - {person.jobs.join(', ')}
-            </Link>
+      {unimportantCrew.length && (
+        <>
+          <Typography variant="h1" style={{marginTop: 20}}>Other Crew</Typography>
+          <div>
+            {unimportantCrew.map(person => (
+              <div key={person.id}>
+                <Link to={`/person/${person.id}`}>
+                  {person.name} - {person.jobs.join(', ')}
+                </Link>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </>
   )
 }
@@ -173,7 +177,7 @@ function CastList({id}: { id: Movie['id'] }) {
 
   const importantCast = data.castForMovie
     .filter((person: CastCredit) => person.order < 12)
-  const unimportantCrew = data.castForMovie
+  const unimportantCast = data.castForMovie
     .filter((person: CastCredit) => person.order >= 12)
 
   return (
@@ -182,16 +186,20 @@ function CastList({id}: { id: Movie['id'] }) {
       <StyledCardListWrapper>
         {importantCast.map(person => <PersonCard key={person.id} person={person}/>)}
       </StyledCardListWrapper>
-      <Typography variant="h1" style={{marginTop: 20}}>Other Crew</Typography>
-      <div>
-        {unimportantCrew.map(person => (
-          <div key={person.id}>
-            <Link to={`/person/${person.id}`}>
-              {person.name} - {person.character}
-            </Link>
+      {unimportantCast.length && (
+        <>
+          <Typography variant="h1" style={{marginTop: 20}}>Other Cast</Typography>
+          <div>
+            {unimportantCast.map(person => (
+              <div key={person.id}>
+                <Link to={`/person/${person.id}`}>
+                  {person.name} - {person.character}
+                </Link>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </>
   )
 }

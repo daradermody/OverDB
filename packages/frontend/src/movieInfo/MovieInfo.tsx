@@ -66,7 +66,7 @@ function MovieSummary({id}: { id: Movie['id'] }) {
   return (
     <StyledWrapper>
       <StyledPoster>
-        <Poster style={{height: '400px'}} src={movie.posterPath} alt={`poster of ${movie.title}`}/>
+        <Poster style={{height: '400px'}} src={movie.posterPath} size="l" alt={`poster of ${movie.title}`}/>
         <TmdbRating id={movie.id} vote={movie.voteAverage} release={movie.releaseDate}/>
       </StyledPoster>
       <div>

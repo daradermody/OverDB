@@ -29,6 +29,7 @@ export function PersonSummary({id}: { id: Person['id'] }) {
       <Poster
         style={{height: '400px', width: '266.66px', backgroundColor: 'white'}}
         src={person.profilePath}
+        size="l"
         alt={`image of ${person.name}`}
       />
       <div style={{width: '100%'}}>

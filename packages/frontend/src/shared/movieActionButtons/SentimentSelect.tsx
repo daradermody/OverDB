@@ -19,12 +19,9 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
   useMutationErrorHandler('Could not set sentiment', sentimentError)
   useMutationErrorHandler('Could not set watched status', watchedError)
 
-  const [showOptions, setShowOptions] = useState(false)
   const [anchor, setAnchor] = useState(null)
-  const anchorRef = useRef(null)
 
   function changeSentiment(sentiment: Sentiment) {
-    setShowOptions(false)
     setAnchor(null)
     void setSentiment({
       variables: {id, sentiment},
@@ -54,24 +51,19 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
   return (
     <>
       <Button
-        ref={anchorRef}
         sx={{minWidth: 'unset', visibility: anchor ? 'hidden' : 'inherit'}}
         color="inherit"
         disableRipple
         size="medium"
-        onClick={e => {
-          e.stopPropagation()
-          e.preventDefault()
-          setAnchor(e.currentTarget)}
-        }
+        onClick={e => setAnchor(e.currentTarget)}
       >
         <Typography color={sentiment === Sentiment.None ? 'inherit' : 'primary'}>{getIconForSentiment(sentiment)}</Typography>
-        {!withLabel || <SentimentText sentiment={sentiment} onClear={() => changeSentiment(Sentiment.None)}/>}
+        {withLabel && <SentimentText sentiment={sentiment} onClear={() => changeSentiment(Sentiment.None)}/>}
       </Button>
 
       <Popover
         open={!!anchor}
-        anchorEl={anchorRef.current}
+        anchorEl={anchor}
         onClose={() => setAnchor(null)}
         anchorOrigin={placement === 'top' ? { vertical: 'bottom', horizontal: 'center', } : {vertical: 'center', horizontal: 'left'}}
         transformOrigin={placement === 'top' ? {vertical: 'bottom',horizontal: 'center',} : {vertical: 'center', horizontal: 'left'}}

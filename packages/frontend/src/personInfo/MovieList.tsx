@@ -5,7 +5,7 @@ import * as React from 'react'
 import { useLocation } from 'react-router'
 import { useNavigate } from 'react-router-dom'
 import { CrewCredit, Person, useGetPersonCreditsQuery } from '../../types/graphql'
-import MovieCards from '../shared/cards/MovieCard'
+import { MovieCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import ToggleFilter from '../shared/ToggleFilter'
 

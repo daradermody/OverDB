@@ -3,7 +3,7 @@ import styled from '@emotion/styled'
 import { Divider, Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetProfileCountsQuery, useGetWatchedMoviesQuery } from '../../types/graphql'
-import MovieCards from '../shared/cards/MovieCard'
+import { MovieCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import Link from '../shared/general/Link'
 import PageWrapper from '../shared/PageWrapper'
@@ -95,7 +95,7 @@ function RecentlyWatchedMovies() {
   return (
     <div style={{width: '100%'}}>
       <Typography variant="h1">Recently Watched</Typography>
-      <MovieCards movies={data?.watched?.results} loading={loading} loadingCount={3}/>
+      <MovieCards movies={data?.watched?.results} loading={loading} loadingCount={4}/>
     </div>
   )
 }

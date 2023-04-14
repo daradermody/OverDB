@@ -82,10 +82,7 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
           justifyContent: 'space-evenly',
           backgroundColor: !withLabel ? 'rgba(0,0,0,0.8)' : undefined,
         }}>
-          <IconButton onClick={() => {
-            console.log('liked')
-            changeSentiment(Sentiment.Liked)
-          }}>{getIconForSentiment(Sentiment.Liked)}</IconButton>
+          <IconButton onClick={() => changeSentiment(Sentiment.Liked)}>{getIconForSentiment(Sentiment.Liked)}</IconButton>
           <IconButton onClick={() => changeSentiment(Sentiment.Disliked)}>{getIconForSentiment(Sentiment.Disliked)}</IconButton>
           <IconButton onClick={() => changeSentiment(Sentiment.None)}><Clear/></IconButton>
         </div>

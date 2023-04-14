@@ -5,7 +5,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import { Autocomplete, Box, Fab, IconButton, InputAdornment, Modal, Skeleton, TextField, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { useThrottleCallback } from '@react-hook/throttle'
 import * as React from 'react'
-import { HTMLAttributes, KeyboardEvent, useCallback, useEffect, useState } from 'react'
+import { HTMLAttributes, useCallback, useEffect, useState } from 'react'
 import { useLocation } from 'react-router'
 import { useNavigate } from 'react-router-dom'
 import { Movie, PersonInfo, SearchResult, useSearchLazyQuery } from '../../types/graphql'
@@ -74,26 +74,35 @@ function SearchButton(props: SearchProps) {
 function SearchInput(props: SearchProps) {
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
+  const navigate = useNavigate()
   const [search, {data, loading, error}] = useSearchLazyQuery({notifyOnNetworkStatusChange: true})
   useMutationErrorHandler('Could not search', error)
 
-  const handleKeyUp = useThrottleCallback(async (e: KeyboardEvent<HTMLInputElement>) => {
-    if ((e.target as HTMLInputElement).value) {
-      if (e.code === 'Escape') {
-        (e.target as HTMLInputElement).blur()
-        setIsOpen(false)
-      } else {
-        await search({variables: {query: (e.target as HTMLInputElement).value.trim()}})
-      }
+  const goToSearchPage = useCallback((searchQuery) => {
+    setQuery('')
+    setIsOpen(false)
+    navigate(`/search/${encodeURIComponent(searchQuery)}`)
+  }, [setQuery, setIsOpen, navigate])
+
+  const searchQuery = useThrottleCallback(query => search({variables: {query}}), 2, true)
+
+  const handleKeyUp = useCallback(async e => {
+    if (e.code === 'Escape') {
+      (e.target as HTMLInputElement).blur()
+      setIsOpen(false)
+    } else if (e.code === 'Enter') {
+      goToSearchPage(e.target.value.trim())
+    } else if (e.target.value.trim()) {
+      searchQuery(e.target.value.trim())
     }
-  }, 4, true)
+  }, [setIsOpen, goToSearchPage, searchQuery])
+
 
   useEffect(() => setIsOpen(!!query), [query, setIsOpen])
 
   return (
     <Autocomplete<SearchResult, false, false, true>
       options={data?.search || []}
-      autoHighlight
       noOptionsText="No results found"
       loadingText={<div style={{ maxHeight: 'calc(40vh - 16px)', margin: '-6px -16px' }}><LoadingResults/></div>}
       size="medium"
@@ -107,17 +116,21 @@ function SearchInput(props: SearchProps) {
       isOptionEqualToValue={(option, value) => option.id === value.id}
       inputValue={query}
       disabled={props.disabled}
-      onInputChange={(e, value) => setQuery(value)}
-      onChange={(e, result) => {
-        if (typeof result !== 'string') {
+      value={null}
+      onInputChange={(e, value, reason) => {
+        if (reason === 'input') setQuery(value)
+      }}
+      onChange={(e, result, reason, details) => {
+        if (reason === 'selectOption') {
           (e.target as HTMLInputElement).blur()
-          props.onSelect(result)
+          props.onSelect(result as SearchResult)
+          setTimeout(() => setIsOpen(false), 0)
           if (props.clearOnSelect) {
             setTimeout(() => setQuery(''), 0)
           }
         }
       }}
-      getOptionLabel={(option: SearchResult | string) => (option as Movie).title || (option as PersonInfo).name || (option as string)}
+      getOptionLabel={(option: SearchResult | string) => (option as Movie).title || (option as PersonInfo).name || ''}
       renderOption={(props, option) => {
         return option.__typename === 'Movie'
           ? <MovieResult key={option.id} liProps={props} movie={option}/>
@@ -127,14 +140,16 @@ function SearchInput(props: SearchProps) {
         <TextField
           {...params}
           variant="outlined"
-          autoFocus
           placeholder="Search for cast and crew you love..."
           onKeyUp={handleKeyUp}
           InputProps={{
             ...params.InputProps,
             endAdornment: (
               <InputAdornment position="end">
-                <SearchIcon/>
+                <IconButton onClick={() => goToSearchPage(query)} edge="end">
+                  <SearchIcon/>
+                </IconButton>
+
               </InputAdornment>
             )
           }}
@@ -151,14 +166,19 @@ interface MobileSearchInputProps {
 
 function MobileSearchInput(props: MobileSearchInputProps) {
   const [query, setQuery] = useState('')
+  const navigate = useNavigate()
   const [search, {data, loading, error}] = useSearchLazyQuery({notifyOnNetworkStatusChange: true})
   useMutationErrorHandler('Could not search', error)
 
-  const handleKeyUp = useThrottleCallback(async e => {
-    if (e.target.value) {
-      await search({variables: {query: e.target.value.trim()}})
+  const handleKeyUp = useCallback(async e => {
+    if (e.code === 'Enter') {
+      navigate(`/search/${encodeURIComponent(e.target.value.trim())}`, {replace: true})
+    } else if (e.target.value.trim()) {
+      searchQuery(e.target.value.trim())
     }
-  }, 2, true)
+  }, [])
+
+  const searchQuery = useThrottleCallback(query => search({variables: {query}}), 2, true)
 
   return (
     <Box display="flex" flexDirection="column" height="100%">

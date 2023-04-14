@@ -9,8 +9,10 @@ import { Header } from './header/Header'
 import { Homepage } from './homepage/Homepage'
 import Login from './Login'
 import { MovieInfo } from './movieInfo/MovieInfo'
+import PageNotFound from './pageNotFound/PageNotFound'
 import { PersonInfo } from './personInfo/PersonInfo'
 import Profile from './Profile/Profile'
+import { SearchPage } from './searchPage/SearchPage'
 import { ErrorBoundary } from './shared/errorHandlers'
 import ScrollToTop from './shared/general/ScrollToTop'
 import useIsOnline from './shared/useIsOnline'
@@ -47,6 +49,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<Homepage/>}/>
       <Route path="/login" element={<Login/>}/>
+      <Route path="/search/:query" element={<SearchPage/>}/>
       <Route path="/person/:id" element={authed(<PersonInfo/>)}/>
       <Route path="/movie/:id" element={authed(<MovieInfo/>)}/>
       <Route path="/profile" element={authed(<Profile/>)}/>
@@ -55,6 +58,7 @@ function AppRoutes() {
       <Route path="/profile/watchlist" element={authed(<Watchlist/>)}/>
       <Route path="/profile/watched" element={authed(<WatchedMovies/>)}/>
       <Route path="/upcoming" element={authed(<UpcomingMovies/>)}/>
+      <Route path="*" element={<PageNotFound/>}/>
     </Routes>
   )
 }
@@ -67,9 +71,7 @@ function authed(children: ReactNode) {
   return <div>{children}</div>
 }
 
-const Root = styled('div')(({theme}) => (
-  {
-    backgroundColor: theme.palette.background.default
-  }
-))
+const Root = styled('div')(({theme}) => ({
+  backgroundColor: theme.palette.background.default
+}))
 

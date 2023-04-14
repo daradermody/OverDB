@@ -2,7 +2,7 @@ import { gql } from '@apollo/client'
 import { Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetWatchlistQuery } from '../../types/graphql'
-import MovieCards from '../shared/cards/MovieCard'
+import { MovieCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import PageWrapper from '../shared/PageWrapper'
 

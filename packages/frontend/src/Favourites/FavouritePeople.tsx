@@ -2,9 +2,8 @@ import { gql } from '@apollo/client'
 import { Box, Link, Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetFavouritePeopleQuery } from '../../types/graphql'
-import { LoadingPeople, PersonCard } from '../shared/cards/PersonCard'
+import { PersonCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
-import { StyledCardListWrapper } from '../shared/styledComponents'
 
 export function FavouritePeople() {
   const {data, error, loading, refetch} = useGetFavouritePeopleQuery()
@@ -26,11 +25,7 @@ export function FavouritePeople() {
     )
   }
 
-  return (
-    <StyledCardListWrapper>
-      {loading ? <LoadingPeople/> : data.favouritePeople.map(person => <PersonCard key={person.id} person={person}/>)}
-    </StyledCardListWrapper>
-  )
+  return <PersonCards people={data?.favouritePeople} loading={loading}/>
 }
 
 gql`

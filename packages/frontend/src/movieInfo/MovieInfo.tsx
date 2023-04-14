@@ -5,6 +5,7 @@ import * as React from 'react'
 import { useLocation } from 'react-router'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CastCredit, Movie, useGetCastQuery, useGetCrewQuery, useGetMovieInfoQuery } from '../../types/graphql'
+import { PersonCards } from '../shared/cards'
 import { PersonCard } from '../shared/cards/PersonCard'
 import { ErrorMessage } from '../shared/errorHandlers'
 import { InterestingDivider } from '../shared/general/InterestingDivider'
@@ -130,23 +131,17 @@ function CrewList({id}: { id: Movie['id'] }) {
     return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
-  if (loading) {
-    return <LoadingSpinner/>
-  }
-
-  const importantCrew = data.crewForMovie
+  const importantCrew = data?.crewForMovie
     .filter(person => person.jobs.find(job => importantJobs.includes(job)))
     .slice(0, 12)
-  const unimportantCrew = data.crewForMovie
+  const unimportantCrew = data?.crewForMovie
     .filter(person => !importantCrew.includes(person))
 
   return (
     <>
       <Typography variant="h1">Main Crew</Typography>
-      <StyledCardListWrapper>
-        {importantCrew.map(person => <PersonCard key={person.id} person={person}/>)}
-      </StyledCardListWrapper>
-      {unimportantCrew.length && (
+      <PersonCards people={importantCrew} loading={loading}/>
+      {!!unimportantCrew?.length && (
         <>
           <Typography variant="h1" style={{marginTop: 20}}>Other Crew</Typography>
           <div>
@@ -171,22 +166,16 @@ function CastList({id}: { id: Movie['id'] }) {
     return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
-  if (loading) {
-    return <LoadingSpinner/>
-  }
-
-  const importantCast = data.castForMovie
+  const importantCast = data?.castForMovie
     .filter((person: CastCredit) => person.order < 12)
-  const unimportantCast = data.castForMovie
+  const unimportantCast = data?.castForMovie
     .filter((person: CastCredit) => person.order >= 12)
 
   return (
     <>
       <Typography variant="h1">Main Crew</Typography>
-      <StyledCardListWrapper>
-        {importantCast.map(person => <PersonCard key={person.id} person={person}/>)}
-      </StyledCardListWrapper>
-      {unimportantCast.length && (
+      <PersonCards people={importantCast} loading={loading}/>
+      {!!unimportantCast?.length && (
         <>
           <Typography variant="h1" style={{marginTop: 20}}>Other Cast</Typography>
           <div>

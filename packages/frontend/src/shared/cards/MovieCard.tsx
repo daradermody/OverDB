@@ -1,40 +1,14 @@
 import styled from '@emotion/styled'
-import { Card, CardContent, CardMedia, Skeleton, Tooltip, Typography } from '@mui/material'
-import { range } from 'lodash'
+import { Card, CardContent, CardMedia, Tooltip, Typography } from '@mui/material'
 import * as React from 'react'
-import { useState } from 'react'
 import { Movie, MovieCredit } from '../../../types/graphql'
 import Link from '../general/Link'
 import { getPosterUrl, handlePosterError } from '../general/Poster'
 import { SentimentSelect } from '../movieActionButtons/SentimentSelect'
 import { WatchedButton } from '../movieActionButtons/WatchedButton'
 import { WatchlistButton } from '../movieActionButtons/WatchlistButton'
-import { StyledCardListWrapper } from '../styledComponents'
 
-interface MovieCardsProps {
-  movies?: MovieCardProps['movie'][]
-  loading?: boolean
-  loadingCount?: number
-  showCharactersOnly?: boolean
-}
-
-export default function MovieCards({movies, loading, loadingCount, showCharactersOnly}: MovieCardsProps) {
-  if (loading) {
-    return (
-      <StyledCardListWrapper>
-        {range(loadingCount || 18).map((_, i) => <LoadingMovieCard key={i}/>)}
-      </StyledCardListWrapper>
-    )
-  } else {
-    return (
-      <StyledCardListWrapper>
-        {movies?.map(movie => <MovieCard key={movie.id} movie={movie} showCharactersOnly={showCharactersOnly}/>)}
-      </StyledCardListWrapper>
-    )
-  }
-}
-
-interface MovieCardProps {
+export interface MovieCardProps {
   movie: {
     id: Movie['id'];
     title: Movie['title'];
@@ -49,7 +23,7 @@ interface MovieCardProps {
   showCharactersOnly?: boolean
 }
 
-function MovieCard({movie, showCharactersOnly}: MovieCardProps) {
+export function MovieCard({movie, showCharactersOnly}: MovieCardProps) {
   return (
     <StyledCard>
       <Link to={`/movie/${movie.id}`}>
@@ -70,15 +44,6 @@ const StyledCard = styled(Card)`
     max-width: 200px;
   }
 `
-
-export function LoadingMovieCard() {
-  return (
-    <Card style={{width: 175}}>
-      <Skeleton variant="rectangular" animation="wave" height={256}/>
-      <Skeleton variant="rectangular" animation={false} height={85} style={{marginTop: 1}}/>
-    </Card>
-  )
-}
 
 function MovieImage({movie}: MovieCardProps) {
   return (

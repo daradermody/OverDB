@@ -3,7 +3,7 @@ import { Loop } from '@mui/icons-material'
 import { CircularProgress, IconButton, Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetRecommendedMoviesQuery } from '../../../types/graphql'
-import MovieCards from '../../shared/cards/MovieCard'
+import { MovieCards } from '../../shared/cards'
 import { ErrorMessage } from '../../shared/errorHandlers'
 
 export function MovieSuggestions() {

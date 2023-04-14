@@ -15,9 +15,7 @@ export function Header() {
 
   return (
     <Root>
-      <Container sx={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-      }}>
+      <Container sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
         <Link to="/">
           <Typography sx={{fontSize: 32}}>OverDB</Typography>
         </Link>
@@ -41,8 +39,7 @@ export function Header() {
   )
 }
 
-const Root = styled('div')(({theme}) => (
-  {
-    color: theme.palette.text.primary, backgroundColor: '#430568',
-  }
-))
+const Root = styled('div')(({theme}) => ({
+  color: theme.palette.text.primary,
+  backgroundColor: '#430568',
+}))

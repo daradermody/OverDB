@@ -6,7 +6,7 @@ import { CastCredit, CrewCredit, Person } from '../../../types/graphql'
 import Link from '../general/Link'
 import { getPosterUrl, handlePosterError } from '../general/Poster'
 
-interface PersonCardProps {
+export interface PersonCardProps {
   person: Person & { jobs?: CrewCredit['jobs'] } & { character?: CastCredit['character'] }
 }
 
@@ -46,23 +46,6 @@ export function PersonCard({person}: PersonCardProps) {
         </CardContent>
       </Link>
     </StyledCard>
-  )
-}
-
-export function LoadingPersonCard() {
-  return (
-    <Card style={{width: 175}}>
-      <Skeleton variant="rectangular" animation="wave" height={256}/>
-      <Skeleton variant="rectangular" animation={false} height={50} style={{marginTop: 1}}/>
-    </Card>
-  )
-}
-
-export function LoadingPeople() {
-  return (
-    <>
-      {range(6).map((_, i) => <LoadingPersonCard key={i}/>)}
-    </>
   )
 }
 

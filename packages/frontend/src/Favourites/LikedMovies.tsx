@@ -2,7 +2,7 @@ import { gql } from '@apollo/client'
 import { Box, Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetLikedMoviesQuery } from '../../types/graphql'
-import MovieCards from '../shared/cards/MovieCard'
+import { MovieCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 
 export function LikedMovies() {

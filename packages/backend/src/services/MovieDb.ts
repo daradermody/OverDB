@@ -1,6 +1,6 @@
 import axios from 'axios'
 import * as fs from 'fs'
-import { Cast, MovieDb as MovieDbApi } from 'moviedb-promise'
+import { Cast, DiscoverMovieResponse, MovieDb as MovieDbApi, MovieRecommendationsResponse } from 'moviedb-promise'
 import { Crew, MovieResponse, Person as TmdbPerson, PersonMovieCreditsResponse } from 'moviedb-promise/dist/request-types'
 import { CastCredit, CrewCredit, isMovieSearchResult, isPersonSearchResult, Movie, MovieCredit, MovieInfo, Person, PersonWithoutFav } from '../../types'
 import getToken from '../utils/getToken'
@@ -110,11 +110,35 @@ export default class MovieDb {
       .map(result => isMovieSearchResult(result) ? pickMovieProperties(result) : pickPersonProperties(result))
   }
 
-  static async trending(): Promise<MovieInfo[]> {
+  static async discoverBasedOnPeople(personIds: Person['id'][]): Promise<MovieInfo[]> {
+    const recommendedMovies = await Promise.all(
+      personIds.map(async id => {
+        const {data} = await axios.get<DiscoverMovieResponse>(`https://api.themoviedb.org/3//discover/movie?api_key=${key}&with_people=${id}`)
+        return data.results!
+      })
+    )
+    return recommendedMovies
+      .flat()
+      .map(pickMovieProperties);
+  }
+
+  static async discoverBasedOnMovies(movieIds: Movie['id'][]): Promise<MovieInfo[]> {
+    const recommendedMovies = await Promise.all(
+      movieIds.map(async id => {
+        const {data} = await axios.get<MovieRecommendationsResponse>(`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${key}`)
+        return data.results!
+      })
+    )
+    return recommendedMovies
+      .flat()
+      .map(pickMovieProperties);
+  }
+
+  static async trending(size: number): Promise<MovieInfo[]> {
     const {results} = await this.movieDbApi.trending({time_window: 'week', media_type: 'movie'})
     return results!
       .map(pickMovieProperties)
-      .slice(0, 12)
+      .slice(0, size)
   }
 
   static async save(): Promise<void> {
@@ -224,7 +248,7 @@ function pickCastCreditForMovieProperties(credit: Pick<Cast, 'id' | 'name' | 'pr
   }
 }
 
-function pickMovieProperties(movie: MovieResponse): MovieInfo {
+function pickMovieProperties(movie: Pick<MovieResponse, 'id' | 'title' | 'poster_path' | 'release_date' | 'vote_average' | 'overview' | 'tagline'>): MovieInfo {
   return {
     id: `${movie.id}`,
     title: movie.title!,

@@ -15,7 +15,9 @@ import {
   QueryCrewForMovieArgs,
   QueryMovieArgs,
   QueryPersonArgs,
+  QueryRecommendedMoviesArgs,
   QuerySearchArgs,
+  QueryTrendingArgs,
   QueryWatchedArgs,
   ResolverFn,
   Resolvers,
@@ -55,7 +57,7 @@ const index: Resolvers<{ user: User }> = {
   },
   Query: applyAuth({
     favouritePeople: (_1, _2, {user}) => Promise.all(UserData.getFavourites(user.id).slice().reverse().map(MovieDb.personInfo)) as any,
-    recommendedMovies: (_1, _2, {user}) => recommendedMoviesResolver(user.id),
+    recommendedMovies: (_1, args: QueryRecommendedMoviesArgs, {user}) => recommendedMoviesResolver(user.id, args.size || 18) as unknown as Promise<Movie[]>,
     movie: (_, args: QueryMovieArgs) => MovieDb.movieInfo(args.id) as any,
     crewForMovie: (_, args: QueryCrewForMovieArgs) => MovieDb.movieCrew(args.id),
     castForMovie: (_, args: QueryCastForMovieArgs) => MovieDb.movieCast(args.id),
@@ -86,7 +88,7 @@ const index: Resolvers<{ user: User }> = {
         results: await Promise.all(movieIds.map(MovieDb.movieInfo)) as any
       }
     },
-    trending: () => MovieDb.trending(),
+    trending: (_, args: QueryTrendingArgs) => MovieDb.trending(args.size || 12),
     profileCounts: async (_1: any, _2: any, {user}) => {
       const [people, watched, liked, watchlist] = await Promise.all([
         UserData.getFavourites(user.id), UserData.getWatched(user.id), UserData.getLikedMovies(user.id), UserData.getWatchlist(user.id)

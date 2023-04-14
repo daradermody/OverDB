@@ -180,8 +180,18 @@ export type QueryPersonArgs = {
 };
 
 
+export type QueryRecommendedMoviesArgs = {
+  size?: InputMaybe<Scalars['Int']>;
+};
+
+
 export type QuerySearchArgs = {
   query: Scalars['String'];
+};
+
+
+export type QueryTrendingArgs = {
+  size?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -414,8 +424,8 @@ export type SearchQueryHookResult = ReturnType<typeof useSearchQuery>;
 export type SearchLazyQueryHookResult = ReturnType<typeof useSearchLazyQuery>;
 export type SearchQueryResult = Apollo.QueryResult<SearchQuery, SearchQueryVariables>;
 export const GetTrendingMoviesDocument = gql`
-    query GetTrendingMovies {
-  trending {
+    query GetTrendingMovies($size: Int!) {
+  trending(size: $size) {
     id
     title
     posterPath
@@ -436,10 +446,11 @@ export const GetTrendingMoviesDocument = gql`
  * @example
  * const { data, loading, error } = useGetTrendingMoviesQuery({
  *   variables: {
+ *      size: // value for 'size'
  *   },
  * });
  */
-export function useGetTrendingMoviesQuery(baseOptions?: Apollo.QueryHookOptions<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>) {
+export function useGetTrendingMoviesQuery(baseOptions: Apollo.QueryHookOptions<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>(GetTrendingMoviesDocument, options);
       }
@@ -451,8 +462,8 @@ export type GetTrendingMoviesQueryHookResult = ReturnType<typeof useGetTrendingM
 export type GetTrendingMoviesLazyQueryHookResult = ReturnType<typeof useGetTrendingMoviesLazyQuery>;
 export type GetTrendingMoviesQueryResult = Apollo.QueryResult<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>;
 export const GetRecommendedMoviesDocument = gql`
-    query GetRecommendedMovies {
-  recommendedMovies {
+    query GetRecommendedMovies($size: Int!) {
+  recommendedMovies(size: $size) {
     id
     posterPath
     title
@@ -476,10 +487,11 @@ export const GetRecommendedMoviesDocument = gql`
  * @example
  * const { data, loading, error } = useGetRecommendedMoviesQuery({
  *   variables: {
+ *      size: // value for 'size'
  *   },
  * });
  */
-export function useGetRecommendedMoviesQuery(baseOptions?: Apollo.QueryHookOptions<GetRecommendedMoviesQuery, GetRecommendedMoviesQueryVariables>) {
+export function useGetRecommendedMoviesQuery(baseOptions: Apollo.QueryHookOptions<GetRecommendedMoviesQuery, GetRecommendedMoviesQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetRecommendedMoviesQuery, GetRecommendedMoviesQueryVariables>(GetRecommendedMoviesDocument, options);
       }

@@ -7,7 +7,7 @@ import { ErrorMessage } from '../../shared/errorHandlers'
 import PageWrapper from '../../shared/PageWrapper'
 
 export function TrendingMoves() {
-  const {data, loading, error, refetch} = useGetTrendingMoviesQuery()
+  const {data, loading, error, refetch} = useGetTrendingMoviesQuery({variables: {size: 12}})
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>
@@ -27,8 +27,8 @@ export function TrendingMoves() {
 }
 
 gql`
-  query GetTrendingMovies {
-    trending {
+  query GetTrendingMovies($size: Int!) {
+    trending(size: $size) {
       id
       title
       posterPath

@@ -12,7 +12,7 @@
     "dev": "concurrently -n client,server -c green,cyan 'yarn workspace @overdb/frontend dev' 'yarn workspace @overdb/backend dev'",
     "graphql-type-gen": "yarn workspaces foreach --parallel run graphql-type-gen",
     "build": "NODE_ENV=production scripts/build.sh",
-    "deploy": "sudo systemctl stop overdb.service && sudo cp build/overdb /usr/local/bin/overdb && sudo systemctl restart overdb.service"
+    "deploy": "scripts/deploy.sh"
   },
   "repository": {
     "type": "git",

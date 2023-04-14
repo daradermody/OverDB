@@ -102,7 +102,7 @@ type Counts {
 
 type Query {
   favouritePeople: [PersonInfo!]!
-  recommendedMovies: [Movie!]!
+  recommendedMovies(size: Int): [Movie!]!
   movie(id: ID!): Movie!
   crewForMovie(id: ID!): [CrewCredit!]!
   castForMovie(id: ID!): [CastCredit!]!
@@ -112,7 +112,7 @@ type Query {
   watchlist: [Movie!]!
   watched(offset: Int, limit: Int): PaginatedMovies!
   likedMovies: [Movie!]!
-  trending: [MovieInfo!]!
+  trending(size: Int): [MovieInfo!]!
   profileCounts: Counts!
   upcoming: [Movie!]!
 }

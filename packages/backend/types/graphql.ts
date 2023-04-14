@@ -179,8 +179,18 @@ export type QueryPersonArgs = {
 };
 
 
+export type QueryRecommendedMoviesArgs = {
+  size?: InputMaybe<Scalars['Int']>;
+};
+
+
 export type QuerySearchArgs = {
   query: Scalars['String'];
+};
+
+
+export type QueryTrendingArgs = {
+  size?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -431,9 +441,9 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   movie?: Resolver<ResolversTypes['Movie'], ParentType, ContextType, RequireFields<QueryMovieArgs, 'id'>>;
   person?: Resolver<ResolversTypes['PersonInfo'], ParentType, ContextType, RequireFields<QueryPersonArgs, 'id'>>;
   profileCounts?: Resolver<ResolversTypes['Counts'], ParentType, ContextType>;
-  recommendedMovies?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
+  recommendedMovies?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType, Partial<QueryRecommendedMoviesArgs>>;
   search?: Resolver<Array<ResolversTypes['SearchResult']>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'query'>>;
-  trending?: Resolver<Array<ResolversTypes['MovieInfo']>, ParentType, ContextType>;
+  trending?: Resolver<Array<ResolversTypes['MovieInfo']>, ParentType, ContextType, Partial<QueryTrendingArgs>>;
   upcoming?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
   watched?: Resolver<ResolversTypes['PaginatedMovies'], ParentType, ContextType, Partial<QueryWatchedArgs>>;
   watchlist?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;

@@ -13,12 +13,7 @@ export default function RottenTomatoesReview({id}: { id: Movie['id'] }) {
   }
 
   if (loading) {
-    return (
-      <div style={{display: 'flex', alignItems: 'center', gap: 20, width: '100%'}}>
-        <Skeleton variant="rectangular" height={75} width={75}/>
-        <Skeleton variant="rectangular" height={75} sx={{flexGrow: 1}}/>
-      </div>
-    )
+    return <LoadingRottenTomatoesReview/>
   }
 
   if (!data.movie.tomatometer) {
@@ -36,6 +31,15 @@ export default function RottenTomatoesReview({id}: { id: Movie['id'] }) {
         </StyledScoreText>
       </a>
       <Typography variant="body1" dangerouslySetInnerHTML={{__html: consensus || 'No critics consensus'}}/>
+    </div>
+  )
+}
+
+export function LoadingRottenTomatoesReview() {
+  return (
+    <div style={{display: 'flex', alignItems: 'center', gap: 20, width: '100%'}}>
+      <Skeleton variant="rectangular" height={75} width={75}/>
+      <Skeleton variant="rectangular" height={75} sx={{flexGrow: 1}}/>
     </div>
   )
 }

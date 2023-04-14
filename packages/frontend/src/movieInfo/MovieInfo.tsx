@@ -1,24 +1,21 @@
 import { gql } from '@apollo/client'
 import styled from '@emotion/styled'
-import { Box, Typography } from '@mui/material'
+import { Box, Skeleton, Typography } from '@mui/material'
 import * as React from 'react'
 import { useLocation } from 'react-router'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CastCredit, Movie, useGetCastQuery, useGetCrewQuery, useGetMovieInfoQuery } from '../../types/graphql'
 import { PersonCards } from '../shared/cards'
-import { PersonCard } from '../shared/cards/PersonCard'
 import { ErrorMessage } from '../shared/errorHandlers'
 import { InterestingDivider } from '../shared/general/InterestingDivider'
 import Link from '../shared/general/Link'
-import LoadingSpinner from '../shared/general/LoadingSpinner'
 import { Poster } from '../shared/general/Poster'
 import { SentimentSelect } from '../shared/movieActionButtons/SentimentSelect'
 import { WatchedButton } from '../shared/movieActionButtons/WatchedButton'
 import { WatchlistButton } from '../shared/movieActionButtons/WatchlistButton'
 import PageWrapper from '../shared/PageWrapper'
-import { StyledCardListWrapper } from '../shared/styledComponents'
 import ToggleFilter from '../shared/ToggleFilter'
-import RottenTomatoesReview from './RottenTomatoesReview'
+import RottenTomatoesReview, { LoadingRottenTomatoesReview } from './RottenTomatoesReview'
 import { TmdbRating } from './TmdbRating'
 
 export function MovieInfo() {
@@ -59,7 +56,7 @@ function MovieSummary({id}: { id: Movie['id'] }) {
   }
 
   if (loading) {
-    return <LoadingSpinner/>
+    return <LoadingMovieSummary/>
   }
 
   const {movie} = data
@@ -123,6 +120,25 @@ const StyledActionsAndReview = styled.div`
     align-items: center;
   }
 `
+
+function LoadingMovieSummary() {
+  return (
+    <StyledWrapper>
+      <StyledPoster>
+        <Skeleton variant="rectangular" height="100%"/>
+      </StyledPoster>
+      <Box gap="10px" width="100%">
+        <Skeleton variant="rectangular" height={28} sx={{maxWidth: '200px'}}/>
+        <Skeleton variant="rectangular" height={16} sx={{maxWidth: '300px', m: '16px 0 24px'}}/>
+        <Skeleton variant="rectangular" height={170}/>
+        <StyledActionsAndReview style={{width: '100%'}}>
+          <Skeleton variant="rectangular" height={116} sx={{width: '100%', maxWidth: '190px'}}/>
+          <LoadingRottenTomatoesReview/>
+        </StyledActionsAndReview>
+      </Box>
+    </StyledWrapper>
+  )
+}
 
 function CrewList({id}: { id: Movie['id'] }) {
   const {data, error, loading, refetch} = useGetCrewQuery({variables: {id}})

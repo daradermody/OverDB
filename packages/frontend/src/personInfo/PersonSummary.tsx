@@ -2,11 +2,10 @@ import { gql } from '@apollo/client'
 import styled from '@emotion/styled'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
-import { Button, Typography } from '@mui/material'
+import { Box, Button, Skeleton, Typography } from '@mui/material'
 import * as React from 'react'
 import { Person, useGetPersonInfoQuery, useSetFavouriteMutation } from '../../types/graphql'
 import { ErrorMessage, useMutationErrorHandler } from '../shared/errorHandlers'
-import LoadingSpinner from '../shared/general/LoadingSpinner'
 import { Poster } from '../shared/general/Poster'
 
 
@@ -20,7 +19,7 @@ export function PersonSummary({id}: { id: Person['id'] }) {
   }
 
   if (loadingPerson) {
-    return <LoadingSpinner/>
+    return <LoadingPersonSummary/>
   }
 
   const {person} = data
@@ -46,6 +45,20 @@ export function PersonSummary({id}: { id: Person['id'] }) {
           {person.favourited ? 'Favourited' : 'Favourite'}
         </Button>
       </div>
+    </StyledWrapper>
+  )
+}
+
+function LoadingPersonSummary() {
+  return (
+    <StyledWrapper>
+      <Skeleton variant="rectangular" height={400} width={266.66} sx={{flexShrink: 0}}/>
+      <Box gap="10px" width="100%">
+        <Skeleton variant="rectangular" height={28} sx={{maxWidth: '200px'}}/>
+        <Skeleton variant="rectangular" height={16} sx={{maxWidth: '125px', m: '24px 0 24px'}}/>
+        <Skeleton variant="rectangular" height={170}/>
+        <Skeleton variant="rectangular" height={37} sx={{maxWidth: '150px', mt: '20px'}}/>
+      </Box>
     </StyledWrapper>
   )
 }

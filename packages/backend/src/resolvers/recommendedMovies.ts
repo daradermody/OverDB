@@ -13,10 +13,14 @@ export default async function recommendedMoviesResolver(userId: User['id'], maxS
 }
 
 async function getRecommendations(userId: User['id'], numberOfInputs: number) {
-  const favouritePeople = UserData.getFavourites(userId).slice(0, numberOfInputs)
+  const favouritePeople = UserData.getFavourites(userId)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, numberOfInputs)
   const numExtraMovies = Math.max(favouritePeople.length - numberOfInputs, 0)
 
-  const likedMovies = UserData.getLikedMovies(userId).slice(0, numberOfInputs)
+  const likedMovies = UserData.getLikedMovies(userId)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, numberOfInputs)
   const numExtraPeople = Math.max(likedMovies.length - numberOfInputs, 0)
 
   const numPeople = Math.round(numberOfInputs + numExtraPeople)

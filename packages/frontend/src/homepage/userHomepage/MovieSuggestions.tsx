@@ -35,7 +35,7 @@ export function MovieSuggestions() {
       <div>
         <div style={{display: 'flex', alignItems: 'center', gap: 4, marginBottom: '42px'}}>
           <Typography variant="h1">Recommended</Typography>
-          <IconButton onClick={recRefetch} disabled={recLoading} size="small">
+          <IconButton onClick={() => recRefetch()} disabled={recLoading} size="small">
             {recLoading ? <CircularProgress size={20}/> : <Loop/>}
           </IconButton>
         </div>

@@ -25,8 +25,14 @@ async function getRecommendations(userId: User['id'], numberOfInputs: number) {
 
   const numPeople = Math.round(numberOfInputs + numExtraPeople)
   const numMovies = Math.round(numberOfInputs + numExtraMovies)
-  return (await Promise.all([
+  const movies = (await Promise.all([
     MovieDb.discoverBasedOnPeople(favouritePeople.slice(0, numPeople)),
     MovieDb.discoverBasedOnMovies(likedMovies.slice(0, numMovies))
   ])).flat()
+
+  const moviesById: Record<MovieInfo['id'], MovieInfo> = {}
+  for (const movie of movies) {
+    moviesById[movie.id] = movie
+  }
+  return Object.values(moviesById)
 }

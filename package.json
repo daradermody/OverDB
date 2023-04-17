@@ -4,7 +4,7 @@
   "author": "Dara Dermody",
   "description": "Web application that allows people to easily follow their favourite cast and crew in movies",
   "license": "MIT",
-  "packageManager": "yarn@3.1.1",
+  "packageManager": "yarn@3.5.0",
   "workspaces": [
     "packages/*"
   ],

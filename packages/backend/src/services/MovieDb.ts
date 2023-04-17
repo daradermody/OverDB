@@ -1,6 +1,5 @@
-import axios from 'axios'
 import * as fs from 'fs'
-import { Cast, DiscoverMovieResponse, MovieDb as MovieDbApi, MovieRecommendationsResponse } from 'moviedb-promise'
+import { Cast, MovieDb as MovieDbApi } from 'moviedb-promise'
 import { Crew, MovieResponse, Person as TmdbPerson, PersonMovieCreditsResponse } from 'moviedb-promise/dist/request-types'
 import { CastCredit, CrewCredit, isMovieSearchResult, isPersonSearchResult, Movie, MovieCredit, MovieInfo, Person, PersonWithoutFav } from '../../types'
 import getToken from '../utils/getToken'
@@ -33,9 +32,9 @@ export default class MovieDb {
 
   static async personMovieCredits(id: Person['id']): Promise<Pick<MovieCredit, 'id' | 'title' | 'jobs' | 'character' | 'releaseDate'>[]> {
     if (!MovieDb.cache.personMovieCredits[id]) {
-      const {data} = await axios.get<PersonMovieCreditsResponse>(`https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${key}`)
-      const crew = data.crew as Required<NonNullable<PersonMovieCreditsResponse['crew']>[0]>[]
-      const cast = data.cast as Required<NonNullable<PersonMovieCreditsResponse['cast']>[0]>[]
+      const response = await this.movieDbApi.personMovieCredits({id})
+      const cast = response.cast as Required<NonNullable<PersonMovieCreditsResponse['cast']>[0]>[]
+      const crew = response.crew as Required<NonNullable<PersonMovieCreditsResponse['crew']>[0]>[]
       const crewMovies = filterInvalidMovies(crew)
       const castMovies = cast.map(c => ({...c, job: 'Actor'}))
       const movies = aggregateAndNormalizeJobs([...castMovies, ...crewMovies])
@@ -61,7 +60,7 @@ export default class MovieDb {
 
   static async personInfo(id: Person['id']): Promise<PersonWithoutFav> {
     if (!MovieDb.cache.personInfo[id]) {
-      const {data: person} = await axios.get(`https://api.themoviedb.org/3/person/${id}?api_key=${key}`)
+      const person = await this.movieDbApi.personInfo({id})
       MovieDb.cache.personInfo[id] = pickPersonProperties(person)
     }
     return MovieDb.cache.personInfo[id]
@@ -69,7 +68,7 @@ export default class MovieDb {
 
   static async movieInfo(id: Movie['id']): Promise<MovieInfo> {
     if (!MovieDb.cache.movieInfo[id]) {
-      const {data: movie} = await axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${key}`)
+      const movie = await this.movieDbApi.movieInfo({id})
       MovieDb.cache.movieInfo[id] = pickMovieProperties(movie)
       MovieDb.save()
         .catch(console.error)
@@ -112,10 +111,7 @@ export default class MovieDb {
 
   static async discoverBasedOnPeople(personIds: Person['id'][]): Promise<MovieInfo[]> {
     const recommendedMovies = await Promise.all(
-      personIds.map(async id => {
-        const {data} = await axios.get<DiscoverMovieResponse>(`https://api.themoviedb.org/3//discover/movie?api_key=${key}&with_people=${id}`)
-        return data.results!
-      })
+      personIds.map(async id => (await this.movieDbApi.discoverMovie({with_people: id})).results!)
     )
     return recommendedMovies
       .flat()
@@ -124,10 +120,7 @@ export default class MovieDb {
 
   static async discoverBasedOnMovies(movieIds: Movie['id'][]): Promise<MovieInfo[]> {
     const recommendedMovies = await Promise.all(
-      movieIds.map(async id => {
-        const {data} = await axios.get<MovieRecommendationsResponse>(`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${key}`)
-        return data.results!
-      })
+      movieIds.map(async id => (await this.movieDbApi.movieRecommendations({id})).results!)
     )
     return recommendedMovies
       .flat()

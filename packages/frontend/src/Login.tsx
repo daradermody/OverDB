@@ -1,7 +1,7 @@
 import React = require('react')
 import styled from '@emotion/styled'
 import { Alert, Button, TextField } from '@mui/material'
-import * as queryString from 'query-string'
+import queryString from 'query-string'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PageWrapper from './shared/PageWrapper'

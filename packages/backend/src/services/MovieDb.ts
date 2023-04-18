@@ -32,7 +32,7 @@ export default class MovieDb {
 
   static async personMovieCredits(id: Person['id']): Promise<Pick<MovieCredit, 'id' | 'title' | 'jobs' | 'character' | 'releaseDate'>[]> {
     if (!MovieDb.cache.personMovieCredits[id]) {
-      const response = await this.movieDbApi.personMovieCredits({id})
+      const response = await MovieDb.movieDbApi.personMovieCredits({id})
       const cast = response.cast as Required<NonNullable<PersonMovieCreditsResponse['cast']>[0]>[]
       const crew = response.crew as Required<NonNullable<PersonMovieCreditsResponse['crew']>[0]>[]
       const crewMovies = filterInvalidMovies(crew)
@@ -60,7 +60,7 @@ export default class MovieDb {
 
   static async personInfo(id: Person['id']): Promise<PersonWithoutFav> {
     if (!MovieDb.cache.personInfo[id]) {
-      const person = await this.movieDbApi.personInfo({id})
+      const person = await MovieDb.movieDbApi.personInfo({id})
       MovieDb.cache.personInfo[id] = pickPersonProperties(person)
     }
     return MovieDb.cache.personInfo[id]
@@ -68,7 +68,7 @@ export default class MovieDb {
 
   static async movieInfo(id: Movie['id']): Promise<MovieInfo> {
     if (!MovieDb.cache.movieInfo[id]) {
-      const movie = await this.movieDbApi.movieInfo({id})
+      const movie = await MovieDb.movieDbApi.movieInfo({id})
       MovieDb.cache.movieInfo[id] = pickMovieProperties(movie)
       MovieDb.save()
         .catch(console.error)
@@ -103,7 +103,7 @@ export default class MovieDb {
   }
 
   static async search(query: string): Promise<(MovieInfo | PersonWithoutFav)[]> {
-    const {results} = await this.movieDbApi.searchMulti({query})
+    const {results} = await MovieDb.movieDbApi.searchMulti({query})
     return results!
       .filter(result => isMovieSearchResult(result) || isPersonSearchResult(result))
       .map(result => isMovieSearchResult(result) ? pickMovieProperties(result) : pickPersonProperties(result))
@@ -111,7 +111,7 @@ export default class MovieDb {
 
   static async discoverBasedOnPeople(personIds: Person['id'][]): Promise<MovieInfo[]> {
     const recommendedMovies = await Promise.all(
-      personIds.map(async id => (await this.movieDbApi.discoverMovie({with_people: id})).results!)
+      personIds.map(async id => (await MovieDb.movieDbApi.discoverMovie({with_people: id})).results!)
     )
     return recommendedMovies
       .flat()
@@ -120,7 +120,7 @@ export default class MovieDb {
 
   static async discoverBasedOnMovies(movieIds: Movie['id'][]): Promise<MovieInfo[]> {
     const recommendedMovies = await Promise.all(
-      movieIds.map(async id => (await this.movieDbApi.movieRecommendations({id})).results!)
+      movieIds.map(async id => (await MovieDb.movieDbApi.movieRecommendations({id})).results!)
     )
     return recommendedMovies
       .flat()
@@ -128,7 +128,7 @@ export default class MovieDb {
   }
 
   static async trending(size: number): Promise<MovieInfo[]> {
-    const {results} = await this.movieDbApi.trending({time_window: 'week', media_type: 'movie'})
+    const {results} = await MovieDb.movieDbApi.trending({time_window: 'week', media_type: 'movie'})
     return results!
       .map(pickMovieProperties)
       .slice(0, size)

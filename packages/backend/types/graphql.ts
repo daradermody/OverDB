@@ -289,6 +289,16 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
   info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>;
 
+/** Mapping of union types */
+export type ResolversUnionTypes = ResolversObject<{
+  SearchResult: ( Movie ) | ( PersonInfo );
+}>;
+
+/** Mapping of union parent types */
+export type ResolversUnionParentTypes = ResolversObject<{
+  SearchResult: ( Movie ) | ( PersonInfo );
+}>;
+
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
@@ -306,7 +316,7 @@ export type ResolversTypes = ResolversObject<{
   Person: ResolversTypes['CastCredit'] | ResolversTypes['CrewCredit'] | ResolversTypes['PersonInfo'];
   PersonInfo: ResolverTypeWrapper<PersonInfo>;
   Query: ResolverTypeWrapper<{}>;
-  SearchResult: ResolversTypes['Movie'] | ResolversTypes['PersonInfo'];
+  SearchResult: ResolverTypeWrapper<ResolversUnionTypes['SearchResult']>;
   Sentiment: Sentiment;
   String: ResolverTypeWrapper<Scalars['String']>;
   Tomatometer: ResolverTypeWrapper<Tomatometer>;
@@ -330,7 +340,7 @@ export type ResolversParentTypes = ResolversObject<{
   Person: ResolversParentTypes['CastCredit'] | ResolversParentTypes['CrewCredit'] | ResolversParentTypes['PersonInfo'];
   PersonInfo: PersonInfo;
   Query: {};
-  SearchResult: ResolversParentTypes['Movie'] | ResolversParentTypes['PersonInfo'];
+  SearchResult: ResolversUnionParentTypes['SearchResult'];
   String: Scalars['String'];
   Tomatometer: Tomatometer;
 }>;

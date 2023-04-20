@@ -67,11 +67,11 @@ function MovieSummary({id}: { id: Movie['id'] }) {
         <Poster style={{height: '400px'}} src={movie.posterPath} size="l" alt={`poster of ${movie.title}`}/>
         <TmdbRating id={movie.id} vote={movie.voteAverage} release={movie.releaseDate}/>
       </StyledPoster>
-      <div>
+      <Box width="100%">
         <div>
-          <Typography variant="h1" sx={{display: 'inline'}}>{movie.title}</Typography>
+          <Typography component="span" variant="h1">{movie.title}</Typography>
           {movie.releaseDate && (
-            <Typography variant="subtitle1" sx={{display: 'inline', ml: 1}}>({movie.releaseDate?.split('-')?.[0]})</Typography>
+            <Typography component="span" sx={{ml: 1}} variant="subtitle1">({movie.releaseDate?.split('-')?.[0]})</Typography>
           )}
         </div>
 
@@ -86,7 +86,7 @@ function MovieSummary({id}: { id: Movie['id'] }) {
           </div>
           <RottenTomatoesReview id={movie.id}/>
         </StyledActionsAndReview>
-      </div>
+      </Box>
     </StyledWrapper>
   )
 }

@@ -36,7 +36,7 @@ export function Search(props: SearchProps) {
 function SearchButton(props: SearchProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const showSearchInput: boolean = location.state?.showSearchInput
+  const showSearchInput: boolean = location.state?.showSearchInput || false
 
   const setShowSearchInput = useCallback((showSearchInput) => {
     navigate(location, {state: {showSearchInput}, replace: !showSearchInput})
@@ -79,6 +79,7 @@ function SearchInput(props: SearchProps) {
   useMutationErrorHandler('Could not search', error)
 
   const goToSearchPage = useCallback((searchQuery) => {
+    if (!searchQuery) return
     setQuery('')
     setIsOpen(false)
     navigate(`/search/${encodeURIComponent(searchQuery)}`)
@@ -87,10 +88,10 @@ function SearchInput(props: SearchProps) {
   const searchQuery = useThrottleCallback(query => search({variables: {query}}), 2, true)
 
   const handleKeyUp = useCallback(async e => {
-    if (e.code === 'Escape') {
+    if (e.key === 'Escape') {
       (e.target as HTMLInputElement).blur()
       setIsOpen(false)
-    } else if (e.code === 'Enter') {
+    } else if (e.key === 'Enter') {
       goToSearchPage(e.target.value.trim())
     } else if (e.target.value.trim()) {
       searchQuery(e.target.value.trim())
@@ -171,7 +172,8 @@ function MobileSearchInput(props: MobileSearchInputProps) {
   useMutationErrorHandler('Could not search', error)
 
   const handleKeyUp = useCallback(async e => {
-    if (e.code === 'Enter') {
+    if (!e.target.value.trim()) return
+    if (e.key === 'Enter') {
       navigate(`/search/${encodeURIComponent(e.target.value.trim())}`, {replace: true})
     } else if (e.target.value.trim()) {
       searchQuery(e.target.value.trim())

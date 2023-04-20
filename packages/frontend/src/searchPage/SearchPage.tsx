@@ -29,7 +29,7 @@ export function SearchPage() {
       <Typography variant="h1">Results for "{query}"</Typography>
       <div>
         {error && <ErrorMessage error={error} onRetry={refetch}/>}
-        {data && <MoviesPeopleCards moviesAndPeople={data.search} loading={loading}/>}
+        {!error && <MoviesPeopleCards moviesAndPeople={data?.search} loading={loading}/>}
       </div>
     </PageWrapper>
   )

@@ -22,20 +22,20 @@ import {
   ResolverFn,
   Resolvers,
   SearchResult,
-  User
 } from '../../types'
 import MovieDb from '../services/MovieDb'
 import RottenTomatoes from '../services/RottenTomatoes'
 import { UserData } from '../services/UserData'
+import { User } from '../services/users'
 import recommendedMoviesResolver from './recommendedMovies'
 import upcomingMoviesResolver from './upcomingMoviesResolver'
 
 const unauthedQueries: (keyof Query)[] = ['trending']
 const index: Resolvers<{ user: User }> = {
   Movie: {
-    sentiment: (parent, _, {user}) => UserData.getSentiment(user.id, parent.id),
-    watched: (parent, _, {user}) => UserData.isWatched(user.id, parent.id),
-    inWatchlist: (parent, _, {user}) => UserData.inWatchlist(user.id, parent.id),
+    sentiment: (parent, _, {user}) => UserData.getSentiment(user.username, parent.id),
+    watched: (parent, _, {user}) => UserData.isWatched(user.username, parent.id),
+    inWatchlist: (parent, _, {user}) => UserData.inWatchlist(user.username, parent.id),
     tomatometer: ({title, releaseDate}) => {
       if (!releaseDate) {
         return null
@@ -45,19 +45,19 @@ const index: Resolvers<{ user: User }> = {
     }
   },
   MovieCredit: {
-    sentiment: (parent: MovieCredit, _, {user}) => UserData.getSentiment(user.id, parent.id),
-    watched: (parent: MovieCredit, _, {user}) => UserData.isWatched(user.id, parent.id),
-    inWatchlist: (parent: MovieCredit, _, {user}) => UserData.inWatchlist(user.id, parent.id),
+    sentiment: (parent: MovieCredit, _, {user}) => UserData.getSentiment(user.username, parent.id),
+    watched: (parent: MovieCredit, _, {user}) => UserData.isWatched(user.username, parent.id),
+    inWatchlist: (parent: MovieCredit, _, {user}) => UserData.inWatchlist(user.username, parent.id),
   },
   PersonInfo: {
-    favourited: (parent: PersonWithoutFav, _, {user}) => UserData.isFavourited(user.id, parent.id)
+    favourited: (parent: PersonWithoutFav, _, {user}) => UserData.isFavourited(user.username, parent.id)
   },
   SearchResult: {
     __resolveType: (obj: SearchResult) => isMovieSummary(obj) ? 'Movie' : 'PersonInfo'
   },
   Query: applyAuth({
-    favouritePeople: (_1, _2, {user}) => Promise.all(UserData.getFavourites(user.id).slice().reverse().map(MovieDb.personInfo)) as any,
-    recommendedMovies: (_1, args: QueryRecommendedMoviesArgs, {user}) => recommendedMoviesResolver(user.id, args.size || 18) as unknown as Promise<Movie[]>,
+    favouritePeople: (_1, _2, {user}) => Promise.all(UserData.getFavourites(user.username).slice().reverse().map(MovieDb.personInfo)) as any,
+    recommendedMovies: (_1, args: QueryRecommendedMoviesArgs, {user}) => recommendedMoviesResolver(user.username, args.size || 18) as unknown as Promise<Movie[]>,
     movie: (_, args: QueryMovieArgs) => MovieDb.movieInfo(args.id) as any,
     crewForMovie: (_, args: QueryCrewForMovieArgs) => MovieDb.movieCrew(args.id),
     castForMovie: (_, args: QueryCastForMovieArgs) => MovieDb.movieCast(args.id),
@@ -74,12 +74,12 @@ const index: Resolvers<{ user: User }> = {
     },
     search: (_, args: QuerySearchArgs) => MovieDb.search(args.query) as any,
     person: (_, args: QueryPersonArgs) => MovieDb.personInfo(args.id) as any,
-    watchlist: (_1, _2, {user}) => Promise.all(UserData.getWatchlist(user.id).slice().reverse().map(MovieDb.movieInfo)) as any,
-    likedMovies: (_1, _2, {user}) => Promise.all(UserData.getLikedMovies(user.id).slice().reverse().map(MovieDb.movieInfo)) as any,
+    watchlist: (_1, _2, {user}) => Promise.all(UserData.getWatchlist(user.username).slice().reverse().map(MovieDb.movieInfo)) as any,
+    likedMovies: (_1, _2, {user}) => Promise.all(UserData.getLikedMovies(user.username).slice().reverse().map(MovieDb.movieInfo)) as any,
     watched: async (_, args: QueryWatchedArgs, {user}) => {
       const offset = args.offset || 0
       const limit = args.limit || 10
-      const watchedMovieIds = UserData.getWatched(user.id).slice().reverse()
+      const watchedMovieIds = UserData.getWatched(user.username).slice().reverse()
       const movieIds = watchedMovieIds.slice(offset, offset + limit)
       return {
         offset,
@@ -91,27 +91,27 @@ const index: Resolvers<{ user: User }> = {
     trending: (_, args: QueryTrendingArgs) => MovieDb.trending(args.size || 12),
     profileCounts: async (_1: any, _2: any, {user}) => {
       const [people, watched, liked, watchlist] = await Promise.all([
-        UserData.getFavourites(user.id), UserData.getWatched(user.id), UserData.getLikedMovies(user.id), UserData.getWatchlist(user.id)
+        UserData.getFavourites(user.username), UserData.getWatched(user.username), UserData.getLikedMovies(user.username), UserData.getWatchlist(user.username)
       ])
       return {favouritePeople: people.length, watched: watched.length, moviesLiked: liked.length, watchlist: watchlist.length}
     },
-    upcoming: async (_1, _2, {user}) => await upcomingMoviesResolver(user.id) as any
+    upcoming: async (_1, _2, {user}) => await upcomingMoviesResolver(user.username) as any
   }),
   Mutation: {
     setFavourite: (_, args: MutationSetFavouriteArgs, {user}) => {
-      UserData.setFavourite(user.id, args.id, args.favourited)
+      UserData.setFavourite(user.username, args.id, args.favourited)
       return MovieDb.personInfo(args.id) as any
     },
     setWatched: (_, args: MutationSetWatchedArgs, {user}) => {
-      UserData.setWatched(user.id, args.id, args.watched)
+      UserData.setWatched(user.username, args.id, args.watched)
       return MovieDb.movieInfo(args.id) as any
     },
     setInWatchlist: (_, args: MutationSetInWatchlistArgs, {user}) => {
-      UserData.setInWatchlist(user.id, args.id, args.inWatchlist)
+      UserData.setInWatchlist(user.username, args.id, args.inWatchlist)
       return MovieDb.movieInfo(args.id) as any
     },
     setSentiment: (_, args: MutationSetSentimentArgs, {user}) => {
-      UserData.setSentiment(user.id, args.id, args.sentiment)
+      UserData.setSentiment(user.username, args.id, args.sentiment)
       return MovieDb.movieInfo(args.id) as any
     }
   }

@@ -8,10 +8,9 @@ import express, { Request, Response } from 'express'
 import * as fs from 'fs'
 import * as http from 'http'
 import { join } from 'path'
-import { User } from '../types'
 import resolvers from './resolvers'
 import { setupDataDir } from './services/dataStorage'
-import { users } from './services/users'
+import { getUser, isLoginValid, User } from './services/users'
 import getToken from './utils/getToken'
 
 dotenv.config()
@@ -52,13 +51,12 @@ async function main() {
   console.log(`🚀 Backend ready at http://localhost:${PORT}`)
 }
 
-function login(req: Request, res: Response) {
-  const user = users.find(u => u.username === req.body.username && u.password === req.body.password)
-  if (user) {
-    const {password, ...userWithoutPassword} = user
-    const cookie = JSON.stringify(userWithoutPassword)
+async function login(req: Request, res: Response) {
+  if (await isLoginValid(req.body.username, req.body.password)) {
+    const user = getUser(req.body.username)
+    const cookie = JSON.stringify(user)
     res.cookie('user', cookie, {maxAge: SIX_MONTHS_IN_MILLIS, signed: true, secure: process.env.NODE_ENV === 'production'})
-    res.json(userWithoutPassword)
+    res.json(user)
   } else {
     res.sendStatus(401)
   }

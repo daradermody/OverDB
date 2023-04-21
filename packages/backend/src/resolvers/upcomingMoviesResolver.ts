@@ -1,9 +1,10 @@
-import { MovieInfo, User } from '../../types'
+import { MovieInfo } from '../../types'
 import MovieDb from '../services/MovieDb'
 import { UserData } from '../services/UserData'
+import { User } from '../services/users'
 
-export default async function upcomingMoviesResolver(userId: User['id']): Promise<MovieInfo[]> {
-  const peopleIds = UserData.getFavourites(userId)
+export default async function upcomingMoviesResolver(username: User['username']): Promise<MovieInfo[]> {
+  const peopleIds = UserData.getFavourites(username)
   const creditsForPeople = await Promise.all(peopleIds.map(MovieDb.personMovieCredits))
 
   const now = new Date()

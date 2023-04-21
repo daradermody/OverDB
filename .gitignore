@@ -21,5 +21,6 @@ packages/backend/.env
 packages/backend/build
 build
 packages/backend/data/*
+!packages/backend/data/users.yml
 
 .vercel

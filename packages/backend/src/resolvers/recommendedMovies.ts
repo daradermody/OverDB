@@ -1,10 +1,11 @@
-import { MovieInfo, User } from '../../types'
+import { MovieInfo } from '../../types'
 import MovieDb from '../services/MovieDb'
 import { UserData } from '../services/UserData'
+import { User } from '../services/users'
 
-export default async function recommendedMoviesResolver(userId: User['id'], maxSize: number): Promise<MovieInfo[]> {
-  const acknowledgedMovies = new Set([...UserData.getWatched(userId), ...UserData.getWatchlist(userId)])
-  const recommendations = await getRecommendations(userId, Math.round(maxSize / 4))
+export default async function recommendedMoviesResolver(username: User['username'], maxSize: number): Promise<MovieInfo[]> {
+  const acknowledgedMovies = new Set([...UserData.getWatched(username), ...UserData.getWatchlist(username)])
+  const recommendations = await getRecommendations(username, Math.round(maxSize / 4))
 
   return recommendations
     .filter(movie => !acknowledgedMovies.has(movie.id))
@@ -12,13 +13,13 @@ export default async function recommendedMoviesResolver(userId: User['id'], maxS
     .slice(0, maxSize)
 }
 
-async function getRecommendations(userId: User['id'], numberOfInputs: number) {
-  const favouritePeople = UserData.getFavourites(userId)
+async function getRecommendations(username: User['username'], numberOfInputs: number) {
+  const favouritePeople = UserData.getFavourites(username)
     .sort(() => Math.random() - 0.5)
     .slice(0, numberOfInputs)
   const numExtraMovies = Math.max(favouritePeople.length - numberOfInputs, 0)
 
-  const likedMovies = UserData.getLikedMovies(userId)
+  const likedMovies = UserData.getLikedMovies(username)
     .sort(() => Math.random() - 0.5)
     .slice(0, numberOfInputs)
   const numExtraPeople = Math.max(likedMovies.length - numberOfInputs, 0)

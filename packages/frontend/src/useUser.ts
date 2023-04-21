@@ -1,5 +1,5 @@
 import { useApolloClient } from '@apollo/client'
-import { User } from '@overdb/backend/types'
+import { User } from '@overdb/backend/src/services/users'
 import { effect, signal } from '@preact/signals'
 import axios from 'axios'
 import * as cookie from 'cookie'

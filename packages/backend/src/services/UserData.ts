@@ -1,9 +1,10 @@
 import * as fs from 'fs'
-import { Movie, Person, Sentiment, User } from '../../types'
+import { Movie, Person, Sentiment } from '../../types'
 import { dataDir } from './dataStorage'
+import { User } from './users'
 
 interface Data {
-  [userId: User['id']]: {
+  [username: User['username']]: {
     favourites: Person['id'][];
     sentiments: Record<Movie['id'], Sentiment>;
     watched: Movie['id'][];
@@ -11,7 +12,7 @@ interface Data {
   }
 }
 
-const emptyObject: Data[number] = {
+const emptyObject: Data[User['username']] = {
   favourites: [],
   sentiments: {},
   watched: [],
@@ -22,78 +23,78 @@ export class UserData {
   static FILE_PATH = `${dataDir}/user_data.json`
   private static data: Data = UserData.readCache()
 
-  public static getFavourites(userId: User['id']): Person['id'][] {
-    return UserData.forUser(userId).favourites
+  public static getFavourites(username: User['username']): Person['id'][] {
+    return UserData.forUser(username).favourites
   }
 
-  public static setFavourite(userId: User['id'], personId: Person['id'], favourite: boolean): void {
-    let favourites = UserData.forUser(userId).favourites
+  public static setFavourite(username: User['username'], personId: Person['id'], favourite: boolean): void {
+    let favourites = UserData.forUser(username).favourites
     if (favourite) {
       favourites = Array.from(new Set([...favourites, personId]))
     } else {
       favourites = favourites.filter(id => id !== personId)
     }
 
-    UserData.data[userId] = {
-      ...UserData.forUser(userId),
+    UserData.data[username] = {
+      ...UserData.forUser(username),
       favourites,
     }
     UserData.save()
   }
 
-  public static isFavourited(userId: User['id'], personId: Person['id']): boolean {
-    return UserData.forUser(userId).favourites.includes(personId)
+  public static isFavourited(username: User['username'], personId: Person['id']): boolean {
+    return UserData.forUser(username).favourites.includes(personId)
   }
 
-  static getLikedMovies(userId: User['id']): Movie['id'][] {
-    return Object.entries(UserData.forUser(userId).sentiments)
+  static getLikedMovies(username: User['username']): Movie['id'][] {
+    return Object.entries(UserData.forUser(username).sentiments)
       .filter(([_, sentiment]) => sentiment === Sentiment.Liked)
       .map(([movieId, _]) => movieId)
   }
 
-  static getSentiment(userId: User['id'], movieId: Movie['id']): Sentiment {
-    return UserData.forUser(userId).sentiments[movieId] || Sentiment.None
+  static getSentiment(username: User['username'], movieId: Movie['id']): Sentiment {
+    return UserData.forUser(username).sentiments[movieId] || Sentiment.None
   }
 
-  static setSentiment(userId: User['id'], movieId: Movie['id'], sentiment: Sentiment): void {
+  static setSentiment(username: User['username'], movieId: Movie['id'], sentiment: Sentiment): void {
     if (sentiment === Sentiment.None) {
-      delete UserData.forUser(userId).sentiments[movieId]
+      delete UserData.forUser(username).sentiments[movieId]
     } else {
-      UserData.forUser(userId).sentiments[movieId] = sentiment
+      UserData.forUser(username).sentiments[movieId] = sentiment
     }
     UserData.save()
   }
 
-  static getWatched(userId: User['id']): string[] {
-    return UserData.forUser(userId).watched
+  static getWatched(username: User['username']): string[] {
+    return UserData.forUser(username).watched
   }
 
-  static isWatched(userId: User['id'], movieId: Movie['id']): boolean {
-    return UserData.forUser(userId).watched.includes(movieId)
+  static isWatched(username: User['username'], movieId: Movie['id']): boolean {
+    return UserData.forUser(username).watched.includes(movieId)
   }
 
-  static setWatched(userId: User['id'], movieId: Movie['id'], isWatched: boolean): void {
+  static setWatched(username: User['username'], movieId: Movie['id'], isWatched: boolean): void {
     if (isWatched) {
-      UserData.forUser(userId).watched = Array.from(new Set([...UserData.forUser(userId).watched, movieId]))
+      UserData.forUser(username).watched = Array.from(new Set([...UserData.forUser(username).watched, movieId]))
     } else {
-      UserData.forUser(userId).watched = UserData.forUser(userId).watched.filter(id => id !== movieId)
+      UserData.forUser(username).watched = UserData.forUser(username).watched.filter(id => id !== movieId)
     }
     UserData.save()
   }
 
-  static getWatchlist(userId: User['id']): Movie['id'][] {
-    return UserData.forUser(userId).watchlist
+  static getWatchlist(username: User['username']): Movie['id'][] {
+    return UserData.forUser(username).watchlist
   }
 
-  static inWatchlist(userId: User['id'], movieId: Movie['id']): boolean {
-    return UserData.forUser(userId).watchlist.includes(movieId)
+  static inWatchlist(username: User['username'], movieId: Movie['id']): boolean {
+    return UserData.forUser(username).watchlist.includes(movieId)
   }
 
-  static setInWatchlist(userId: User['id'], movieId: Movie['id'], inWatchlist: boolean): void {
+  static setInWatchlist(username: User['username'], movieId: Movie['id'], inWatchlist: boolean): void {
     if (inWatchlist) {
-      UserData.forUser(userId).watchlist = Array.from(new Set([...UserData.forUser(userId).watchlist, movieId]))
+      UserData.forUser(username).watchlist = Array.from(new Set([...UserData.forUser(username).watchlist, movieId]))
     } else {
-      UserData.forUser(userId).watchlist = UserData.forUser(userId).watchlist.filter(id => id !== movieId)
+      UserData.forUser(username).watchlist = UserData.forUser(username).watchlist.filter(id => id !== movieId)
     }
     UserData.save()
   }
@@ -109,7 +110,7 @@ export class UserData {
     fs.writeFileSync(UserData.FILE_PATH, JSON.stringify(UserData.data))
   }
 
-  private static forUser(id: User['id']) {
+  private static forUser(id: User['username']) {
     if (!UserData.data[id]) {
       UserData.data[id] = emptyObject
       UserData.save()

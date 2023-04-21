@@ -20,10 +20,4 @@ export function isPersonSearchResult(result: MovieResult | TvResult | PersonResu
 
 }
 
-export interface User {
-  id: number
-  username: string
-  avatarUrl: string
-}
-
 export * from './graphql'

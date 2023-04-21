@@ -17,7 +17,7 @@ import { ErrorBoundary } from './shared/errorHandlers'
 import ScrollToTop from './shared/general/ScrollToTop'
 import useIsOnline from './shared/useIsOnline'
 import UpcomingMovies from './upcomingMovies/UpcomingMovies'
-import { userSignal } from './useUser'
+import useUser, { userSignal } from './useUser'
 import WatchedMovies from './WatchedMovies/WatchedMovies'
 import Watchlist from './watchlist/Watchlist'
 
@@ -45,6 +45,8 @@ export default function App() {
 }
 
 function AppRoutes() {
+  const {user} = useUser()
+
   return (
     <Routes>
       <Route path="/" element={<Homepage/>}/>
@@ -52,11 +54,12 @@ function AppRoutes() {
       <Route path="/search/:query" element={<SearchPage/>}/>
       <Route path="/person/:id" element={authed(<PersonInfo/>)}/>
       <Route path="/movie/:id" element={authed(<MovieInfo/>)}/>
-      <Route path="/profile" element={authed(<Profile/>)}/>
-      <Route path="/profile/favourites" element={authed(<Navigate to="/profile/favourite/people" replace/>)}/>
-      <Route path="/profile/favourite/:type" element={authed(<Favourites/>)}/>
-      <Route path="/profile/watchlist" element={authed(<Watchlist/>)}/>
-      <Route path="/profile/watched" element={authed(<WatchedMovies/>)}/>
+      <Route path="/profile" element={<Navigate replace to={`/profile/${user?.username}`}/>}/>
+      <Route path="/profile/:username" element={authed(<Profile/>)}/>
+      <Route path="/profile/:username/favourites" element={authed(<Navigate to={`/profile/${user?.username}/favourite/people`} replace/>)}/>
+      <Route path="/profile/:username/favourite/:type" element={authed(<Favourites/>)}/>
+      <Route path="/profile/:username/watchlist" element={authed(<Watchlist/>)}/>
+      <Route path="/profile/:username/watched" element={authed(<WatchedMovies/>)}/>
       <Route path="/upcoming" element={authed(<UpcomingMovies/>)}/>
       <Route path="*" element={<PageNotFound/>}/>
     </Routes>

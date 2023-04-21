@@ -7,12 +7,12 @@ import { FavouritePeople } from './FavouritePeople'
 import { LikedMovies } from './LikedMovies'
 
 export default function Favourites() {
-  const {type} = useParams<{ type: 'people' | 'movies' }>()
+  const {type, username} = useParams<{ type: 'people' | 'movies', username: string }>()
   const navigate = useNavigate()
 
   useEffect(() => {
     if (!['people', 'movies'].includes(type)) {
-      navigate('/profile/favourite/people', {replace: true})
+      navigate(`/profile/${username}/favourite/people`, {replace: true})
     }
   })
 
@@ -20,13 +20,13 @@ export default function Favourites() {
     <PageWrapper>
       <Typography variant="h1">Favourites</Typography>
       <Box sx={{borderBottom: 1, borderColor: 'divider', mb: 2}}>
-        <Tabs value={type} onChange={(e, value) => navigate(`/profile/favourite/${value}`)}>
+        <Tabs value={type} onChange={(e, value) => navigate(`/profile/${username}/favourite/${value}`)}>
           <Tab label="People" value="people"/>
           <Tab label="Movies" value="movies"/>
         </Tabs>
       </Box>
-      {type === 'people' && <FavouritePeople/>}
-      {type === 'movies' && <LikedMovies/>}
+      {type === 'people' && <FavouritePeople username={username}/>}
+      {type === 'movies' && <LikedMovies username={username}/>}
     </PageWrapper>
   )
 }

@@ -6,6 +6,9 @@ import { useEffect, useState } from 'react'
 
 const cache = new InMemoryCache({
   typePolicies: {
+    User: {
+      merge: (existing, incoming) => ({...existing, ...incoming})
+    },
     Query: {
       fields: {
         watched: {

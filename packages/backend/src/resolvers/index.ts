@@ -18,7 +18,7 @@ import {
   QueryRecommendedMoviesArgs,
   QuerySearchArgs,
   QueryTrendingArgs,
-  QueryWatchedArgs,
+  QueryUserArgs,
   ResolverFn,
   Resolvers,
   SearchResult,
@@ -26,7 +26,7 @@ import {
 import MovieDb from '../services/MovieDb'
 import RottenTomatoes from '../services/RottenTomatoes'
 import { UserData } from '../services/UserData'
-import { User } from '../services/users'
+import { getUser, User } from '../services/users'
 import recommendedMoviesResolver from './recommendedMovies'
 import upcomingMoviesResolver from './upcomingMoviesResolver'
 
@@ -52,11 +52,36 @@ const index: Resolvers<{ user: User }> = {
   PersonInfo: {
     favourited: (parent: PersonWithoutFav, _, {user}) => UserData.isFavourited(user.username, parent.id)
   },
+  User: {
+    favouritePeople: parent => Promise.all(UserData.getFavourites(parent.username).slice().reverse().map(MovieDb.personInfo)) as any,
+    watchlist: parent => Promise.all(UserData.getWatchlist(parent.username).slice().reverse().map(MovieDb.movieInfo)) as any,
+    likedMovies: parent => Promise.all(UserData.getLikedMovies(parent.username).slice().reverse().map(MovieDb.movieInfo)) as any,
+    watched: async (parent, args) => {
+      const offset = args.offset || 0
+      const limit = args.limit || 10
+      const watchedMovieIds = UserData.getWatched(parent.username).slice().reverse()
+      const movieIds = watchedMovieIds.slice(offset, offset + limit)
+      return {
+        offset,
+        limit,
+        endReached: !args.limit || offset + limit >= watchedMovieIds.length,
+        results: await Promise.all(movieIds.map(MovieDb.movieInfo)) as any
+      }
+    },
+    stats: async (parent) => {
+      const [people, watched, liked, watchlist] = await Promise.all([
+        UserData.getFavourites(parent.username),
+        UserData.getWatched(parent.username),
+        UserData.getLikedMovies(parent.username),
+        UserData.getWatchlist(parent.username)
+      ])
+      return {favouritePeople: people.length, watched: watched.length, moviesLiked: liked.length, watchlist: watchlist.length}
+    }
+  },
   SearchResult: {
     __resolveType: (obj: SearchResult) => isMovieSummary(obj) ? 'Movie' : 'PersonInfo'
   },
   Query: applyAuth({
-    favouritePeople: (_1, _2, {user}) => Promise.all(UserData.getFavourites(user.username).slice().reverse().map(MovieDb.personInfo)) as any,
     recommendedMovies: (_1, args: QueryRecommendedMoviesArgs, {user}) => recommendedMoviesResolver(user.username, args.size || 18) as unknown as Promise<Movie[]>,
     movie: (_, args: QueryMovieArgs) => MovieDb.movieInfo(args.id) as any,
     crewForMovie: (_, args: QueryCrewForMovieArgs) => MovieDb.movieCrew(args.id),
@@ -74,28 +99,9 @@ const index: Resolvers<{ user: User }> = {
     },
     search: (_, args: QuerySearchArgs) => MovieDb.search(args.query) as any,
     person: (_, args: QueryPersonArgs) => MovieDb.personInfo(args.id) as any,
-    watchlist: (_1, _2, {user}) => Promise.all(UserData.getWatchlist(user.username).slice().reverse().map(MovieDb.movieInfo)) as any,
-    likedMovies: (_1, _2, {user}) => Promise.all(UserData.getLikedMovies(user.username).slice().reverse().map(MovieDb.movieInfo)) as any,
-    watched: async (_, args: QueryWatchedArgs, {user}) => {
-      const offset = args.offset || 0
-      const limit = args.limit || 10
-      const watchedMovieIds = UserData.getWatched(user.username).slice().reverse()
-      const movieIds = watchedMovieIds.slice(offset, offset + limit)
-      return {
-        offset,
-        limit,
-        endReached: !args.limit || offset + limit >= watchedMovieIds.length,
-        results: await Promise.all(movieIds.map(MovieDb.movieInfo)) as any
-      }
-    },
     trending: (_, args: QueryTrendingArgs) => MovieDb.trending(args.size || 12),
-    profileCounts: async (_1: any, _2: any, {user}) => {
-      const [people, watched, liked, watchlist] = await Promise.all([
-        UserData.getFavourites(user.username), UserData.getWatched(user.username), UserData.getLikedMovies(user.username), UserData.getWatchlist(user.username)
-      ])
-      return {favouritePeople: people.length, watched: watched.length, moviesLiked: liked.length, watchlist: watchlist.length}
-    },
-    upcoming: async (_1, _2, {user}) => await upcomingMoviesResolver(user.username) as any
+    upcoming: async (_1, _2, {user}) => await upcomingMoviesResolver(user.username) as any,
+    user: async (_, args: QueryUserArgs) => getUser(args.username) as any
   }),
   Mutation: {
     setFavourite: (_, args: MutationSetFavouriteArgs, {user}) => {

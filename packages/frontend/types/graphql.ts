@@ -24,14 +24,6 @@ export type CastCredit = Person & {
   profilePath?: Maybe<Scalars['String']>;
 };
 
-export type Counts = {
-  __typename?: 'Counts';
-  favouritePeople: Scalars['Int'];
-  moviesLiked: Scalars['Int'];
-  watched: Scalars['Int'];
-  watchlist: Scalars['Int'];
-};
-
 export type CrewCredit = Person & {
   __typename?: 'CrewCredit';
   id: Scalars['ID'];
@@ -141,17 +133,13 @@ export type Query = {
   castForMovie: Array<CastCredit>;
   creditsForPerson: Array<MovieCredit>;
   crewForMovie: Array<CrewCredit>;
-  favouritePeople: Array<PersonInfo>;
-  likedMovies: Array<Movie>;
   movie: Movie;
   person: PersonInfo;
-  profileCounts: Counts;
   recommendedMovies: Array<Movie>;
   search: Array<SearchResult>;
   trending: Array<MovieInfo>;
   upcoming: Array<Movie>;
-  watched: PaginatedMovies;
-  watchlist: Array<Movie>;
+  user: User;
 };
 
 
@@ -195,9 +183,8 @@ export type QueryTrendingArgs = {
 };
 
 
-export type QueryWatchedArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+export type QueryUserArgs = {
+  username: Scalars['String'];
 };
 
 export type SearchResult = Movie | PersonInfo;
@@ -207,6 +194,14 @@ export enum Sentiment {
   Liked = 'LIKED',
   None = 'NONE'
 }
+
+export type Stats = {
+  __typename?: 'Stats';
+  favouritePeople: Scalars['Int'];
+  moviesLiked: Scalars['Int'];
+  watched: Scalars['Int'];
+  watchlist: Scalars['Int'];
+};
 
 export type Tomatometer = {
   __typename?: 'Tomatometer';
@@ -222,13 +217,32 @@ export enum TomatometerState {
   Rotten = 'ROTTEN'
 }
 
+export type User = {
+  __typename?: 'User';
+  avatarUrl: Scalars['String'];
+  favouritePeople: Array<PersonInfo>;
+  likedMovies: Array<Movie>;
+  stats: Stats;
+  username: Scalars['String'];
+  watched: PaginatedMovies;
+  watchlist: Array<Movie>;
+};
+
+
+export type UserWatchedArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+};
+
 
 export const GetFavouritePeopleDocument = gql`
-    query GetFavouritePeople {
-  favouritePeople {
-    id
-    profilePath
-    name
+    query GetFavouritePeople($username: String!) {
+  user(username: $username) {
+    favouritePeople {
+      id
+      profilePath
+      name
+    }
   }
 }
     `;
@@ -245,10 +259,11 @@ export const GetFavouritePeopleDocument = gql`
  * @example
  * const { data, loading, error } = useGetFavouritePeopleQuery({
  *   variables: {
+ *      username: // value for 'username'
  *   },
  * });
  */
-export function useGetFavouritePeopleQuery(baseOptions?: Apollo.QueryHookOptions<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>) {
+export function useGetFavouritePeopleQuery(baseOptions: Apollo.QueryHookOptions<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>(GetFavouritePeopleDocument, options);
       }
@@ -260,12 +275,14 @@ export type GetFavouritePeopleQueryHookResult = ReturnType<typeof useGetFavourit
 export type GetFavouritePeopleLazyQueryHookResult = ReturnType<typeof useGetFavouritePeopleLazyQuery>;
 export type GetFavouritePeopleQueryResult = Apollo.QueryResult<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>;
 export const GetLikedMoviesDocument = gql`
-    query GetLikedMovies {
-  likedMovies {
-    id
-    title
-    posterPath
-    releaseDate
+    query GetLikedMovies($username: String!) {
+  user(username: $username) {
+    likedMovies {
+      id
+      title
+      posterPath
+      releaseDate
+    }
   }
 }
     `;
@@ -282,10 +299,11 @@ export const GetLikedMoviesDocument = gql`
  * @example
  * const { data, loading, error } = useGetLikedMoviesQuery({
  *   variables: {
+ *      username: // value for 'username'
  *   },
  * });
  */
-export function useGetLikedMoviesQuery(baseOptions?: Apollo.QueryHookOptions<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>) {
+export function useGetLikedMoviesQuery(baseOptions: Apollo.QueryHookOptions<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>(GetLikedMoviesDocument, options);
       }
@@ -296,55 +314,95 @@ export function useGetLikedMoviesLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type GetLikedMoviesQueryHookResult = ReturnType<typeof useGetLikedMoviesQuery>;
 export type GetLikedMoviesLazyQueryHookResult = ReturnType<typeof useGetLikedMoviesLazyQuery>;
 export type GetLikedMoviesQueryResult = Apollo.QueryResult<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>;
-export const GetProfileCountsDocument = gql`
-    query GetProfileCounts {
-  profileCounts {
-    favouritePeople
-    watched
-    moviesLiked
-    watchlist
+export const GetUserDocument = gql`
+    query GetUser($username: String!) {
+  user(username: $username) {
+    avatarUrl
   }
 }
     `;
 
 /**
- * __useGetProfileCountsQuery__
+ * __useGetUserQuery__
  *
- * To run a query within a React component, call `useGetProfileCountsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetProfileCountsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetProfileCountsQuery({
+ * const { data, loading, error } = useGetUserQuery({
  *   variables: {
+ *      username: // value for 'username'
  *   },
  * });
  */
-export function useGetProfileCountsQuery(baseOptions?: Apollo.QueryHookOptions<GetProfileCountsQuery, GetProfileCountsQueryVariables>) {
+export function useGetUserQuery(baseOptions: Apollo.QueryHookOptions<GetUserQuery, GetUserQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetProfileCountsQuery, GetProfileCountsQueryVariables>(GetProfileCountsDocument, options);
+        return Apollo.useQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, options);
       }
-export function useGetProfileCountsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProfileCountsQuery, GetProfileCountsQueryVariables>) {
+export function useGetUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserQuery, GetUserQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetProfileCountsQuery, GetProfileCountsQueryVariables>(GetProfileCountsDocument, options);
+          return Apollo.useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, options);
         }
-export type GetProfileCountsQueryHookResult = ReturnType<typeof useGetProfileCountsQuery>;
-export type GetProfileCountsLazyQueryHookResult = ReturnType<typeof useGetProfileCountsLazyQuery>;
-export type GetProfileCountsQueryResult = Apollo.QueryResult<GetProfileCountsQuery, GetProfileCountsQueryVariables>;
-export const GetWatchedMoviesDocument = gql`
-    query GetWatchedMovies($offset: Int, $limit: Int) {
-  watched(offset: $offset, limit: $limit) {
-    endReached
-    results {
-      id
-      title
-      posterPath
-      releaseDate
+export type GetUserQueryHookResult = ReturnType<typeof useGetUserQuery>;
+export type GetUserLazyQueryHookResult = ReturnType<typeof useGetUserLazyQuery>;
+export type GetUserQueryResult = Apollo.QueryResult<GetUserQuery, GetUserQueryVariables>;
+export const GetUserStatsDocument = gql`
+    query GetUserStats($username: String!) {
+  user(username: $username) {
+    stats {
+      favouritePeople
       watched
-      inWatchlist
-      sentiment
+      moviesLiked
+      watchlist
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUserStatsQuery__
+ *
+ * To run a query within a React component, call `useGetUserStatsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserStatsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserStatsQuery({
+ *   variables: {
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useGetUserStatsQuery(baseOptions: Apollo.QueryHookOptions<GetUserStatsQuery, GetUserStatsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserStatsQuery, GetUserStatsQueryVariables>(GetUserStatsDocument, options);
+      }
+export function useGetUserStatsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserStatsQuery, GetUserStatsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserStatsQuery, GetUserStatsQueryVariables>(GetUserStatsDocument, options);
+        }
+export type GetUserStatsQueryHookResult = ReturnType<typeof useGetUserStatsQuery>;
+export type GetUserStatsLazyQueryHookResult = ReturnType<typeof useGetUserStatsLazyQuery>;
+export type GetUserStatsQueryResult = Apollo.QueryResult<GetUserStatsQuery, GetUserStatsQueryVariables>;
+export const GetWatchedMoviesDocument = gql`
+    query GetWatchedMovies($username: String!, $offset: Int, $limit: Int) {
+  user(username: $username) {
+    watched(offset: $offset, limit: $limit) {
+      endReached
+      results {
+        id
+        title
+        posterPath
+        releaseDate
+        watched
+        inWatchlist
+        sentiment
+      }
     }
   }
 }
@@ -362,12 +420,13 @@ export const GetWatchedMoviesDocument = gql`
  * @example
  * const { data, loading, error } = useGetWatchedMoviesQuery({
  *   variables: {
+ *      username: // value for 'username'
  *      offset: // value for 'offset'
  *      limit: // value for 'limit'
  *   },
  * });
  */
-export function useGetWatchedMoviesQuery(baseOptions?: Apollo.QueryHookOptions<GetWatchedMoviesQuery, GetWatchedMoviesQueryVariables>) {
+export function useGetWatchedMoviesQuery(baseOptions: Apollo.QueryHookOptions<GetWatchedMoviesQuery, GetWatchedMoviesQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetWatchedMoviesQuery, GetWatchedMoviesQueryVariables>(GetWatchedMoviesDocument, options);
       }
@@ -925,15 +984,17 @@ export type GetUpcomingMoviesQueryHookResult = ReturnType<typeof useGetUpcomingM
 export type GetUpcomingMoviesLazyQueryHookResult = ReturnType<typeof useGetUpcomingMoviesLazyQuery>;
 export type GetUpcomingMoviesQueryResult = Apollo.QueryResult<GetUpcomingMoviesQuery, GetUpcomingMoviesQueryVariables>;
 export const GetWatchlistDocument = gql`
-    query GetWatchlist {
-  watchlist {
-    id
-    title
-    posterPath
-    releaseDate
-    watched
-    inWatchlist
-    sentiment
+    query GetWatchlist($username: String!) {
+  user(username: $username) {
+    watchlist {
+      id
+      title
+      posterPath
+      releaseDate
+      watched
+      inWatchlist
+      sentiment
+    }
   }
 }
     `;
@@ -950,10 +1011,11 @@ export const GetWatchlistDocument = gql`
  * @example
  * const { data, loading, error } = useGetWatchlistQuery({
  *   variables: {
+ *      username: // value for 'username'
  *   },
  * });
  */
-export function useGetWatchlistQuery(baseOptions?: Apollo.QueryHookOptions<GetWatchlistQuery, GetWatchlistQueryVariables>) {
+export function useGetWatchlistQuery(baseOptions: Apollo.QueryHookOptions<GetWatchlistQuery, GetWatchlistQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetWatchlistQuery, GetWatchlistQueryVariables>(GetWatchlistDocument, options);
       }

@@ -93,15 +93,24 @@ type Tomatometer {
   link: String!
 }
 
-type Counts {
+type Stats {
   favouritePeople: Int!
   watched: Int!
   moviesLiked: Int!
   watchlist: Int!
 }
 
-type Query {
+type User {
+  username: String!
+  avatarUrl: String!
+  watchlist: [Movie!]!
+  watched(offset: Int, limit: Int): PaginatedMovies!
+  likedMovies: [Movie!]!
+  stats: Stats!
   favouritePeople: [PersonInfo!]!
+}
+
+type Query {
   recommendedMovies(size: Int): [Movie!]!
   movie(id: ID!): Movie!
   crewForMovie(id: ID!): [CrewCredit!]!
@@ -109,12 +118,9 @@ type Query {
   person(id: ID!): PersonInfo!
   creditsForPerson(id: ID!): [MovieCredit!]!
   search(query: String!): [SearchResult!]!
-  watchlist: [Movie!]!
-  watched(offset: Int, limit: Int): PaginatedMovies!
-  likedMovies: [Movie!]!
   trending(size: Int): [MovieInfo!]!
-  profileCounts: Counts!
   upcoming: [Movie!]!
+  user(username: String!): User!
 }
 
 type Mutation {

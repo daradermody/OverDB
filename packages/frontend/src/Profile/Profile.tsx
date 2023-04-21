@@ -2,27 +2,41 @@ import { gql } from '@apollo/client'
 import styled from '@emotion/styled'
 import { Divider, Typography } from '@mui/material'
 import * as React from 'react'
-import { useGetProfileCountsQuery, useGetWatchedMoviesQuery } from '../../types/graphql'
+import { useParams } from 'react-router-dom'
+import { useGetUserQuery, useGetUserStatsQuery, useGetWatchedMoviesQuery } from '../../types/graphql'
 import { MovieCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import Link from '../shared/general/Link'
 import PageWrapper from '../shared/PageWrapper'
-import useUser from '../useUser'
+import {User} from '../../types/graphql'
 
 export default function Profile() {
-  const {user} = useUser()
+  const {username} = useParams<{ username: string }>()
+  const {data, loading, error, refetch} = useGetUserQuery({variables: {username}})
+
+  if (error) {
+    return <ErrorMessage error={error} onRetry={refetch}/>
+  }
+
+  if (loading) {
+    return <LoadingProfile/>
+  }
 
   return (
     <PageWrapper>
       <StyledProfile>
         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, margin: '20px 0 50px'}}>
-          <img style={{width: 300, aspectRatio: '1', clipPath: 'circle()'}} src={user.avatarUrl} alt="profile photo"/>
+          <img style={{width: 300, aspectRatio: '1', clipPath: 'circle()'}} src={data.user.avatarUrl} alt="profile photo"/>
           <Stats/>
         </div>
-        <RecentlyWatchedMovies/>
+        <RecentlyWatchedMovies username={username}/>
       </StyledProfile>
     </PageWrapper>
   )
+}
+
+function LoadingProfile() {
+  return null
 }
 
 const StyledProfile = styled.div`
@@ -38,7 +52,9 @@ const StyledProfile = styled.div`
 `
 
 function Stats() {
-  const {data, loading, error, refetch} = useGetProfileCountsQuery()
+  const {username} = useParams<{ username: string }>()
+
+  const {data, loading, error, refetch} = useGetUserStatsQuery({variables: {username}})
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>
@@ -46,20 +62,20 @@ function Stats() {
 
   return (
     <div style={{display: 'flex', justifyContent: 'center', flexGrow: 1}}>
-      <Link to="/profile/favourite/people">
-        <Stat value={data?.profileCounts?.favouritePeople} label="Favourite people" loading={loading}/>
+      <Link to={`/profile/${username}/favourite/people`}>
+        <Stat value={data?.user.stats.favouritePeople} label="Favourite people" loading={loading}/>
       </Link>
       <Divider orientation="vertical" flexItem/>
-      <Link to="/profile/watched">
-        <Stat value={data?.profileCounts?.watched} label="Movies watched" loading={loading}/>
+      <Link to={`/profile/${username}/watched`}>
+        <Stat value={data?.user.stats.watched} label="Movies watched" loading={loading}/>
       </Link>
       <Divider orientation="vertical" flexItem/>
-      <Link to="/profile/favourite/movies">
-        <Stat value={data?.profileCounts?.moviesLiked} label="Movies liked" loading={loading}/>
+      <Link to={`/profile/${username}/favourite/movies`}>
+        <Stat value={data?.user.stats.moviesLiked} label="Movies liked" loading={loading}/>
       </Link>
       <Divider orientation="vertical" flexItem/>
-      <Link to="/profile/watchlist">
-        <Stat value={data?.profileCounts?.watchlist} label="In watchlist" loading={loading}/>
+      <Link to={`/profile/${username}/watchlist`}>
+        <Stat value={data?.user.stats.watchlist} label="In watchlist" loading={loading}/>
       </Link>
     </div>
   )
@@ -85,8 +101,8 @@ const StatWrapper = styled.div`
   }
 `
 
-function RecentlyWatchedMovies() {
-  const {data, error, loading, refetch} = useGetWatchedMoviesQuery({variables: {limit: 8}})
+function RecentlyWatchedMovies({username}: {username: User['username']}) {
+  const {data, error, loading, refetch} = useGetWatchedMoviesQuery({variables: {username, limit: 8}})
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>
@@ -95,18 +111,28 @@ function RecentlyWatchedMovies() {
   return (
     <div style={{width: '100%'}}>
       <Typography variant="h1">Recently Watched</Typography>
-      <MovieCards movies={data?.watched?.results} loading={loading} loadingCount={4}/>
+      <MovieCards movies={data?.user.watched?.results} loading={loading} loadingCount={4}/>
     </div>
   )
 }
 
 gql`
-  query GetProfileCounts {
-    profileCounts {
-      favouritePeople
-      watched
-      moviesLiked
-      watchlist
+  query GetUser($username: String!) {
+    user(username: $username) {
+      avatarUrl
+    }
+  }
+`
+
+gql`
+  query GetUserStats($username: String!) {
+    user(username: $username) {
+      stats {
+        favouritePeople
+        watched
+        moviesLiked
+        watchlist
+      }
     }
   }
 `

@@ -36,7 +36,7 @@ export function ProfileIcon({disabled}: { disabled?: boolean }) {
           </MenuItem>
         </Link>
 
-        <Link to="/profile/favourites">
+        <Link to={`/profile/${user.username}/favourites`}>
           <MenuItem onClick={handleClose}>
             <ListItemIcon>
               <Favorite fontSize="small"/>
@@ -45,7 +45,7 @@ export function ProfileIcon({disabled}: { disabled?: boolean }) {
           </MenuItem>
         </Link>
 
-        <Link to="/profile/watched">
+        <Link to={`/profile/${user.username}/watched`}>
           <MenuItem onClick={handleClose}>
             <ListItemIcon>
               <Visibility fontSize="small"/>
@@ -54,7 +54,7 @@ export function ProfileIcon({disabled}: { disabled?: boolean }) {
           </MenuItem>
         </Link>
 
-        <Link to="/profile/watchlist">
+        <Link to={`/profile/${user.username}/watchlist`}>
           <MenuItem onClick={handleClose}>
             <ListItemIcon>
               <AlarmOn fontSize="small"/>

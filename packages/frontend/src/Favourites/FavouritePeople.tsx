@@ -1,9 +1,10 @@
 import { gql } from '@apollo/client'
-import { Box, Link, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import * as React from 'react'
 import { useGetFavouritePeopleQuery, User } from '../../types/graphql'
 import { PersonCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
+import Link from '../shared/general/Link'
 import useUser from '../useUser'
 
 export function FavouritePeople({username}: {username: User['username']}) {

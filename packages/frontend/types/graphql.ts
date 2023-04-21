@@ -140,6 +140,7 @@ export type Query = {
   trending: Array<MovieInfo>;
   upcoming: Array<Movie>;
   user: User;
+  users: Array<User>;
 };
 
 
@@ -221,7 +222,9 @@ export type User = {
   __typename?: 'User';
   avatarUrl: Scalars['String'];
   favouritePeople: Array<PersonInfo>;
+  isAdmin?: Maybe<Scalars['Boolean']>;
   likedMovies: Array<Movie>;
+  public?: Maybe<Scalars['Boolean']>;
   stats: Stats;
   username: Scalars['String'];
   watched: PaginatedMovies;
@@ -437,6 +440,48 @@ export function useGetWatchedMoviesLazyQuery(baseOptions?: Apollo.LazyQueryHookO
 export type GetWatchedMoviesQueryHookResult = ReturnType<typeof useGetWatchedMoviesQuery>;
 export type GetWatchedMoviesLazyQueryHookResult = ReturnType<typeof useGetWatchedMoviesLazyQuery>;
 export type GetWatchedMoviesQueryResult = Apollo.QueryResult<GetWatchedMoviesQuery, GetWatchedMoviesQueryVariables>;
+export const GetUsersDocument = gql`
+    query GetUsers {
+  users {
+    username
+    avatarUrl
+    isAdmin
+    stats {
+      favouritePeople
+      moviesLiked
+      watched
+      watchlist
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUsersQuery__
+ *
+ * To run a query within a React component, call `useGetUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUsersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUsersQuery(baseOptions?: Apollo.QueryHookOptions<GetUsersQuery, GetUsersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
+      }
+export function useGetUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUsersQuery, GetUsersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
+        }
+export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
+export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery>;
+export type GetUsersQueryResult = Apollo.QueryResult<GetUsersQuery, GetUsersQueryVariables>;
 export const SearchDocument = gql`
     query Search($query: String!) {
   search(query: $query) {

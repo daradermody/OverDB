@@ -2,6 +2,7 @@ import { readFileSync } from 'fs'
 import { scryptSync, timingSafeEqual } from 'crypto'
 import YAML from 'yaml'
 import { dataDir } from './dataStorage'
+import {User as ApiUser} from '../../types/graphql'
 
 const usersInfo: UsersFile = YAML.parse(readFileSync(`${dataDir}/users.yml`, 'utf8'))
 
@@ -20,13 +21,16 @@ export function getUser(username: string): User {
   return {username, ...userInfo}
 }
 
-export interface User {
-  username: string
-  avatarUrl: string
+export function getUsers(): User[] {
+  return Object.entries(usersInfo)
+    .map(([username, userInfo]) => {
+    const {passwordHash, ...rest} = userInfo
+    return {username, ...rest}
+  })
 }
 
-interface UserWithHash extends User {
-  passwordHash: string
-}
+export type User = Pick<ApiUser, 'username' | 'avatarUrl' | 'isAdmin' | 'public'>
+
+type UserWithHash = User & { passwordHash: string }
 
 type UsersFile = Record<User['username'], Omit<UserWithHash, 'username'>>

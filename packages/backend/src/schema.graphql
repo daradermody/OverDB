@@ -103,6 +103,8 @@ type Stats {
 type User {
   username: String!
   avatarUrl: String!
+  isAdmin: Boolean
+  public: Boolean
   watchlist: [Movie!]!
   watched(offset: Int, limit: Int): PaginatedMovies!
   likedMovies: [Movie!]!
@@ -121,6 +123,7 @@ type Query {
   trending(size: Int): [MovieInfo!]!
   upcoming: [Movie!]!
   user(username: String!): User!
+  users: [User!]!
 }
 
 type Mutation {

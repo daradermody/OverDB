@@ -3,6 +3,7 @@ import { Box } from '@mui/material'
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import Admin from './admin/Admin'
 import Favourites from './Favourites/Favourites'
 import Footer from './Footer/Footer'
 import { Header } from './header/Header'
@@ -61,6 +62,7 @@ function AppRoutes() {
       <Route path="/profile/:username/watchlist" element={authed(<Watchlist/>)}/>
       <Route path="/profile/:username/watched" element={authed(<WatchedMovies/>)}/>
       <Route path="/upcoming" element={authed(<UpcomingMovies/>)}/>
+      <Route path="/admin" element={authed(<Admin/>)}/>
       <Route path="*" element={<PageNotFound/>}/>
     </Routes>
   )

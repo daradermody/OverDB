@@ -139,6 +139,7 @@ export type Query = {
   trending: Array<MovieInfo>;
   upcoming: Array<Movie>;
   user: User;
+  users: Array<User>;
 };
 
 
@@ -220,7 +221,9 @@ export type User = {
   __typename?: 'User';
   avatarUrl: Scalars['String'];
   favouritePeople: Array<PersonInfo>;
+  isAdmin?: Maybe<Scalars['Boolean']>;
   likedMovies: Array<Movie>;
+  public?: Maybe<Scalars['Boolean']>;
   stats: Stats;
   username: Scalars['String'];
   watched: PaginatedMovies;
@@ -459,6 +462,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   trending?: Resolver<Array<ResolversTypes['MovieInfo']>, ParentType, ContextType, Partial<QueryTrendingArgs>>;
   upcoming?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'username'>>;
+  users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
 }>;
 
 export type SearchResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['SearchResult'] = ResolversParentTypes['SearchResult']> = ResolversObject<{
@@ -484,7 +488,9 @@ export type TomatometerResolvers<ContextType = any, ParentType extends Resolvers
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   avatarUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   favouritePeople?: Resolver<Array<ResolversTypes['PersonInfo']>, ParentType, ContextType>;
+  isAdmin?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   likedMovies?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
+  public?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   stats?: Resolver<ResolversTypes['Stats'], ParentType, ContextType>;
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   watched?: Resolver<ResolversTypes['PaginatedMovies'], ParentType, ContextType, Partial<UserWatchedArgs>>;

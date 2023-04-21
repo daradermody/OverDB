@@ -26,7 +26,7 @@ import {
 import MovieDb from '../services/MovieDb'
 import RottenTomatoes from '../services/RottenTomatoes'
 import { UserData } from '../services/UserData'
-import { getUser, User } from '../services/users'
+import { getUser, getUsers, User } from '../services/users'
 import recommendedMoviesResolver from './recommendedMovies'
 import upcomingMoviesResolver from './upcomingMoviesResolver'
 
@@ -101,7 +101,20 @@ const index: Resolvers<{ user: User }> = {
     person: (_, args: QueryPersonArgs) => MovieDb.personInfo(args.id) as any,
     trending: (_, args: QueryTrendingArgs) => MovieDb.trending(args.size || 12),
     upcoming: async (_1, _2, {user}) => await upcomingMoviesResolver(user.username) as any,
-    user: async (_, args: QueryUserArgs) => getUser(args.username) as any
+    user: async (_, args: QueryUserArgs, {user}) => {
+      const requestedUser = getUser(args.username)
+      const canViewUser = user.username === requestedUser.username || user.isAdmin || requestedUser.public
+      if (!canViewUser) {
+        throw new GraphQLError('User not found', {
+          extensions: {
+            code: 'NOT FOUND',
+            http: {status: 404},
+          },
+        })
+      }
+      return requestedUser as any
+    },
+    users: requiresAdmin(async () => getUsers() as any)
   }),
   Mutation: {
     setFavourite: (_, args: MutationSetFavouriteArgs, {user}) => {
@@ -140,6 +153,20 @@ function withUser<TResult, TParent, TContext extends { user?: User }, TArgs>(res
         extensions: {
           code: 'UNAUTHENTICATED',
           http: {status: 401},
+        },
+      })
+    }
+    return resolver(parent, args, context, info)
+  }
+}
+
+function requiresAdmin<TResult, TParent = {}, TContext = {}, TArgs = {}>(resolver: ResolverFn<TResult, TParent, TContext, TArgs>): ResolverFn<TResult, TParent, TContext, TArgs> {
+  return (parent: any, args: any, context: any, info: any) => {
+    if (!context.user?.isAdmin) {
+      throw new GraphQLError('You must be admin', {
+        extensions: {
+          code: 'FORBIDDEN',
+          http: {status: 403},
         },
       })
     }

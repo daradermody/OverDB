@@ -1,4 +1,4 @@
-import { AccountCircle, AlarmOn, Favorite, Logout, Visibility, Event } from '@mui/icons-material'
+import { AccountCircle, AlarmOn, Favorite, Logout, Visibility, Event, AdminPanelSettings } from '@mui/icons-material'
 import { Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material'
 import * as React from 'react'
 import Link from '../shared/general/Link'
@@ -14,7 +14,11 @@ export function ProfileIcon({disabled}: { disabled?: boolean }) {
   return (
     <div>
       <IconButton aria-describedby="profile-button" disabled={disabled} onClick={handleOpen}>
-        <img style={{width: 50, aspectRatio: '1', clipPath: 'circle()'}} src={user.avatarUrl} alt="profile photo"/>
+        <img
+          style={{width: 50, aspectRatio: '1', clipPath: 'circle()', objectFit: 'cover'}}
+          src={user.avatarUrl}
+          alt="profile photo"
+        />
       </IconButton>
 
       <Menu
@@ -71,6 +75,17 @@ export function ProfileIcon({disabled}: { disabled?: boolean }) {
             <ListItemText>Upcoming movies</ListItemText>
           </MenuItem>
         </Link>
+
+        {user.isAdmin && (
+          <Link to="/admin">
+            <MenuItem onClick={handleClose}>
+              <ListItemIcon>
+                <AdminPanelSettings fontSize="small"/>
+              </ListItemIcon>
+              <ListItemText>Admin</ListItemText>
+            </MenuItem>
+          </Link>
+        )}
 
         <Divider/>
         <MenuItem onClick={logout}>

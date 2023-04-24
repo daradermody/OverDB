@@ -112,6 +112,14 @@ export type PaginatedMovies = {
   results: Array<Movie>;
 };
 
+export type PaginatedPeople = {
+  __typename?: 'PaginatedPeople';
+  endReached: Scalars['Boolean'];
+  limit: Scalars['Int'];
+  offset: Scalars['Int'];
+  results: Array<PersonInfo>;
+};
+
 export type Person = {
   id: Scalars['ID'];
   name: Scalars['String'];
@@ -221,14 +229,26 @@ export enum TomatometerState {
 export type User = {
   __typename?: 'User';
   avatarUrl: Scalars['String'];
-  favouritePeople: Array<PersonInfo>;
+  favouritePeople: PaginatedPeople;
   isAdmin?: Maybe<Scalars['Boolean']>;
-  likedMovies: Array<Movie>;
+  likedMovies: PaginatedMovies;
   public?: Maybe<Scalars['Boolean']>;
   stats: Stats;
   username: Scalars['String'];
   watched: PaginatedMovies;
-  watchlist: Array<Movie>;
+  watchlist: PaginatedMovies;
+};
+
+
+export type UserFavouritePeopleArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+};
+
+
+export type UserLikedMoviesArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -238,13 +258,22 @@ export type UserWatchedArgs = {
 };
 
 
+export type UserWatchlistArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+};
+
+
 export const GetFavouritePeopleDocument = gql`
-    query GetFavouritePeople($username: String!) {
+    query GetFavouritePeople($username: String!, $offset: Int, $limit: Int) {
   user(username: $username) {
-    favouritePeople {
-      id
-      profilePath
-      name
+    favouritePeople(offset: $offset, limit: $limit) {
+      endReached
+      results {
+        id
+        profilePath
+        name
+      }
     }
   }
 }
@@ -263,6 +292,8 @@ export const GetFavouritePeopleDocument = gql`
  * const { data, loading, error } = useGetFavouritePeopleQuery({
  *   variables: {
  *      username: // value for 'username'
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
  *   },
  * });
  */
@@ -278,13 +309,16 @@ export type GetFavouritePeopleQueryHookResult = ReturnType<typeof useGetFavourit
 export type GetFavouritePeopleLazyQueryHookResult = ReturnType<typeof useGetFavouritePeopleLazyQuery>;
 export type GetFavouritePeopleQueryResult = Apollo.QueryResult<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>;
 export const GetLikedMoviesDocument = gql`
-    query GetLikedMovies($username: String!) {
+    query GetLikedMovies($username: String!, $offset: Int, $limit: Int) {
   user(username: $username) {
-    likedMovies {
-      id
-      title
-      posterPath
-      releaseDate
+    likedMovies(offset: $offset, limit: $limit) {
+      endReached
+      results {
+        id
+        title
+        posterPath
+        releaseDate
+      }
     }
   }
 }
@@ -303,6 +337,8 @@ export const GetLikedMoviesDocument = gql`
  * const { data, loading, error } = useGetLikedMoviesQuery({
  *   variables: {
  *      username: // value for 'username'
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
  *   },
  * });
  */
@@ -1029,16 +1065,19 @@ export type GetUpcomingMoviesQueryHookResult = ReturnType<typeof useGetUpcomingM
 export type GetUpcomingMoviesLazyQueryHookResult = ReturnType<typeof useGetUpcomingMoviesLazyQuery>;
 export type GetUpcomingMoviesQueryResult = Apollo.QueryResult<GetUpcomingMoviesQuery, GetUpcomingMoviesQueryVariables>;
 export const GetWatchlistDocument = gql`
-    query GetWatchlist($username: String!) {
+    query GetWatchlist($username: String!, $offset: Int, $limit: Int) {
   user(username: $username) {
-    watchlist {
-      id
-      title
-      posterPath
-      releaseDate
-      watched
-      inWatchlist
-      sentiment
+    watchlist(offset: $offset, limit: $limit) {
+      endReached
+      results {
+        id
+        title
+        posterPath
+        releaseDate
+        watched
+        inWatchlist
+        sentiment
+      }
     }
   }
 }
@@ -1057,6 +1096,8 @@ export const GetWatchlistDocument = gql`
  * const { data, loading, error } = useGetWatchlistQuery({
  *   variables: {
  *      username: // value for 'username'
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
  *   },
  * });
  */

@@ -7,29 +7,42 @@ import { useEffect, useState } from 'react'
 const cache = new InMemoryCache({
   typePolicies: {
     User: {
-      merge: (existing, incoming) => ({...existing, ...incoming})
-    },
-    Query: {
+      merge: (existing, incoming) => ({...existing, ...incoming}),
       fields: {
         watched: {
           keyArgs: false,
-          merge(existing, incoming, {args: {offset = 0}}) {
-            const merged = existing?.results?.slice(0) || []
-            for (let i = 0; i < incoming.results.length; ++i) {
-              merged[offset + i] = incoming.results[i]
-            }
-            return {
-              offset: offset,
-              limit: merged.length,
-              endReached: incoming.endReached,
-              results: merged,
-            }
-          },
+          merge: mergePaginated,
+        },
+        watchlist: {
+          keyArgs: false,
+          merge: mergePaginated,
+        },
+        likedMovies: {
+          keyArgs: false,
+          merge: mergePaginated,
+        },
+        favouritePeople: {
+          keyArgs: false,
+          merge: mergePaginated,
         }
       }
     }
   }
 })
+
+function mergePaginated(existing, incoming, options) {
+  const offset = options.args.offset || 0
+  const merged = existing?.results?.slice(0) || []
+  for (let i = 0; i < incoming.results.length; ++i) {
+    merged[offset + i] = incoming.results[i]
+  }
+  return {
+    offset: offset,
+    limit: merged.length,
+    endReached: incoming.endReached,
+    results: merged,
+  }
+}
 
 export default function useApolloClient() {
   const [client, setClient] = useState<ApolloClient<any>>()

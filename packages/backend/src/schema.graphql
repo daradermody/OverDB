@@ -80,6 +80,13 @@ type PaginatedMovies {
   results: [Movie!]!
 }
 
+type PaginatedPeople {
+  offset: Int!
+  limit: Int!
+  endReached: Boolean!
+  results: [PersonInfo!]!
+}
+
 enum TomatometerState {
   CERTIFIED_FRESH
   FRESH
@@ -105,11 +112,11 @@ type User {
   avatarUrl: String!
   isAdmin: Boolean
   public: Boolean
-  watchlist: [Movie!]!
+  favouritePeople(offset: Int, limit: Int): PaginatedPeople!
+  watchlist(offset: Int, limit: Int): PaginatedMovies!
   watched(offset: Int, limit: Int): PaginatedMovies!
-  likedMovies: [Movie!]!
+  likedMovies(offset: Int, limit: Int): PaginatedMovies!
   stats: Stats!
-  favouritePeople: [PersonInfo!]!
 }
 
 type Query {

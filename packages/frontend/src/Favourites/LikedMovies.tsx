@@ -4,17 +4,21 @@ import * as React from 'react'
 import { useGetLikedMoviesQuery, User } from '../../types/graphql'
 import { MovieCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
+import FetchMoreButton from '../shared/FetchMoreButton'
 import useUser from '../useUser'
 
-export function LikedMovies({username}: {username: User['username']}) {
+export function LikedMovies({username}: { username: User['username'] }) {
   const {user} = useUser()
-  const {data, error, loading, refetch} = useGetLikedMoviesQuery({variables: {username}})
+  const {data, error, loading, refetch, fetchMore} = useGetLikedMoviesQuery({
+    variables: {username},
+    notifyOnNetworkStatusChange: true
+  })
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
-  if (data && !data.user.likedMovies.length) {
+  if (data && !data.user.likedMovies.results.length) {
     return (
       <Box mb="30px">
         <Typography variant="body1">
@@ -24,17 +28,30 @@ export function LikedMovies({username}: {username: User['username']}) {
     )
   }
 
-  return <MovieCards movies={data?.user.likedMovies} loading={loading}/>
+  return (
+    <>
+      <MovieCards movies={data?.user.likedMovies.results} loading={loading && !data}/>
+      <FetchMoreButton
+        fetchMore={fetchMore}
+        currentLength={data?.user.likedMovies.results.length}
+        endReached={data?.user.likedMovies.endReached}
+        loading={loading}
+      />
+    </>
+  )
 }
 
 gql`
-  query GetLikedMovies($username: String!) {
+  query GetLikedMovies($username: String!, $offset: Int, $limit: Int) {
     user(username: $username) {
-      likedMovies {
-        id
-        title
-        posterPath
-        releaseDate
+      likedMovies(offset: $offset, limit: $limit) {
+        endReached
+        results {
+          id
+          title
+          posterPath
+          releaseDate
+        }
       }
     }
   }

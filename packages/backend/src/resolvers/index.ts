@@ -8,6 +8,8 @@ import {
   MutationSetInWatchlistArgs,
   MutationSetSentimentArgs,
   MutationSetWatchedArgs,
+  PaginatedMovies,
+  PaginatedPeople,
   PersonWithoutFav,
   Query,
   QueryCastForMovieArgs,
@@ -27,6 +29,7 @@ import MovieDb from '../services/MovieDb'
 import RottenTomatoes from '../services/RottenTomatoes'
 import { UserData } from '../services/UserData'
 import { getUser, getUsers, User } from '../services/users'
+import { paginate } from './pagination'
 import recommendedMoviesResolver from './recommendedMovies'
 import upcomingMoviesResolver from './upcomingMoviesResolver'
 
@@ -53,20 +56,21 @@ const index: Resolvers<{ user: User }> = {
     favourited: (parent: PersonWithoutFav, _, {user}) => UserData.isFavourited(user.username, parent.id)
   },
   User: {
-    favouritePeople: parent => Promise.all(UserData.getFavourites(parent.username).slice().reverse().map(MovieDb.personInfo)) as any,
-    watchlist: parent => Promise.all(UserData.getWatchlist(parent.username).slice().reverse().map(MovieDb.movieInfo)) as any,
-    likedMovies: parent => Promise.all(UserData.getLikedMovies(parent.username).slice().reverse().map(MovieDb.movieInfo)) as any,
-    watched: async (parent, args) => {
-      const offset = args.offset || 0
-      const limit = args.limit || 10
-      const watchedMovieIds = UserData.getWatched(parent.username).slice().reverse()
-      const movieIds = watchedMovieIds.slice(offset, offset + limit)
-      return {
-        offset,
-        limit,
-        endReached: !args.limit || offset + limit >= watchedMovieIds.length,
-        results: await Promise.all(movieIds.map(MovieDb.movieInfo)) as any
-      }
+    favouritePeople: (parent, args) => {
+      const ids = UserData.getFavourites(parent.username).slice().reverse()
+      return paginate(ids, MovieDb.personInfo, args.offset, args.limit) as Promise<PaginatedPeople>
+    },
+    watchlist: (parent, args) => {
+      const ids = UserData.getWatchlist(parent.username).slice().reverse()
+      return paginate(ids, MovieDb.movieInfo, args.offset, args.limit) as Promise<PaginatedMovies>
+    },
+    likedMovies: (parent, args) => {
+      const ids = UserData.getLikedMovies(parent.username).slice().reverse()
+      return paginate(ids, MovieDb.movieInfo, args.offset, args.limit) as Promise<PaginatedMovies>
+    },
+    watched: (parent, args) => {
+      const ids = UserData.getWatched(parent.username).slice().reverse()
+      return paginate(ids, MovieDb.movieInfo, args.offset, args.limit) as Promise<PaginatedMovies>
     },
     stats: async (parent) => {
       const [people, watched, liked, watchlist] = await Promise.all([

@@ -5,11 +5,15 @@ import { useParams } from 'react-router-dom'
 import { useGetWatchlistQuery } from '../../types/graphql'
 import { MovieCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
+import FetchMoreButton from '../shared/FetchMoreButton'
 import PageWrapper from '../shared/PageWrapper'
 
 export default function Watchlist() {
   const {username} = useParams<{ username: string }>()
-  const {data, error, loading, refetch} = useGetWatchlistQuery({variables: {username}})
+  const {data, error, loading, refetch, fetchMore} = useGetWatchlistQuery({
+    variables: {username},
+    notifyOnNetworkStatusChange: true
+  })
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>
@@ -18,22 +22,31 @@ export default function Watchlist() {
   return (
     <PageWrapper>
       <Typography variant="h1">Watchlist</Typography>
-      <MovieCards movies={data?.user.watchlist} loading={loading} loadingCount={6}/>
+      <MovieCards movies={data?.user.watchlist.results} loading={loading && !data} loadingCount={6}/>
+      <FetchMoreButton
+        fetchMore={fetchMore}
+        currentLength={data?.user.watchlist.results.length}
+        endReached={data?.user.watchlist.endReached}
+        loading={loading}
+      />
     </PageWrapper>
   )
 }
 
 gql`
-  query GetWatchlist($username: String!) {
+  query GetWatchlist($username: String!, $offset: Int, $limit: Int) {
     user(username: $username) {
-      watchlist {
-        id
-        title
-        posterPath
-        releaseDate
-        watched
-        inWatchlist
-        sentiment
+      watchlist(offset: $offset, limit: $limit) {
+        endReached
+        results {
+          id
+          title
+          posterPath
+          releaseDate
+          watched
+          inWatchlist
+          sentiment
+        }
       }
     }
   }

@@ -34,29 +34,29 @@ export type CrewCredit = Person & {
 export type Movie = {
   __typename?: 'Movie';
   id: Scalars['ID'];
-  inWatchlist: Scalars['Boolean'];
+  inWatchlist?: Maybe<Scalars['Boolean']>;
   overview: Scalars['String'];
   posterPath?: Maybe<Scalars['String']>;
   releaseDate?: Maybe<Scalars['String']>;
-  sentiment: Sentiment;
+  sentiment?: Maybe<Sentiment>;
   tagline: Scalars['String'];
   title: Scalars['String'];
   tomatometer?: Maybe<Tomatometer>;
   voteAverage: Scalars['Float'];
-  watched: Scalars['Boolean'];
+  watched?: Maybe<Scalars['Boolean']>;
 };
 
 export type MovieCredit = {
   __typename?: 'MovieCredit';
   character?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
-  inWatchlist: Scalars['Boolean'];
+  inWatchlist?: Maybe<Scalars['Boolean']>;
   jobs: Array<Scalars['String']>;
   posterPath?: Maybe<Scalars['String']>;
   releaseDate?: Maybe<Scalars['String']>;
-  sentiment: Sentiment;
+  sentiment?: Maybe<Sentiment>;
   title: Scalars['String'];
-  watched: Scalars['Boolean'];
+  watched?: Maybe<Scalars['Boolean']>;
 };
 
 export type MovieInfo = {
@@ -128,7 +128,7 @@ export type Person = {
 export type PersonInfo = Person & {
   __typename?: 'PersonInfo';
   biography?: Maybe<Scalars['String']>;
-  favourited: Scalars['Boolean'];
+  favourited?: Maybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   knownForDepartment?: Maybe<Scalars['String']>;
   name: Scalars['String'];
@@ -409,29 +409,29 @@ export type CrewCreditResolvers<ContextType = any, ParentType extends ResolversP
 
 export type MovieResolvers<ContextType = any, ParentType extends ResolversParentTypes['Movie'] = ResolversParentTypes['Movie']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  inWatchlist?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  inWatchlist?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   overview?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   posterPath?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   releaseDate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  sentiment?: Resolver<ResolversTypes['Sentiment'], ParentType, ContextType>;
+  sentiment?: Resolver<Maybe<ResolversTypes['Sentiment']>, ParentType, ContextType>;
   tagline?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   tomatometer?: Resolver<Maybe<ResolversTypes['Tomatometer']>, ParentType, ContextType>;
   voteAverage?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  watched?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  watched?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type MovieCreditResolvers<ContextType = any, ParentType extends ResolversParentTypes['MovieCredit'] = ResolversParentTypes['MovieCredit']> = ResolversObject<{
   character?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  inWatchlist?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  inWatchlist?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   jobs?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   posterPath?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   releaseDate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  sentiment?: Resolver<ResolversTypes['Sentiment'], ParentType, ContextType>;
+  sentiment?: Resolver<Maybe<ResolversTypes['Sentiment']>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  watched?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  watched?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -479,7 +479,7 @@ export type PersonResolvers<ContextType = any, ParentType extends ResolversParen
 
 export type PersonInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['PersonInfo'] = ResolversParentTypes['PersonInfo']> = ResolversObject<{
   biography?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  favourited?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  favourited?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   knownForDepartment?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

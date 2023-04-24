@@ -61,15 +61,13 @@ function MovieImage({movie}: MovieCardProps) {
           backgroundColor: movie.posterPath ? 'black' : 'white',
         }}
       />
-      {
-        ((movie.watched ?? movie.inWatchlist ?? movie.sentiment) !== undefined) && (
-          <StyledActions className="show-on-hover" onClick={e => e.preventDefault()}>
-            <WatchedButton id={movie.id} watched={movie.watched}/>
-            <WatchlistButton id={movie.id} inWatchlist={movie.inWatchlist}/>
-            <SentimentSelect id={movie.id} sentiment={movie.sentiment} placement="top"/>
-          </StyledActions>
-        )
-      }
+      {![undefined, null].includes(movie.watched ?? movie.inWatchlist ?? movie.sentiment) && (
+        <StyledActions className="show-on-hover" onClick={e => e.preventDefault()}>
+          <WatchedButton id={movie.id} watched={movie.watched}/>
+          <WatchlistButton id={movie.id} inWatchlist={movie.inWatchlist}/>
+          <SentimentSelect id={movie.id} sentiment={movie.sentiment} placement="top"/>
+        </StyledActions>
+      )}
     </StyledMovieImage>
   )
 }

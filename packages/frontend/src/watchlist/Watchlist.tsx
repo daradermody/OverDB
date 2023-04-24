@@ -7,8 +7,11 @@ import { MovieCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import FetchMoreButton from '../shared/FetchMoreButton'
 import PageWrapper from '../shared/PageWrapper'
+import UserBadge from '../shared/UserBadge'
+import useUser from '../useUser'
 
 export default function Watchlist() {
+  const {user} = useUser()
   const {username} = useParams<{ username: string }>()
   const {data, error, loading, refetch, fetchMore} = useGetWatchlistQuery({
     variables: {username},
@@ -21,7 +24,9 @@ export default function Watchlist() {
 
   return (
     <PageWrapper>
-      <Typography variant="h1">Watchlist</Typography>
+      <Typography variant="h1">
+        {user?.username === username ? 'Watchlist' : <UserBadge username={username}>{username}'s watchlist</UserBadge>}
+      </Typography>
       <MovieCards movies={data?.user.watchlist.results} loading={loading && !data} loadingCount={6}/>
       <FetchMoreButton
         fetchMore={fetchMore}

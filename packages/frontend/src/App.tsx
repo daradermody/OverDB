@@ -53,14 +53,14 @@ function AppRoutes() {
       <Route path="/" element={<Homepage/>}/>
       <Route path="/login" element={<Login/>}/>
       <Route path="/search/:query" element={<SearchPage/>}/>
-      <Route path="/person/:id" element={authed(<PersonInfo/>)}/>
-      <Route path="/movie/:id" element={authed(<MovieInfo/>)}/>
-      <Route path="/profile" element={<Navigate replace to={`/profile/${user?.username}`}/>}/>
-      <Route path="/profile/:username" element={authed(<Profile/>)}/>
-      <Route path="/profile/:username/favourites" element={authed(<Navigate to={`/profile/${user?.username}/favourite/people`} replace/>)}/>
-      <Route path="/profile/:username/favourite/:type" element={authed(<Favourites/>)}/>
-      <Route path="/profile/:username/watchlist" element={authed(<Watchlist/>)}/>
-      <Route path="/profile/:username/watched" element={authed(<WatchedMovies/>)}/>
+      <Route path="/person/:id" element={<PersonInfo/>}/>
+      <Route path="/movie/:id" element={<MovieInfo/>}/>
+      <Route path="/profile" element={authed(<Navigate replace to={`/profile/${user?.username}`}/>)}/>
+      <Route path="/profile/:username" element={<Profile/>}/>
+      <Route path="/profile/:username/favourites" element={<Navigate to={`/profile/${user?.username}/favourite/people`} replace/>}/>
+      <Route path="/profile/:username/favourite/:type" element={<Favourites/>}/>
+      <Route path="/profile/:username/watchlist" element={<Watchlist/>}/>
+      <Route path="/profile/:username/watched" element={<WatchedMovies/>}/>
       <Route path="/upcoming" element={authed(<UpcomingMovies/>)}/>
       <Route path="/admin" element={authed(<Admin/>)}/>
       <Route path="*" element={<PageNotFound/>}/>

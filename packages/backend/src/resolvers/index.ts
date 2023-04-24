@@ -11,7 +11,6 @@ import {
   PaginatedMovies,
   PaginatedPeople,
   PersonWithoutFav,
-  Query,
   QueryCastForMovieArgs,
   QueryCreditsForPersonArgs,
   QueryCrewForMovieArgs,
@@ -24,6 +23,7 @@ import {
   ResolverFn,
   Resolvers,
   SearchResult,
+  User as ApiUser
 } from '../../types'
 import MovieDb from '../services/MovieDb'
 import RottenTomatoes from '../services/RottenTomatoes'
@@ -33,12 +33,11 @@ import { paginate } from './pagination'
 import recommendedMoviesResolver from './recommendedMovies'
 import upcomingMoviesResolver from './upcomingMoviesResolver'
 
-const unauthedQueries: (keyof Query)[] = ['trending']
-const index: Resolvers<{ user: User }> = {
+const index: Resolvers<{ user?: User }> = {
   Movie: {
-    sentiment: (parent, _, {user}) => UserData.getSentiment(user.username, parent.id),
-    watched: (parent, _, {user}) => UserData.isWatched(user.username, parent.id),
-    inWatchlist: (parent, _, {user}) => UserData.inWatchlist(user.username, parent.id),
+    sentiment: (parent, _, {user}) => user ? UserData.getSentiment(user.username, parent.id) : null,
+    watched: (parent, _, {user}) => user ? UserData.isWatched(user.username, parent.id) : null,
+    inWatchlist: (parent, _, {user}) => user ? UserData.inWatchlist(user.username, parent.id) : null,
     tomatometer: ({title, releaseDate}) => {
       if (!releaseDate) {
         return null
@@ -48,12 +47,12 @@ const index: Resolvers<{ user: User }> = {
     }
   },
   MovieCredit: {
-    sentiment: (parent: MovieCredit, _, {user}) => UserData.getSentiment(user.username, parent.id),
-    watched: (parent: MovieCredit, _, {user}) => UserData.isWatched(user.username, parent.id),
-    inWatchlist: (parent: MovieCredit, _, {user}) => UserData.inWatchlist(user.username, parent.id),
+    sentiment: (parent: MovieCredit, _, {user}) => user ? UserData.getSentiment(user.username, parent.id) : null,
+    watched: (parent: MovieCredit, _, {user}) => user ? UserData.isWatched(user.username, parent.id) : null,
+    inWatchlist: (parent: MovieCredit, _, {user}) => user ? UserData.inWatchlist(user.username, parent.id) : null,
   },
   PersonInfo: {
-    favourited: (parent: PersonWithoutFav, _, {user}) => UserData.isFavourited(user.username, parent.id)
+    favourited: (parent: PersonWithoutFav, _, {user}) => user ? UserData.isFavourited(user.username, parent.id) : null
   },
   User: {
     favouritePeople: (parent, args) => {
@@ -85,9 +84,9 @@ const index: Resolvers<{ user: User }> = {
   SearchResult: {
     __resolveType: (obj: SearchResult) => isMovieSummary(obj) ? 'Movie' : 'PersonInfo'
   },
-  Query: applyAuth({
-    recommendedMovies: (_1, args: QueryRecommendedMoviesArgs, {user}) => recommendedMoviesResolver(user.username, args.size || 18) as unknown as Promise<Movie[]>,
-    movie: (_, args: QueryMovieArgs) => MovieDb.movieInfo(args.id) as any,
+  Query: {
+    recommendedMovies: requiresLogin((_1, args: QueryRecommendedMoviesArgs, {user}) => recommendedMoviesResolver(user.username, args.size || 18) as unknown as Promise<Movie[]>),
+    movie: async (_, args: QueryMovieArgs) => await MovieDb.movieInfo(args.id) as Movie,
     crewForMovie: (_, args: QueryCrewForMovieArgs) => MovieDb.movieCrew(args.id),
     castForMovie: (_, args: QueryCastForMovieArgs) => MovieDb.movieCast(args.id),
     creditsForPerson: async (_, args: QueryCreditsForPersonArgs) => {
@@ -101,13 +100,13 @@ const index: Resolvers<{ user: User }> = {
         console.error(e)
       }
     },
-    search: (_, args: QuerySearchArgs) => MovieDb.search(args.query) as any,
-    person: (_, args: QueryPersonArgs) => MovieDb.personInfo(args.id) as any,
+    search: async (_, args: QuerySearchArgs) => await MovieDb.search(args.query) as (PersonWithoutFav | Movie)[],
+    person: (_, args: QueryPersonArgs) => MovieDb.personInfo(args.id),
     trending: (_, args: QueryTrendingArgs) => MovieDb.trending(args.size || 12),
-    upcoming: async (_1, _2, {user}) => await upcomingMoviesResolver(user.username) as any,
+    upcoming: requiresLogin(async (_1, _2, {user}) => await upcomingMoviesResolver(user.username) as Movie[]),
     user: async (_, args: QueryUserArgs, {user}) => {
       const requestedUser = getUser(args.username)
-      const canViewUser = user.username === requestedUser.username || user.isAdmin || requestedUser.public
+      const canViewUser = user?.username === requestedUser.username || user?.isAdmin || requestedUser.public
       if (!canViewUser) {
         throw new GraphQLError('User not found', {
           extensions: {
@@ -116,41 +115,31 @@ const index: Resolvers<{ user: User }> = {
           },
         })
       }
-      return requestedUser as any
+      return requestedUser as ApiUser
     },
-    users: requiresAdmin(async () => getUsers() as any)
-  }),
+    users: requiresAdmin(async () => await getUsers() as ApiUser[])
+  },
   Mutation: {
-    setFavourite: (_, args: MutationSetFavouriteArgs, {user}) => {
+    setFavourite: requiresLogin((_, args: MutationSetFavouriteArgs, {user}) => {
       UserData.setFavourite(user.username, args.id, args.favourited)
-      return MovieDb.personInfo(args.id) as any
-    },
-    setWatched: (_, args: MutationSetWatchedArgs, {user}) => {
+      return MovieDb.personInfo(args.id)
+    }),
+    setWatched: requiresLogin(async (_, args: MutationSetWatchedArgs, {user}) => {
       UserData.setWatched(user.username, args.id, args.watched)
-      return MovieDb.movieInfo(args.id) as any
-    },
-    setInWatchlist: (_, args: MutationSetInWatchlistArgs, {user}) => {
+      return await MovieDb.movieInfo(args.id) as Movie
+    }),
+    setInWatchlist: requiresLogin(async (_, args: MutationSetInWatchlistArgs, {user}) => {
       UserData.setInWatchlist(user.username, args.id, args.inWatchlist)
-      return MovieDb.movieInfo(args.id) as any
-    },
-    setSentiment: (_, args: MutationSetSentimentArgs, {user}) => {
+      return await MovieDb.movieInfo(args.id) as Movie
+    }),
+    setSentiment: requiresLogin(async (_, args: MutationSetSentimentArgs, {user}) => {
       UserData.setSentiment(user.username, args.id, args.sentiment)
-      return MovieDb.movieInfo(args.id) as any
-    }
+      return await  MovieDb.movieInfo(args.id) as Movie
+    })
   }
 }
 
-function applyAuth<TResult, TParent, TContext, TArgs>(resolvers: Resolvers['Query']): Resolvers['Query'] {
-  if (!resolvers) return resolvers
-
-  const authedResolvers: Resolvers['Query'] = {}
-  for (const [queryName, resolver] of Object.entries(resolvers)) {
-    authedResolvers[queryName] = unauthedQueries.includes(queryName as keyof Query) ? resolver : withUser(resolver)
-  }
-  return authedResolvers
-}
-
-function withUser<TResult, TParent, TContext extends { user?: User }, TArgs>(resolver: ResolverFn<TResult, TParent, TContext, TArgs>): ResolverFn<TResult, TParent, TContext, TArgs> {
+function requiresLogin<TResult, TParent, TContext extends { user?: User }, TArgs>(resolver: ResolverFn<TResult, TParent, TContext & { user: User }, TArgs>): ResolverFn<TResult, TParent, TContext, TArgs> {
   return (parent: TParent, args: TArgs, context: TContext, info: GraphQLResolveInfo): TResult | Promise<TResult> => {
     if (!context.user) {
       throw new GraphQLError('You must be logged in', {
@@ -160,12 +149,12 @@ function withUser<TResult, TParent, TContext extends { user?: User }, TArgs>(res
         },
       })
     }
-    return resolver(parent, args, context, info)
+    return resolver(parent, args, context as TContext & {user: User}, info)
   }
 }
 
-function requiresAdmin<TResult, TParent = {}, TContext = {}, TArgs = {}>(resolver: ResolverFn<TResult, TParent, TContext, TArgs>): ResolverFn<TResult, TParent, TContext, TArgs> {
-  return (parent: any, args: any, context: any, info: any) => {
+function requiresAdmin<TResult, TParent = {}, TContext extends {user?: User} = {}, TArgs = {}>(resolver: ResolverFn<TResult, TParent, TContext, TArgs>): ResolverFn<TResult, TParent, TContext, TArgs> {
+  return (parent: TParent, args: TArgs, context: TContext, info: GraphQLResolveInfo) => {
     if (!context.user?.isAdmin) {
       throw new GraphQLError('You must be admin', {
         extensions: {

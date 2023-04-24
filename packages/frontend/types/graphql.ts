@@ -35,29 +35,29 @@ export type CrewCredit = Person & {
 export type Movie = {
   __typename?: 'Movie';
   id: Scalars['ID'];
-  inWatchlist: Scalars['Boolean'];
+  inWatchlist?: Maybe<Scalars['Boolean']>;
   overview: Scalars['String'];
   posterPath?: Maybe<Scalars['String']>;
   releaseDate?: Maybe<Scalars['String']>;
-  sentiment: Sentiment;
+  sentiment?: Maybe<Sentiment>;
   tagline: Scalars['String'];
   title: Scalars['String'];
   tomatometer?: Maybe<Tomatometer>;
   voteAverage: Scalars['Float'];
-  watched: Scalars['Boolean'];
+  watched?: Maybe<Scalars['Boolean']>;
 };
 
 export type MovieCredit = {
   __typename?: 'MovieCredit';
   character?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
-  inWatchlist: Scalars['Boolean'];
+  inWatchlist?: Maybe<Scalars['Boolean']>;
   jobs: Array<Scalars['String']>;
   posterPath?: Maybe<Scalars['String']>;
   releaseDate?: Maybe<Scalars['String']>;
-  sentiment: Sentiment;
+  sentiment?: Maybe<Sentiment>;
   title: Scalars['String'];
-  watched: Scalars['Boolean'];
+  watched?: Maybe<Scalars['Boolean']>;
 };
 
 export type MovieInfo = {
@@ -129,7 +129,7 @@ export type Person = {
 export type PersonInfo = Person & {
   __typename?: 'PersonInfo';
   biography?: Maybe<Scalars['String']>;
-  favourited: Scalars['Boolean'];
+  favourited?: Maybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   knownForDepartment?: Maybe<Scalars['String']>;
   name: Scalars['String'];

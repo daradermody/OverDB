@@ -7,8 +7,11 @@ import { MovieCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import FetchMoreButton from '../shared/FetchMoreButton'
 import PageWrapper from '../shared/PageWrapper'
+import UserBadge from '../shared/UserBadge'
+import useUser from '../useUser'
 
 export default function WatchedMovies() {
+  const {user} = useUser()
   const {username} = useParams<{ username: string }>()
   const {data, error, loading, refetch, fetchMore} = useGetWatchedMoviesQuery({
     variables: {username},
@@ -21,7 +24,9 @@ export default function WatchedMovies() {
 
   return (
     <PageWrapper>
-      <Typography variant="h1">Watched movies</Typography>
+      <Typography variant="h1">
+        {user?.username === username ? 'Watched movies' : <UserBadge username={username}>{username}'s watched movies</UserBadge>}
+      </Typography>
       <MovieCards movies={data?.user.watched.results} loading={loading && !data} loadingCount={24}/>
       <FetchMoreButton
         fetchMore={fetchMore}

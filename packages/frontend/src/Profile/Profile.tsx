@@ -9,6 +9,7 @@ import { ErrorMessage } from '../shared/errorHandlers'
 import Link from '../shared/general/Link'
 import PageWrapper from '../shared/PageWrapper'
 import {User} from '../../types/graphql'
+import useUser from '../useUser'
 
 export default function Profile() {
   const {username} = useParams<{ username: string }>()
@@ -102,6 +103,7 @@ const StatWrapper = styled.div`
 `
 
 function RecentlyWatchedMovies({username}: {username: User['username']}) {
+  const {user} = useUser()
   const {data, error, loading, refetch} = useGetWatchedMoviesQuery({variables: {username, limit: 8}})
 
   if (error) {
@@ -110,7 +112,7 @@ function RecentlyWatchedMovies({username}: {username: User['username']}) {
 
   return (
     <div style={{width: '100%'}}>
-      <Typography variant="h1">Recently Watched</Typography>
+      <Typography variant="h1">{user?.username === username ? 'Recently Watched' : `${username}'s recently watched`}</Typography>
       <MovieCards movies={data?.user.watched?.results} loading={loading} loadingCount={4}/>
     </div>
   )

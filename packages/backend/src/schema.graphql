@@ -10,7 +10,7 @@ type PersonInfo implements Person {
   profilePath: String
   knownForDepartment: String
   biography: String
-  favourited: Boolean!
+  favourited: Boolean
 }
 
 type CrewCredit implements Person {
@@ -48,9 +48,9 @@ type Movie {
   releaseDate: String
   posterPath: String
   tomatometer: Tomatometer
-  watched: Boolean!
-  inWatchlist: Boolean!
-  sentiment: Sentiment!
+  watched: Boolean
+  inWatchlist: Boolean
+  sentiment: Sentiment
 }
 
 type MovieCredit {
@@ -58,9 +58,9 @@ type MovieCredit {
   title: String!
   posterPath: String
   releaseDate: String
-  watched: Boolean!
-  inWatchlist: Boolean!
-  sentiment: Sentiment!
+  watched: Boolean
+  inWatchlist: Boolean
+  sentiment: Sentiment
   jobs: [String!]!
   character: String
 }

@@ -78,14 +78,16 @@ function MovieSummary({id}: { id: Movie['id'] }) {
         <Typography variant="body2" sx={{m: '10px 0 20px'}}><i>{movie.tagline}</i></Typography>
         <Typography variant="body1">{movie.overview}</Typography>
 
-        <StyledActionsAndReview>
-          <div style={{display: 'flex', flexDirection: 'column', alignItems: 'start', flexShrink: 0}}>
-            <WatchedButton id={movie.id} watched={movie.watched} withLabel/>
-            <WatchlistButton id={movie.id} inWatchlist={movie.inWatchlist} withLabel/>
-            <SentimentSelect id={movie.id} sentiment={movie.sentiment} withLabel/>
-          </div>
-          <RottenTomatoesReview id={movie.id}/>
-        </StyledActionsAndReview>
+        {((movie.watched ?? movie.inWatchlist ?? movie.sentiment) !== null) && (
+          <StyledActionsAndReview>
+            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'start', flexShrink: 0}}>
+              <WatchedButton id={movie.id} watched={movie.watched} withLabel/>
+              <WatchlistButton id={movie.id} inWatchlist={movie.inWatchlist} withLabel/>
+              <SentimentSelect id={movie.id} sentiment={movie.sentiment} withLabel/>
+            </div>
+            <RottenTomatoesReview id={movie.id}/>
+          </StyledActionsAndReview>
+        )}
       </Box>
     </StyledWrapper>
   )

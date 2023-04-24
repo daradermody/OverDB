@@ -19,20 +19,15 @@ export function Header() {
         <Link to="/">
           <Typography sx={{fontSize: 32}}>OverDB</Typography>
         </Link>
-        {!!user && (
+        {window.location.pathname !== '/login' && (
           <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
             <Search
               clearOnSelect
               onSelect={result => navigate(isMovieSummary(result) ? `/movie/${result.id}` : `/person/${result.id}`)}
               disabled={!isOnline}
             />
-            <ProfileIcon disabled={!isOnline}/>
+            {user ? <ProfileIcon disabled={!isOnline}/> : <Link to="/login"><Button>Login</Button></Link>}
           </div>
-        )}
-        {!user && window.location.pathname !== '/login' && (
-          <Link to="/login">
-            <Button>Login</Button>
-          </Link>
         )}
       </Container>
     </Root>
@@ -40,6 +35,9 @@ export function Header() {
 }
 
 const Root = styled('div')(({theme}) => ({
+  display: 'flex',
+  alignItems: 'center',
   color: theme.palette.text.primary,
   backgroundColor: '#430568',
+  height: '70px',
 }))

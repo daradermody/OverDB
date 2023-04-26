@@ -10,6 +10,7 @@ interface MoviesPeopleCardsProps {
   loading?: boolean
   loadingCount?: number
   cardProps?: Omit<MovieCardProps, 'movie'> & Omit<PersonCardProps, 'person'>
+  compressed?: boolean
 }
 
 export default function MoviesPeopleCards(props: MoviesPeopleCardsProps) {
@@ -17,42 +18,53 @@ export default function MoviesPeopleCards(props: MoviesPeopleCardsProps) {
     <Cards items={props.moviesAndPeople} loading={props.loading} loadingCount={props.loadingCount}>
       {(item, {loading}) => {
         if (loading) {
-          return <LoadingMovieCard/>
+          return <LoadingMovieCard compressed={props.compressed}/>
         } else if (isMovie(item)) {
-          return <MovieCard movie={item} {...props.cardProps}/>
+          return <MovieCard movie={item} compressed={props.compressed} {...props.cardProps}/>
         } else {
-          return <PersonCard person={item} {...props.cardProps}/>
+          return <PersonCard person={item} compressed={props.compressed} {...props.cardProps}/>
         }
       }}
     </Cards>
   )
 }
 
-export function LoadingMovieCard() {
-  return (
-    <Card style={{width: 175}}>
-      <Skeleton variant="rectangular" animation="wave" height={256}/>
-      <Skeleton variant="rectangular" animation={false} height={85} style={{marginTop: 1}}/>
-    </Card>
-  )
+function LoadingMovieCard({compressed}: {compressed?: boolean}) {
+  if (compressed) {
+    return (
+      <Card style={{display: 'flex'}}>
+        <Skeleton variant="rectangular" animation="wave" height={75} width={50}/>
+        <Skeleton variant="rectangular" animation="wave" height={75} sx={{width: '100%', ml: '1px'}}/>
+      </Card>
+    )
+  } else {
+    return (
+      <Card style={{width: 175}}>
+        <Skeleton variant="rectangular" animation="wave" height={256}/>
+        <Skeleton variant="rectangular" animation={false} height={85} style={{marginTop: 1}}/>
+      </Card>
+    )
+  }
 }
 
 interface MovieCardsProps extends Omit<MovieCardProps, 'movie'> {
   movies?: MovieCardProps['movie'][]
   loading?: boolean
   loadingCount?: number
+  compressed?: boolean
 }
 
-export function MovieCards({movies, loading, loadingCount, ...rest}: MovieCardsProps) {
-  return <MoviesPeopleCards moviesAndPeople={movies} loading={loading} loadingCount={loadingCount} cardProps={rest}/>
+export function MovieCards({movies, loading, loadingCount, compressed, ...rest}: MovieCardsProps) {
+  return <MoviesPeopleCards moviesAndPeople={movies} compressed={compressed} loading={loading} loadingCount={loadingCount} cardProps={rest}/>
 }
 
 interface PersonCardsProps extends Omit<PersonCardProps, 'person'> {
   people?: PersonCardProps['person'][]
   loading?: boolean
   loadingCount?: number
+  compressed?: boolean
 }
 
-export function PersonCards({people, loading, loadingCount, ...rest}: PersonCardsProps) {
-  return <MoviesPeopleCards moviesAndPeople={people} loading={loading} loadingCount={loadingCount} cardProps={rest}/>
+export function PersonCards({people, loading, loadingCount, compressed, ...rest}: PersonCardsProps) {
+  return <MoviesPeopleCards moviesAndPeople={people} compressed={compressed} loading={loading} loadingCount={loadingCount} cardProps={rest}/>
 }

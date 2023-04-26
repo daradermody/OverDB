@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { Card, CardContent, CardMedia, Tooltip, Typography } from '@mui/material'
+import { Card, CardMedia, Tooltip, Typography } from '@mui/material'
 import * as React from 'react'
 import { Movie, MovieCredit } from '../../../types/graphql'
 import Link from '../general/Link'
@@ -21,16 +21,15 @@ export interface MovieCardProps {
     character?: MovieCredit['character'];
   }
   showCharactersOnly?: boolean
+  compressed?: boolean
 }
 
-export function MovieCard({movie, showCharactersOnly}: MovieCardProps) {
+export function MovieCard({movie, compressed, showCharactersOnly}: MovieCardProps) {
   return (
-    <StyledCard>
-      <Link to={`/movie/${movie.id}`}>
-        <MovieImage movie={movie}/>
-        <CardContent style={{marginTop: -10}}>
-          <MovieSummary movie={movie} showCharactersOnly={showCharactersOnly}/>
-        </CardContent>
+    <StyledCard sx={{height: compressed ? '75px' : undefined}}>
+      <Link to={`/movie/${movie.id}`} sx={{display: compressed ? 'flex' : 'initial', height: '100%'}}>
+        <MovieImage movie={movie} compressed={compressed}/>
+        <MovieSummary movie={movie} showCharactersOnly={showCharactersOnly} compressed/>
       </Link>
     </StyledCard>
   )
@@ -38,30 +37,26 @@ export function MovieCard({movie, showCharactersOnly}: MovieCardProps) {
 
 const StyledCard = styled(Card)`
   width: 100%;
-
   -webkit-tap-highlight-color: transparent;
-  ${({theme}) => theme.breakpoints.up('sm')} {
-    max-width: 200px;
-  }
 `
 
-function MovieImage({movie}: MovieCardProps) {
+function MovieImage({movie, compressed}: MovieCardProps) {
   return (
-    <StyledMovieImage
-      style={{position: 'relative'}}
-    >
+    <StyledMovieImage>
       <CardMedia
         component="img"
         image={getPosterUrl(movie.posterPath)}
         onError={handlePosterError}
         alt={`${movie.title} poster`}
-        height="256px"
         style={{
+          height: '100%',
+          width: compressed ? 'unset' : undefined,
+          aspectRatio: '185 / 278',
           objectFit: 'contain',
           backgroundColor: movie.posterPath ? 'black' : 'white',
         }}
       />
-      {![undefined, null].includes(movie.watched ?? movie.inWatchlist ?? movie.sentiment) && (
+      {!compressed && ![undefined, null].includes(movie.watched ?? movie.inWatchlist ?? movie.sentiment) && (
         <StyledActions className="show-on-hover" onClick={e => e.preventDefault()}>
           <WatchedButton id={movie.id} watched={movie.watched}/>
           <WatchlistButton id={movie.id} inWatchlist={movie.inWatchlist}/>
@@ -89,18 +84,19 @@ const StyledActions = styled.div`
 
 const StyledMovieImage = styled.div`
   position: relative;
+  height: 100%;
   &:hover .show-on-hover {
     visibility: visible;
   }
 `
 
-function MovieSummary({movie, showCharactersOnly}: MovieCardProps) {
+function MovieSummary({movie, showCharactersOnly, compressed}: MovieCardProps) {
   let roles
   if (isCredit(movie)) {
     roles = showCharactersOnly ? movie.character : movie.jobs.join(', ')
   }
   return (
-    <>
+    <div style={{width: '100%', minWidth: 0, padding: compressed ? '11px 16px' : '16px'}}>
       <Tooltip placement="top" title={<Typography>{movie.title}</Typography>}>
         <Typography gutterBottom variant="body1" component="div" style={{textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}>
           {movie.title}
@@ -109,7 +105,7 @@ function MovieSummary({movie, showCharactersOnly}: MovieCardProps) {
       <Typography gutterBottom variant="caption" component="div">
         {movie.releaseDate ? movie.releaseDate.split('-')[0] : ''}
       </Typography>
-      {roles && (
+      {!compressed && roles && (
         <Tooltip placement="top" title={<Typography>{roles}</Typography>}>
           <Typography
             gutterBottom
@@ -121,7 +117,7 @@ function MovieSummary({movie, showCharactersOnly}: MovieCardProps) {
           </Typography>
         </Tooltip>
       )}
-    </>
+    </div>
   )
 }
 

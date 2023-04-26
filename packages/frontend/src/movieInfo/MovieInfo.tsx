@@ -8,7 +8,6 @@ import { CastCredit, Movie, useGetCastQuery, useGetCrewQuery, useGetMovieInfoQue
 import { PersonCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import { InterestingDivider } from '../shared/general/InterestingDivider'
-import Link from '../shared/general/Link'
 import { Poster } from '../shared/general/Poster'
 import { SentimentSelect } from '../shared/movieActionButtons/SentimentSelect'
 import { WatchedButton } from '../shared/movieActionButtons/WatchedButton'
@@ -162,15 +161,7 @@ function CrewList({id}: { id: Movie['id'] }) {
       {!!unimportantCrew?.length && (
         <>
           <Typography variant="h1" style={{marginTop: 20}}>Other Crew</Typography>
-          <div>
-            {unimportantCrew.map(person => (
-              <div key={person.id}>
-                <Link to={`/person/${person.id}`}>
-                  {person.name} - {person.jobs.join(', ')}
-                </Link>
-              </div>
-            ))}
-          </div>
+          <PersonCards compressed people={unimportantCrew} loading={loading} loadingCount={15}/>
         </>
       )}
     </>
@@ -196,15 +187,7 @@ function CastList({id}: { id: Movie['id'] }) {
       {!!unimportantCast?.length && (
         <>
           <Typography variant="h1" style={{marginTop: 20}}>Other Cast</Typography>
-          <div>
-            {unimportantCast.map(person => (
-              <div key={person.id}>
-                <Link to={`/person/${person.id}`}>
-                  {person.name} - {person.character}
-                </Link>
-              </div>
-            ))}
-          </div>
+          <PersonCards compressed people={unimportantCast} loading={loading} loadingCount={15}/>
         </>
       )}
     </>

@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.ca3.overdb",
+      "sha256_cert_fingerprints": [
+        "40:B7:E1:7E:3B:BF:B0:AF:27:15:42:E8:78:26:AE:B2:66:8B:16:C8:5C:00:63:BA:0C:A5:2B:7E:A8:04:39:4D",
+        "ED:E8:2D:4E:B1:2D:16:47:F1:BB:BD:6A:5D:DD:92:89:63:C4:DC:39:18:AD:0B:69:A0:C5:DB:FD:AF:DD:A0:43"
+      ]
+    }
+  }
+]

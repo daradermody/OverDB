@@ -8,13 +8,8 @@ export default function Footer() {
       <Container sx={{display: 'flex', justifyContent: 'space-between', gap: '4px 20px', flexWrap: 'wrap'}}>
         <div>
           <div style={{display: 'flex', gap: 20, flexWrap: 'wrap'}}>
-            <Link href="/about"><Typography variant="subtitle1">About</Typography></Link>
-            <Link href="/news"><Typography variant="subtitle1">News</Typography></Link>
-            <Link href="/pro"><Typography variant="subtitle1">Pro</Typography></Link>
-            <Link href="/podcast"><Typography variant="subtitle1">Podcast</Typography></Link>
-            <Link href="/help"><Typography variant="subtitle1">Help</Typography></Link>
-            <Link href="/terms"><Typography variant="subtitle1">Terms</Typography></Link>
-            <Link href="/contact"><Typography variant="subtitle1">Contact</Typography></Link>
+            <Link href="/privacy.html"><Typography variant="subtitle1">Privacy</Typography></Link>
+            <Link href="mailto:daradermody@gmail.com"><Typography variant="subtitle1">Contact</Typography></Link>
           </div>
           <Typography variant="subtitle2" marginTop="10px">
             © Caʒ Gmbh. Made by fans in Ireland. Movie data from <Link href="https://themoviedb.org" target="_blank" sx={{color: 'inherit'}}>TMDb</Link>

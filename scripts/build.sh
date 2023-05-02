@@ -11,5 +11,6 @@ yarn nexe \
   --output build/overdb \
   --target linux-x64-14.15.3 \
   --resource build/static \
+  --resource build/static/.well-known \
   --resource build/schema.graphql \
   --resource build/xhr-sync-worker.js

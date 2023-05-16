@@ -69,9 +69,9 @@ function PersonSummary({person, compressed}: PersonCardProps) {
 }
 
 function isCredit<T extends { jobs: string[] }>(person: any): person is T {
-  return !!(person as any).jobs
+  return 'jobs' in person
 }
 
 function isCast<T extends { character: string }>(person: any): person is T {
-  return !!(person as any).character
+  return 'character' in person
 }

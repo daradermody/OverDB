@@ -29,7 +29,7 @@ export function MovieCard({movie, compressed, showCharactersOnly}: MovieCardProp
     <StyledCard sx={{height: compressed ? '75px' : undefined}}>
       <Link to={`/movie/${movie.id}`} sx={{display: compressed ? 'flex' : 'initial', height: '100%'}}>
         <MovieImage movie={movie} compressed={compressed}/>
-        <MovieSummary movie={movie} showCharactersOnly={showCharactersOnly} compressed/>
+        <MovieSummary movie={movie} showCharactersOnly={showCharactersOnly} compressed={compressed}/>
       </Link>
     </StyledCard>
   )
@@ -122,7 +122,5 @@ function MovieSummary({movie, showCharactersOnly, compressed}: MovieCardProps) {
 }
 
 function isCredit(movie: { jobs?: any }): movie is MovieCredit {
-  return !!(
-    movie as MovieCredit
-  ).jobs
+  return 'jobs' in movie
 }

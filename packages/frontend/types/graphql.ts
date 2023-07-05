@@ -862,7 +862,6 @@ export const GetListsDocument = gql`
     lists {
       id
       name
-      type
       items {
         ... on Movie {
           id

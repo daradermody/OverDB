@@ -32,6 +32,19 @@ export type CrewCredit = Person & {
   profilePath?: Maybe<Scalars['String']>;
 };
 
+export type List = {
+  __typename?: 'List';
+  id: Scalars['ID'];
+  items: Array<MovieOrPerson>;
+  name: Scalars['String'];
+  type: ListType;
+};
+
+export enum ListType {
+  Movie = 'MOVIE',
+  Person = 'PERSON'
+}
+
 export type Movie = {
   __typename?: 'Movie';
   id: Scalars['ID'];
@@ -72,12 +85,48 @@ export type MovieInfo = {
   voteAverage: Scalars['Float'];
 };
 
+export type MovieOrPerson = Movie | PersonInfo;
+
 export type Mutation = {
   __typename?: 'Mutation';
+  addToList: List;
+  createList: List;
+  deleteLists: Scalars['Boolean'];
+  editList: List;
+  removeFromList: List;
   setFavourite: PersonInfo;
   setInWatchlist: Movie;
   setSentiment: Movie;
   setWatched: Movie;
+};
+
+
+export type MutationAddToListArgs = {
+  itemId: Scalars['ID'];
+  listId: Scalars['ID'];
+};
+
+
+export type MutationCreateListArgs = {
+  name: Scalars['String'];
+  type: ListType;
+};
+
+
+export type MutationDeleteListsArgs = {
+  ids: Array<Scalars['ID']>;
+};
+
+
+export type MutationEditListArgs = {
+  id: Scalars['ID'];
+  name: Scalars['String'];
+};
+
+
+export type MutationRemoveFromListArgs = {
+  itemId: Scalars['ID'];
+  listId: Scalars['ID'];
 };
 
 
@@ -144,7 +193,7 @@ export type Query = {
   movie: Movie;
   person: PersonInfo;
   recommendedMovies: Array<Movie>;
-  search: Array<SearchResult>;
+  search: Array<MovieOrPerson>;
   trending: Array<MovieInfo>;
   upcoming: Array<Movie>;
   user: User;
@@ -193,10 +242,8 @@ export type QueryTrendingArgs = {
 
 
 export type QueryUserArgs = {
-  username: Scalars['String'];
+  username: Scalars['ID'];
 };
-
-export type SearchResult = Movie | PersonInfo;
 
 export enum Sentiment {
   Disliked = 'DISLIKED',
@@ -232,9 +279,11 @@ export type User = {
   favouritePeople: PaginatedPeople;
   isAdmin?: Maybe<Scalars['Boolean']>;
   likedMovies: PaginatedMovies;
+  list: List;
+  lists: Array<List>;
   public?: Maybe<Scalars['Boolean']>;
   stats: Stats;
-  username: Scalars['String'];
+  username: Scalars['ID'];
   watched: PaginatedMovies;
   watchlist: PaginatedMovies;
 };
@@ -252,6 +301,16 @@ export type UserLikedMoviesArgs = {
 };
 
 
+export type UserListArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type UserListsArgs = {
+  type?: InputMaybe<ListType>;
+};
+
+
 export type UserWatchedArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -265,7 +324,7 @@ export type UserWatchlistArgs = {
 
 
 export const GetFavouritePeopleDocument = gql`
-    query GetFavouritePeople($username: String!, $offset: Int, $limit: Int) {
+    query GetFavouritePeople($username: ID!, $offset: Int, $limit: Int) {
   user(username: $username) {
     favouritePeople(offset: $offset, limit: $limit) {
       endReached
@@ -309,7 +368,7 @@ export type GetFavouritePeopleQueryHookResult = ReturnType<typeof useGetFavourit
 export type GetFavouritePeopleLazyQueryHookResult = ReturnType<typeof useGetFavouritePeopleLazyQuery>;
 export type GetFavouritePeopleQueryResult = Apollo.QueryResult<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>;
 export const GetLikedMoviesDocument = gql`
-    query GetLikedMovies($username: String!, $offset: Int, $limit: Int) {
+    query GetLikedMovies($username: ID!, $offset: Int, $limit: Int) {
   user(username: $username) {
     likedMovies(offset: $offset, limit: $limit) {
       endReached
@@ -354,7 +413,7 @@ export type GetLikedMoviesQueryHookResult = ReturnType<typeof useGetLikedMoviesQ
 export type GetLikedMoviesLazyQueryHookResult = ReturnType<typeof useGetLikedMoviesLazyQuery>;
 export type GetLikedMoviesQueryResult = Apollo.QueryResult<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>;
 export const GetUserDocument = gql`
-    query GetUser($username: String!) {
+    query GetUser($username: ID!) {
   user(username: $username) {
     avatarUrl
   }
@@ -389,7 +448,7 @@ export type GetUserQueryHookResult = ReturnType<typeof useGetUserQuery>;
 export type GetUserLazyQueryHookResult = ReturnType<typeof useGetUserLazyQuery>;
 export type GetUserQueryResult = Apollo.QueryResult<GetUserQuery, GetUserQueryVariables>;
 export const GetUserStatsDocument = gql`
-    query GetUserStats($username: String!) {
+    query GetUserStats($username: ID!) {
   user(username: $username) {
     stats {
       favouritePeople
@@ -429,7 +488,7 @@ export type GetUserStatsQueryHookResult = ReturnType<typeof useGetUserStatsQuery
 export type GetUserStatsLazyQueryHookResult = ReturnType<typeof useGetUserStatsLazyQuery>;
 export type GetUserStatsQueryResult = Apollo.QueryResult<GetUserStatsQuery, GetUserStatsQueryVariables>;
 export const GetWatchedMoviesDocument = gql`
-    query GetWatchedMovies($username: String!, $offset: Int, $limit: Int) {
+    query GetWatchedMovies($username: ID!, $offset: Int, $limit: Int) {
   user(username: $username) {
     watched(offset: $offset, limit: $limit) {
       endReached
@@ -642,6 +701,256 @@ export function useGetRecommendedMoviesLazyQuery(baseOptions?: Apollo.LazyQueryH
 export type GetRecommendedMoviesQueryHookResult = ReturnType<typeof useGetRecommendedMoviesQuery>;
 export type GetRecommendedMoviesLazyQueryHookResult = ReturnType<typeof useGetRecommendedMoviesLazyQuery>;
 export type GetRecommendedMoviesQueryResult = Apollo.QueryResult<GetRecommendedMoviesQuery, GetRecommendedMoviesQueryVariables>;
+export const CreateListDocument = gql`
+    mutation CreateList($name: String!, $type: ListType!) {
+  createList(name: $name, type: $type) {
+    id
+  }
+}
+    `;
+export type CreateListMutationFn = Apollo.MutationFunction<CreateListMutation, CreateListMutationVariables>;
+
+/**
+ * __useCreateListMutation__
+ *
+ * To run a mutation, you first call `useCreateListMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateListMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createListMutation, { data, loading, error }] = useCreateListMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      type: // value for 'type'
+ *   },
+ * });
+ */
+export function useCreateListMutation(baseOptions?: Apollo.MutationHookOptions<CreateListMutation, CreateListMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateListMutation, CreateListMutationVariables>(CreateListDocument, options);
+      }
+export type CreateListMutationHookResult = ReturnType<typeof useCreateListMutation>;
+export type CreateListMutationResult = Apollo.MutationResult<CreateListMutation>;
+export type CreateListMutationOptions = Apollo.BaseMutationOptions<CreateListMutation, CreateListMutationVariables>;
+export const DeleteListsDocument = gql`
+    mutation DeleteLists($ids: [ID!]!) {
+  deleteLists(ids: $ids)
+}
+    `;
+export type DeleteListsMutationFn = Apollo.MutationFunction<DeleteListsMutation, DeleteListsMutationVariables>;
+
+/**
+ * __useDeleteListsMutation__
+ *
+ * To run a mutation, you first call `useDeleteListsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteListsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteListsMutation, { data, loading, error }] = useDeleteListsMutation({
+ *   variables: {
+ *      ids: // value for 'ids'
+ *   },
+ * });
+ */
+export function useDeleteListsMutation(baseOptions?: Apollo.MutationHookOptions<DeleteListsMutation, DeleteListsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteListsMutation, DeleteListsMutationVariables>(DeleteListsDocument, options);
+      }
+export type DeleteListsMutationHookResult = ReturnType<typeof useDeleteListsMutation>;
+export type DeleteListsMutationResult = Apollo.MutationResult<DeleteListsMutation>;
+export type DeleteListsMutationOptions = Apollo.BaseMutationOptions<DeleteListsMutation, DeleteListsMutationVariables>;
+export const EditListDocument = gql`
+    mutation EditList($id: ID!, $name: String!) {
+  editList(id: $id, name: $name) {
+    id
+  }
+}
+    `;
+export type EditListMutationFn = Apollo.MutationFunction<EditListMutation, EditListMutationVariables>;
+
+/**
+ * __useEditListMutation__
+ *
+ * To run a mutation, you first call `useEditListMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditListMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editListMutation, { data, loading, error }] = useEditListMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useEditListMutation(baseOptions?: Apollo.MutationHookOptions<EditListMutation, EditListMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<EditListMutation, EditListMutationVariables>(EditListDocument, options);
+      }
+export type EditListMutationHookResult = ReturnType<typeof useEditListMutation>;
+export type EditListMutationResult = Apollo.MutationResult<EditListMutation>;
+export type EditListMutationOptions = Apollo.BaseMutationOptions<EditListMutation, EditListMutationVariables>;
+export const GetListDocument = gql`
+    query GetList($username: ID!, $id: ID!) {
+  user(username: $username) {
+    list(id: $id) {
+      id
+      name
+      type
+      items {
+        ... on Movie {
+          id
+          posterPath
+          title
+          releaseDate
+          watched
+          inWatchlist
+          sentiment
+        }
+        ... on Person {
+          id
+          name
+          profilePath
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetListQuery__
+ *
+ * To run a query within a React component, call `useGetListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetListQuery({
+ *   variables: {
+ *      username: // value for 'username'
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetListQuery(baseOptions: Apollo.QueryHookOptions<GetListQuery, GetListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetListQuery, GetListQueryVariables>(GetListDocument, options);
+      }
+export function useGetListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetListQuery, GetListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetListQuery, GetListQueryVariables>(GetListDocument, options);
+        }
+export type GetListQueryHookResult = ReturnType<typeof useGetListQuery>;
+export type GetListLazyQueryHookResult = ReturnType<typeof useGetListLazyQuery>;
+export type GetListQueryResult = Apollo.QueryResult<GetListQuery, GetListQueryVariables>;
+export const GetListsDocument = gql`
+    query GetLists($username: ID!) {
+  user(username: $username) {
+    lists {
+      id
+      name
+      type
+      items {
+        ... on Movie {
+          id
+        }
+        ... on Person {
+          id
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetListsQuery__
+ *
+ * To run a query within a React component, call `useGetListsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetListsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetListsQuery({
+ *   variables: {
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useGetListsQuery(baseOptions: Apollo.QueryHookOptions<GetListsQuery, GetListsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetListsQuery, GetListsQueryVariables>(GetListsDocument, options);
+      }
+export function useGetListsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetListsQuery, GetListsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetListsQuery, GetListsQueryVariables>(GetListsDocument, options);
+        }
+export type GetListsQueryHookResult = ReturnType<typeof useGetListsQuery>;
+export type GetListsLazyQueryHookResult = ReturnType<typeof useGetListsLazyQuery>;
+export type GetListsQueryResult = Apollo.QueryResult<GetListsQuery, GetListsQueryVariables>;
+export const GetWatchlistDocument = gql`
+    query GetWatchlist($username: ID!, $offset: Int, $limit: Int) {
+  user(username: $username) {
+    watchlist(offset: $offset, limit: $limit) {
+      endReached
+      results {
+        id
+        title
+        posterPath
+        releaseDate
+        watched
+        inWatchlist
+        sentiment
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetWatchlistQuery__
+ *
+ * To run a query within a React component, call `useGetWatchlistQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWatchlistQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWatchlistQuery({
+ *   variables: {
+ *      username: // value for 'username'
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useGetWatchlistQuery(baseOptions: Apollo.QueryHookOptions<GetWatchlistQuery, GetWatchlistQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWatchlistQuery, GetWatchlistQueryVariables>(GetWatchlistDocument, options);
+      }
+export function useGetWatchlistLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWatchlistQuery, GetWatchlistQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWatchlistQuery, GetWatchlistQueryVariables>(GetWatchlistDocument, options);
+        }
+export type GetWatchlistQueryHookResult = ReturnType<typeof useGetWatchlistQuery>;
+export type GetWatchlistLazyQueryHookResult = ReturnType<typeof useGetWatchlistLazyQuery>;
+export type GetWatchlistQueryResult = Apollo.QueryResult<GetWatchlistQuery, GetWatchlistQueryVariables>;
 export const GetMovieInfoDocument = gql`
     query GetMovieInfo($id: ID!) {
   movie(id: $id) {
@@ -922,6 +1231,118 @@ export function useSetFavouriteMutation(baseOptions?: Apollo.MutationHookOptions
 export type SetFavouriteMutationHookResult = ReturnType<typeof useSetFavouriteMutation>;
 export type SetFavouriteMutationResult = Apollo.MutationResult<SetFavouriteMutation>;
 export type SetFavouriteMutationOptions = Apollo.BaseMutationOptions<SetFavouriteMutation, SetFavouriteMutationVariables>;
+export const GetMovieListsDocument = gql`
+    query GetMovieLists($username: ID!) {
+  user(username: $username) {
+    lists(type: MOVIE) {
+      id
+      name
+      type
+      items {
+        ... on Movie {
+          id
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetMovieListsQuery__
+ *
+ * To run a query within a React component, call `useGetMovieListsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMovieListsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMovieListsQuery({
+ *   variables: {
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useGetMovieListsQuery(baseOptions: Apollo.QueryHookOptions<GetMovieListsQuery, GetMovieListsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMovieListsQuery, GetMovieListsQueryVariables>(GetMovieListsDocument, options);
+      }
+export function useGetMovieListsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMovieListsQuery, GetMovieListsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMovieListsQuery, GetMovieListsQueryVariables>(GetMovieListsDocument, options);
+        }
+export type GetMovieListsQueryHookResult = ReturnType<typeof useGetMovieListsQuery>;
+export type GetMovieListsLazyQueryHookResult = ReturnType<typeof useGetMovieListsLazyQuery>;
+export type GetMovieListsQueryResult = Apollo.QueryResult<GetMovieListsQuery, GetMovieListsQueryVariables>;
+export const AddToListDocument = gql`
+    mutation AddToList($listId: ID!, $itemId: ID!) {
+  addToList(listId: $listId, itemId: $itemId) {
+    id
+  }
+}
+    `;
+export type AddToListMutationFn = Apollo.MutationFunction<AddToListMutation, AddToListMutationVariables>;
+
+/**
+ * __useAddToListMutation__
+ *
+ * To run a mutation, you first call `useAddToListMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddToListMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addToListMutation, { data, loading, error }] = useAddToListMutation({
+ *   variables: {
+ *      listId: // value for 'listId'
+ *      itemId: // value for 'itemId'
+ *   },
+ * });
+ */
+export function useAddToListMutation(baseOptions?: Apollo.MutationHookOptions<AddToListMutation, AddToListMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddToListMutation, AddToListMutationVariables>(AddToListDocument, options);
+      }
+export type AddToListMutationHookResult = ReturnType<typeof useAddToListMutation>;
+export type AddToListMutationResult = Apollo.MutationResult<AddToListMutation>;
+export type AddToListMutationOptions = Apollo.BaseMutationOptions<AddToListMutation, AddToListMutationVariables>;
+export const RemoveFromListDocument = gql`
+    mutation RemoveFromList($listId: ID!, $itemId: ID!) {
+  removeFromList(listId: $listId, itemId: $itemId) {
+    id
+  }
+}
+    `;
+export type RemoveFromListMutationFn = Apollo.MutationFunction<RemoveFromListMutation, RemoveFromListMutationVariables>;
+
+/**
+ * __useRemoveFromListMutation__
+ *
+ * To run a mutation, you first call `useRemoveFromListMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveFromListMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeFromListMutation, { data, loading, error }] = useRemoveFromListMutation({
+ *   variables: {
+ *      listId: // value for 'listId'
+ *      itemId: // value for 'itemId'
+ *   },
+ * });
+ */
+export function useRemoveFromListMutation(baseOptions?: Apollo.MutationHookOptions<RemoveFromListMutation, RemoveFromListMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveFromListMutation, RemoveFromListMutationVariables>(RemoveFromListDocument, options);
+      }
+export type RemoveFromListMutationHookResult = ReturnType<typeof useRemoveFromListMutation>;
+export type RemoveFromListMutationResult = Apollo.MutationResult<RemoveFromListMutation>;
+export type RemoveFromListMutationOptions = Apollo.BaseMutationOptions<RemoveFromListMutation, RemoveFromListMutationVariables>;
 export const SetSentimentDocument = gql`
     mutation SetSentiment($id: ID!, $sentiment: Sentiment!) {
   setSentiment(id: $id, sentiment: $sentiment) {
@@ -1064,51 +1485,3 @@ export function useGetUpcomingMoviesLazyQuery(baseOptions?: Apollo.LazyQueryHook
 export type GetUpcomingMoviesQueryHookResult = ReturnType<typeof useGetUpcomingMoviesQuery>;
 export type GetUpcomingMoviesLazyQueryHookResult = ReturnType<typeof useGetUpcomingMoviesLazyQuery>;
 export type GetUpcomingMoviesQueryResult = Apollo.QueryResult<GetUpcomingMoviesQuery, GetUpcomingMoviesQueryVariables>;
-export const GetWatchlistDocument = gql`
-    query GetWatchlist($username: String!, $offset: Int, $limit: Int) {
-  user(username: $username) {
-    watchlist(offset: $offset, limit: $limit) {
-      endReached
-      results {
-        id
-        title
-        posterPath
-        releaseDate
-        watched
-        inWatchlist
-        sentiment
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useGetWatchlistQuery__
- *
- * To run a query within a React component, call `useGetWatchlistQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetWatchlistQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetWatchlistQuery({
- *   variables: {
- *      username: // value for 'username'
- *      offset: // value for 'offset'
- *      limit: // value for 'limit'
- *   },
- * });
- */
-export function useGetWatchlistQuery(baseOptions: Apollo.QueryHookOptions<GetWatchlistQuery, GetWatchlistQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetWatchlistQuery, GetWatchlistQueryVariables>(GetWatchlistDocument, options);
-      }
-export function useGetWatchlistLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWatchlistQuery, GetWatchlistQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetWatchlistQuery, GetWatchlistQueryVariables>(GetWatchlistDocument, options);
-        }
-export type GetWatchlistQueryHookResult = ReturnType<typeof useGetWatchlistQuery>;
-export type GetWatchlistLazyQueryHookResult = ReturnType<typeof useGetWatchlistLazyQuery>;
-export type GetWatchlistQueryResult = Apollo.QueryResult<GetWatchlistQuery, GetWatchlistQueryVariables>;

@@ -1,10 +1,11 @@
 import { gql } from '@apollo/client'
 import { Check, Close } from '@mui/icons-material'
 import { Skeleton, Typography } from '@mui/material'
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
+import { GridColDef } from '@mui/x-data-grid'
 import * as React from 'react'
 import { useGetUsersQuery, User } from '../../types/graphql'
 import { ErrorMessage } from '../shared/errorHandlers'
+import DataGrid from '../shared/general/DataGrid'
 import Link from '../shared/general/Link'
 import PageWrapper from '../shared/PageWrapper'
 
@@ -24,28 +25,15 @@ function UsersTable() {
     return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
-  if (loading) {
-    return <LoadingTable/>
-  }
-
   return (
     <DataGrid
       rowSelection={false}
       disableColumnSelector
+      loading={loading}
       rows={data?.users}
       getRowId={row => row.username}
       columns={columns}
     />
-  )
-}
-
-function LoadingTable() {
-  return (
-    <div style={{borderRadius: '4px', overflow: 'hidden'}}>
-      <Skeleton variant="rectangular" height={56}/>
-      <Skeleton variant="rectangular" height={200} sx={{ m: '1px 0'}}/>
-      <Skeleton variant="rectangular" height={53}/>
-    </div>
   )
 }
 
@@ -102,7 +90,7 @@ const columns: GridColDef<User>[] = [
     field: 'stats.watchlist',
     sortable: false,
     renderCell: params =>
-      <Link to={`/profile/${params.row.username}/watchlist`}>{params.row.stats.watchlist}</Link>
+      <Link to={`/profile/${params.row.username}/list/watchlist`}>{params.row.stats.watchlist}</Link>
   },
 ]
 

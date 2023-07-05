@@ -18,7 +18,7 @@ export function WatchlistButton({id, inWatchlist, withLabel}: WatchlistButtonPro
   function handleClick() {
     return setInWatchlist({
       variables: {id, inWatchlist: !inWatchlist},
-      refetchQueries: ['GetPersonCredits', 'GetWatchedMovies', 'GetWatchlist'],
+      refetchQueries: ['GetPersonCredits', 'GetWatchedMovies', 'GetWatchlist', 'GetMovieLists'],
       optimisticResponse: {
         setInWatchlist: {
           __typename: 'Movie',

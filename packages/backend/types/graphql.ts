@@ -4,6 +4,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -30,6 +31,19 @@ export type CrewCredit = Person & {
   name: Scalars['String'];
   profilePath?: Maybe<Scalars['String']>;
 };
+
+export type List = {
+  __typename?: 'List';
+  id: Scalars['ID'];
+  items: Array<MovieOrPerson>;
+  name: Scalars['String'];
+  type: ListType;
+};
+
+export enum ListType {
+  Movie = 'MOVIE',
+  Person = 'PERSON'
+}
 
 export type Movie = {
   __typename?: 'Movie';
@@ -71,12 +85,48 @@ export type MovieInfo = {
   voteAverage: Scalars['Float'];
 };
 
+export type MovieOrPerson = Movie | PersonInfo;
+
 export type Mutation = {
   __typename?: 'Mutation';
+  addToList: List;
+  createList: List;
+  deleteLists: Scalars['Boolean'];
+  editList: List;
+  removeFromList: List;
   setFavourite: PersonInfo;
   setInWatchlist: Movie;
   setSentiment: Movie;
   setWatched: Movie;
+};
+
+
+export type MutationAddToListArgs = {
+  itemId: Scalars['ID'];
+  listId: Scalars['ID'];
+};
+
+
+export type MutationCreateListArgs = {
+  name: Scalars['String'];
+  type: ListType;
+};
+
+
+export type MutationDeleteListsArgs = {
+  ids: Array<Scalars['ID']>;
+};
+
+
+export type MutationEditListArgs = {
+  id: Scalars['ID'];
+  name: Scalars['String'];
+};
+
+
+export type MutationRemoveFromListArgs = {
+  itemId: Scalars['ID'];
+  listId: Scalars['ID'];
 };
 
 
@@ -143,7 +193,7 @@ export type Query = {
   movie: Movie;
   person: PersonInfo;
   recommendedMovies: Array<Movie>;
-  search: Array<SearchResult>;
+  search: Array<MovieOrPerson>;
   trending: Array<MovieInfo>;
   upcoming: Array<Movie>;
   user: User;
@@ -192,10 +242,8 @@ export type QueryTrendingArgs = {
 
 
 export type QueryUserArgs = {
-  username: Scalars['String'];
+  username: Scalars['ID'];
 };
-
-export type SearchResult = Movie | PersonInfo;
 
 export enum Sentiment {
   Disliked = 'DISLIKED',
@@ -231,9 +279,11 @@ export type User = {
   favouritePeople: PaginatedPeople;
   isAdmin?: Maybe<Scalars['Boolean']>;
   likedMovies: PaginatedMovies;
+  list: List;
+  lists: Array<List>;
   public?: Maybe<Scalars['Boolean']>;
   stats: Stats;
-  username: Scalars['String'];
+  username: Scalars['ID'];
   watched: PaginatedMovies;
   watchlist: PaginatedMovies;
 };
@@ -248,6 +298,16 @@ export type UserFavouritePeopleArgs = {
 export type UserLikedMoviesArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
+};
+
+
+export type UserListArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type UserListsArgs = {
+  type?: InputMaybe<ListType>;
 };
 
 
@@ -332,12 +392,12 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping of union types */
 export type ResolversUnionTypes = ResolversObject<{
-  SearchResult: ( Movie ) | ( PersonInfo );
+  MovieOrPerson: ( Movie ) | ( PersonInfo );
 }>;
 
 /** Mapping of union parent types */
 export type ResolversUnionParentTypes = ResolversObject<{
-  SearchResult: ( Movie ) | ( PersonInfo );
+  MovieOrPerson: ( Movie ) | ( PersonInfo );
 }>;
 
 /** Mapping between all available schema types and the resolvers types */
@@ -348,16 +408,18 @@ export type ResolversTypes = ResolversObject<{
   Float: ResolverTypeWrapper<Scalars['Float']>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  List: ResolverTypeWrapper<Omit<List, 'items'> & { items: Array<ResolversTypes['MovieOrPerson']> }>;
+  ListType: ListType;
   Movie: ResolverTypeWrapper<Movie>;
   MovieCredit: ResolverTypeWrapper<MovieCredit>;
   MovieInfo: ResolverTypeWrapper<MovieInfo>;
+  MovieOrPerson: ResolverTypeWrapper<ResolversUnionTypes['MovieOrPerson']>;
   Mutation: ResolverTypeWrapper<{}>;
   PaginatedMovies: ResolverTypeWrapper<PaginatedMovies>;
   PaginatedPeople: ResolverTypeWrapper<PaginatedPeople>;
   Person: ResolversTypes['CastCredit'] | ResolversTypes['CrewCredit'] | ResolversTypes['PersonInfo'];
   PersonInfo: ResolverTypeWrapper<PersonInfo>;
   Query: ResolverTypeWrapper<{}>;
-  SearchResult: ResolverTypeWrapper<ResolversUnionTypes['SearchResult']>;
   Sentiment: Sentiment;
   Stats: ResolverTypeWrapper<Stats>;
   String: ResolverTypeWrapper<Scalars['String']>;
@@ -374,16 +436,17 @@ export type ResolversParentTypes = ResolversObject<{
   Float: Scalars['Float'];
   ID: Scalars['ID'];
   Int: Scalars['Int'];
+  List: Omit<List, 'items'> & { items: Array<ResolversParentTypes['MovieOrPerson']> };
   Movie: Movie;
   MovieCredit: MovieCredit;
   MovieInfo: MovieInfo;
+  MovieOrPerson: ResolversUnionParentTypes['MovieOrPerson'];
   Mutation: {};
   PaginatedMovies: PaginatedMovies;
   PaginatedPeople: PaginatedPeople;
   Person: ResolversParentTypes['CastCredit'] | ResolversParentTypes['CrewCredit'] | ResolversParentTypes['PersonInfo'];
   PersonInfo: PersonInfo;
   Query: {};
-  SearchResult: ResolversUnionParentTypes['SearchResult'];
   Stats: Stats;
   String: Scalars['String'];
   Tomatometer: Tomatometer;
@@ -404,6 +467,14 @@ export type CrewCreditResolvers<ContextType = any, ParentType extends ResolversP
   jobs?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   profilePath?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type ListResolvers<ContextType = any, ParentType extends ResolversParentTypes['List'] = ResolversParentTypes['List']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  items?: Resolver<Array<ResolversTypes['MovieOrPerson']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['ListType'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -447,7 +518,16 @@ export type MovieInfoResolvers<ContextType = any, ParentType extends ResolversPa
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type MovieOrPersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['MovieOrPerson'] = ResolversParentTypes['MovieOrPerson']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'Movie' | 'PersonInfo', ParentType, ContextType>;
+}>;
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  addToList?: Resolver<ResolversTypes['List'], ParentType, ContextType, RequireFields<MutationAddToListArgs, 'itemId' | 'listId'>>;
+  createList?: Resolver<ResolversTypes['List'], ParentType, ContextType, RequireFields<MutationCreateListArgs, 'name' | 'type'>>;
+  deleteLists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteListsArgs, 'ids'>>;
+  editList?: Resolver<ResolversTypes['List'], ParentType, ContextType, RequireFields<MutationEditListArgs, 'id' | 'name'>>;
+  removeFromList?: Resolver<ResolversTypes['List'], ParentType, ContextType, RequireFields<MutationRemoveFromListArgs, 'itemId' | 'listId'>>;
   setFavourite?: Resolver<ResolversTypes['PersonInfo'], ParentType, ContextType, RequireFields<MutationSetFavouriteArgs, 'favourited' | 'id'>>;
   setInWatchlist?: Resolver<ResolversTypes['Movie'], ParentType, ContextType, RequireFields<MutationSetInWatchlistArgs, 'id' | 'inWatchlist'>>;
   setSentiment?: Resolver<ResolversTypes['Movie'], ParentType, ContextType, RequireFields<MutationSetSentimentArgs, 'id' | 'sentiment'>>;
@@ -494,15 +574,11 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   movie?: Resolver<ResolversTypes['Movie'], ParentType, ContextType, RequireFields<QueryMovieArgs, 'id'>>;
   person?: Resolver<ResolversTypes['PersonInfo'], ParentType, ContextType, RequireFields<QueryPersonArgs, 'id'>>;
   recommendedMovies?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType, Partial<QueryRecommendedMoviesArgs>>;
-  search?: Resolver<Array<ResolversTypes['SearchResult']>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'query'>>;
+  search?: Resolver<Array<ResolversTypes['MovieOrPerson']>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'query'>>;
   trending?: Resolver<Array<ResolversTypes['MovieInfo']>, ParentType, ContextType, Partial<QueryTrendingArgs>>;
   upcoming?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'username'>>;
   users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
-}>;
-
-export type SearchResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['SearchResult'] = ResolversParentTypes['SearchResult']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'Movie' | 'PersonInfo', ParentType, ContextType>;
 }>;
 
 export type StatsResolvers<ContextType = any, ParentType extends ResolversParentTypes['Stats'] = ResolversParentTypes['Stats']> = ResolversObject<{
@@ -526,9 +602,11 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   favouritePeople?: Resolver<ResolversTypes['PaginatedPeople'], ParentType, ContextType, Partial<UserFavouritePeopleArgs>>;
   isAdmin?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   likedMovies?: Resolver<ResolversTypes['PaginatedMovies'], ParentType, ContextType, Partial<UserLikedMoviesArgs>>;
+  list?: Resolver<ResolversTypes['List'], ParentType, ContextType, RequireFields<UserListArgs, 'id'>>;
+  lists?: Resolver<Array<ResolversTypes['List']>, ParentType, ContextType, Partial<UserListsArgs>>;
   public?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   stats?: Resolver<ResolversTypes['Stats'], ParentType, ContextType>;
-  username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  username?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   watched?: Resolver<ResolversTypes['PaginatedMovies'], ParentType, ContextType, Partial<UserWatchedArgs>>;
   watchlist?: Resolver<ResolversTypes['PaginatedMovies'], ParentType, ContextType, Partial<UserWatchlistArgs>>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -537,16 +615,17 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 export type Resolvers<ContextType = any> = ResolversObject<{
   CastCredit?: CastCreditResolvers<ContextType>;
   CrewCredit?: CrewCreditResolvers<ContextType>;
+  List?: ListResolvers<ContextType>;
   Movie?: MovieResolvers<ContextType>;
   MovieCredit?: MovieCreditResolvers<ContextType>;
   MovieInfo?: MovieInfoResolvers<ContextType>;
+  MovieOrPerson?: MovieOrPersonResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   PaginatedMovies?: PaginatedMoviesResolvers<ContextType>;
   PaginatedPeople?: PaginatedPeopleResolvers<ContextType>;
   Person?: PersonResolvers<ContextType>;
   PersonInfo?: PersonInfoResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  SearchResult?: SearchResultResolvers<ContextType>;
   Stats?: StatsResolvers<ContextType>;
   Tomatometer?: TomatometerResolvers<ContextType>;
   User?: UserResolvers<ContextType>;

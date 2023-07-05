@@ -39,7 +39,7 @@ export default function WatchedMovies() {
 }
 
 gql`
-  query GetWatchedMovies($username: String!, $offset: Int, $limit: Int) {
+  query GetWatchedMovies($username: ID!, $offset: Int, $limit: Int) {
     user(username: $username) {
       watched(offset: $offset, limit: $limit) {
         endReached

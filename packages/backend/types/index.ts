@@ -4,11 +4,7 @@ import { Movie, PersonInfo } from './graphql'
 export type PersonWithoutFav = Omit<PersonInfo, 'favourited'>
 
 export function isMovieSummary(result: Movie | PersonInfo): result is Movie {
-  return 'releaseDate' in result
-}
-
-export function isPersonSummary(result: Movie | PersonInfo): result is PersonInfo {
-  return 'biography' in result
+  return result.__typename === 'Movie' ||  'releaseDate' in result
 }
 
 export function isMovieSearchResult(result: MovieResult | TvResult | PersonResult): result is MovieResult {

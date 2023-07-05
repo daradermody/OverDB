@@ -2,7 +2,7 @@ import { gql } from '@apollo/client'
 import { Clear, ThumbDown, ThumbsUpDown, ThumbUp } from '@mui/icons-material'
 import { Button, IconButton, Popover, Typography } from '@mui/material'
 import * as React from 'react'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Movie, Sentiment, useSetSentimentMutation, useSetWatchedMutation } from '../../../types/graphql'
 import { useMutationErrorHandler } from '../errorHandlers'
 
@@ -54,10 +54,9 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
         sx={{minWidth: 'unset', visibility: anchor ? 'hidden' : 'inherit'}}
         color="inherit"
         disableRipple
-        size="medium"
         onClick={e => setAnchor(e.currentTarget)}
       >
-        <Typography color={sentiment === Sentiment.None ? 'inherit' : 'primary'}>{getIconForSentiment(sentiment)}</Typography>
+        {getIconForSentiment(sentiment, { color: sentiment !== Sentiment.None ? 'primary' : undefined })}
         {withLabel && <SentimentText sentiment={sentiment} onClear={() => changeSentiment(Sentiment.None)}/>}
       </Button>
 
@@ -91,13 +90,13 @@ function SentimentText(props: { sentiment: Sentiment, onClear(): void }) {
   )
 }
 
-function getIconForSentiment(sentiment: Sentiment): JSX.Element {
+function getIconForSentiment(sentiment: Sentiment, options: {color?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning' } = {}): JSX.Element {
   if (sentiment === Sentiment.Liked) {
-    return <ThumbUp/>
+    return <ThumbUp color={options.color}/>
   } else if (sentiment === Sentiment.Disliked) {
-    return <ThumbDown/>
+    return <ThumbDown color={options.color}/>
   } else {
-    return <ThumbsUpDown/>
+    return <ThumbsUpDown color={options.color}/>
   }
 }
 

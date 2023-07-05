@@ -75,7 +75,7 @@ function Stats() {
         <Stat value={data?.user.stats.moviesLiked} label="Movies liked" loading={loading}/>
       </Link>
       <Divider orientation="vertical" flexItem/>
-      <Link to={`/profile/${username}/watchlist`}>
+      <Link to={`/profile/${username}/list/watchlist`}>
         <Stat value={data?.user.stats.watchlist} label="In watchlist" loading={loading}/>
       </Link>
     </div>
@@ -119,7 +119,7 @@ function RecentlyWatchedMovies({username}: {username: User['username']}) {
 }
 
 gql`
-  query GetUser($username: String!) {
+  query GetUser($username: ID!) {
     user(username: $username) {
       avatarUrl
     }
@@ -127,7 +127,7 @@ gql`
 `
 
 gql`
-  query GetUserStats($username: String!) {
+  query GetUserStats($username: ID!) {
     user(username: $username) {
       stats {
         favouritePeople

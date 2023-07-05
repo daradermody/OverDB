@@ -54,7 +54,7 @@ export function FavouritePeople({username}: { username: User['username'] }) {
 }
 
 gql`
-  query GetFavouritePeople($username: String!, $offset: Int, $limit: Int) {
+  query GetFavouritePeople($username: ID!, $offset: Int, $limit: Int) {
     user(username: $username) {
       favouritePeople(offset: $offset, limit: $limit) {
         endReached

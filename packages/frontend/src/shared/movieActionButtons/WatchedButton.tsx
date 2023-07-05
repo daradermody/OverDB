@@ -1,7 +1,6 @@
 import { gql } from '@apollo/client'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { Button, Tooltip, Typography } from '@mui/material'
-import { MouseEvent } from 'react'
 import * as React from 'react'
 import { Movie, useSetWatchedMutation } from '../../../types/graphql'
 import { useMutationErrorHandler } from '../errorHandlers'

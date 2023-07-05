@@ -65,7 +65,7 @@ type MovieCredit {
   character: String
 }
 
-union SearchResult = Movie | PersonInfo
+union MovieOrPerson = Movie | PersonInfo
 
 enum Sentiment {
   NONE
@@ -108,15 +108,29 @@ type Stats {
 }
 
 type User {
-  username: String!
+  username: ID!
   avatarUrl: String!
   isAdmin: Boolean
   public: Boolean
   favouritePeople(offset: Int, limit: Int): PaginatedPeople!
+  lists(type: ListType): [List!]!
+  list(id: ID!): List!
   watchlist(offset: Int, limit: Int): PaginatedMovies!
   watched(offset: Int, limit: Int): PaginatedMovies!
   likedMovies(offset: Int, limit: Int): PaginatedMovies!
   stats: Stats!
+}
+
+enum ListType {
+  MOVIE
+  PERSON
+}
+
+type List {
+  id: ID!
+  name: String!
+  type: ListType!
+  items: [MovieOrPerson!]!
 }
 
 type Query {
@@ -126,10 +140,10 @@ type Query {
   castForMovie(id: ID!): [CastCredit!]!
   person(id: ID!): PersonInfo!
   creditsForPerson(id: ID!): [MovieCredit!]!
-  search(query: String!): [SearchResult!]!
+  search(query: String!): [MovieOrPerson!]!
   trending(size: Int): [MovieInfo!]!
   upcoming: [Movie!]!
-  user(username: String!): User!
+  user(username: ID!): User!
   users: [User!]!
 }
 
@@ -138,4 +152,9 @@ type Mutation {
   setWatched(id: ID!, watched: Boolean!): Movie!
   setInWatchlist(id: ID!, inWatchlist: Boolean!): Movie!
   setSentiment(id: ID!, sentiment: Sentiment!): Movie!
+  createList(name: String!, type: ListType!): List!
+  deleteLists(ids: [ID!]!): Boolean!
+  editList(id: ID!, name: String!): List!
+  addToList(listId: ID!, itemId: ID!): List!
+  removeFromList(listId: ID!, itemId: ID!): List!
 }

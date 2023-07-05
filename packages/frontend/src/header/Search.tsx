@@ -8,12 +8,12 @@ import * as React from 'react'
 import { HTMLAttributes, useCallback, useEffect, useState } from 'react'
 import { useLocation } from 'react-router'
 import { useNavigate } from 'react-router-dom'
-import { Movie, PersonInfo, SearchResult, useSearchLazyQuery } from '../../types/graphql'
+import { Movie, PersonInfo, MovieOrPerson, useSearchLazyQuery } from '../../types/graphql'
 import { useMutationErrorHandler } from '../shared/errorHandlers'
 import { Poster } from '../shared/general/Poster'
 
 interface SearchProps {
-  onSelect: (result: SearchResult) => void
+  onSelect: (result: MovieOrPerson) => void
   clearOnSelect?: boolean
   disabled?: boolean
 }
@@ -102,7 +102,7 @@ function SearchInput(props: SearchProps) {
   useEffect(() => setIsOpen(!!query), [query, setIsOpen])
 
   return (
-    <Autocomplete<SearchResult, false, false, true>
+    <Autocomplete<MovieOrPerson, false, false, true>
       options={data?.search || []}
       noOptionsText="No results found"
       loadingText={<div style={{ maxHeight: 'calc(40vh - 16px)', margin: '-6px -16px' }}><LoadingResults/></div>}
@@ -121,17 +121,17 @@ function SearchInput(props: SearchProps) {
       onInputChange={(e, value, reason) => {
         if (reason === 'input') setQuery(value)
       }}
-      onChange={(e, result, reason, details) => {
+      onChange={(e, result, reason) => {
         if (reason === 'selectOption') {
           (e.target as HTMLInputElement).blur()
-          props.onSelect(result as SearchResult)
+          props.onSelect(result as MovieOrPerson)
           setTimeout(() => setIsOpen(false), 0)
           if (props.clearOnSelect) {
             setTimeout(() => setQuery(''), 0)
           }
         }
       }}
-      getOptionLabel={(option: SearchResult | string) => (option as Movie).title || (option as PersonInfo).name || ''}
+      getOptionLabel={(option: MovieOrPerson | string) => (option as Movie).title || (option as PersonInfo).name || ''}
       renderOption={(props, option) => {
         return option.__typename === 'Movie'
           ? <MovieResult key={option.id} liProps={props} movie={option}/>
@@ -161,7 +161,7 @@ function SearchInput(props: SearchProps) {
 }
 
 interface MobileSearchInputProps {
-  onSelect: (result: SearchResult) => void
+  onSelect: (result: MovieOrPerson) => void
   onCancel: () => void
 }
 
@@ -207,8 +207,8 @@ function MobileSearchInput(props: MobileSearchInputProps) {
         {loading && <LoadingResults/>}
         {data?.search.map((item) => {
           return item.__typename === 'Movie'
-            ? <MovieResult key={item.id} onClick={() => props.onSelect(item as SearchResult)} movie={item}/>
-            : <PersonResult key={item.id} onClick={() => props.onSelect(item as SearchResult)} person={item}/>
+            ? <MovieResult key={item.id} onClick={() => props.onSelect(item as MovieOrPerson)} movie={item}/>
+            : <PersonResult key={item.id} onClick={() => props.onSelect(item as MovieOrPerson)} person={item}/>
         })}
       </Box>
     </Box>

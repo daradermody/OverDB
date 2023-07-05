@@ -8,6 +8,8 @@ import Favourites from './Favourites/Favourites'
 import Footer from './Footer/Footer'
 import { Header } from './header/Header'
 import { Homepage } from './homepage/Homepage'
+import List from './lists/List'
+import Lists from './lists/Lists'
 import Login from './Login'
 import { MovieInfo } from './movieInfo/MovieInfo'
 import PageNotFound from './pageNotFound/PageNotFound'
@@ -20,7 +22,7 @@ import useIsOnline from './shared/useIsOnline'
 import UpcomingMovies from './upcomingMovies/UpcomingMovies'
 import useUser, { userSignal } from './useUser'
 import WatchedMovies from './WatchedMovies/WatchedMovies'
-import Watchlist from './watchlist/Watchlist'
+import Watchlist from './lists/Watchlist'
 
 export default function App() {
   const isOnline = useIsOnline()
@@ -59,7 +61,9 @@ function AppRoutes() {
       <Route path="/profile/:username" element={<Profile/>}/>
       <Route path="/profile/:username/favourites" element={<Navigate to={`/profile/${user?.username}/favourite/people`} replace/>}/>
       <Route path="/profile/:username/favourite/:type" element={<Favourites/>}/>
-      <Route path="/profile/:username/watchlist" element={<Watchlist/>}/>
+      <Route path="/profile/:username/lists" element={<Lists/>}/>
+      <Route path="/profile/:username/list/watchlist" element={<Watchlist/>}/>
+      <Route path="/profile/:username/list/:id" element={<List/>}/>
       <Route path="/profile/:username/watched" element={<WatchedMovies/>}/>
       <Route path="/upcoming" element={authed(<UpcomingMovies/>)}/>
       <Route path="/admin" element={authed(<Admin/>)}/>

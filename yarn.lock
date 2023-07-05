@@ -2580,6 +2580,7 @@ __metadata:
     graphql-tag: ^2.12.6
     jsdom: ^21.1.1
     moviedb-promise: ^3.4.0
+    nanoid: 3
     nodemon: ^2.0.22
     ts-node: ^10.9.1
     typescript: ^5.0.4
@@ -7496,6 +7497,15 @@ __metadata:
   version: 0.0.8
   resolution: "mute-stream@npm:0.0.8"
   checksum: ff48d251fc3f827e5b1206cda0ffdaec885e56057ee86a3155e1951bc940fd5f33531774b1cc8414d7668c10a8907f863f6561875ee6e8768931a62121a531a1
+  languageName: node
+  linkType: hard
+
+"nanoid@npm:3":
+  version: 3.3.6
+  resolution: "nanoid@npm:3.3.6"
+  bin:
+    nanoid: bin/nanoid.cjs
+  checksum: 7d0eda657002738aa5206107bd0580aead6c95c460ef1bdd0b1a87a9c7ae6277ac2e9b945306aaa5b32c6dcb7feaf462d0f552e7f8b5718abfc6ead5c94a71b3
   languageName: node
   linkType: hard
 

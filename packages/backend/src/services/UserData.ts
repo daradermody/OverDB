@@ -1,5 +1,6 @@
 import * as fs from 'fs'
-import { Movie, Person, Sentiment } from '../../types'
+import { nanoid } from 'nanoid'
+import { List, ListType, Movie, Person, Sentiment } from '../../types'
 import { dataDir } from './dataStorage'
 import { User } from './users'
 
@@ -8,15 +9,36 @@ interface Data {
     favourites: Person['id'][];
     sentiments: Record<Movie['id'], Sentiment>;
     watched: Movie['id'][];
-    watchlist: Movie['id'][];
-  }
+    lists: {
+      [id: string]: StoredList;
+      watchlist: MovieList;
+    };
+  };
+}
+
+export type StoredList = MovieList | PersonList
+
+interface MovieList {
+  id: List['id'];
+  name: List['name'];
+  type: ListType.Movie;
+  ids: Movie['id'][];
+}
+
+interface PersonList {
+  id: List['id'];
+  name: List['name'];
+  type: ListType.Person;
+  ids: Person['id'][];
 }
 
 const emptyObject: Data[User['username']] = {
   favourites: [],
   sentiments: {},
   watched: [],
-  watchlist: [],
+  lists: {
+    watchlist: {id: 'watchlist', name: 'Watchlist', type: ListType.Movie, ids: []}
+  }
 }
 
 export class UserData {
@@ -82,19 +104,73 @@ export class UserData {
     UserData.save()
   }
 
+
+  static getLists(username: User['username']): StoredList[] {
+    return Object.values(UserData.forUser(username).lists)
+      .sort((a, b) => (a.id === 'watchlist' || a.name < b.name) ? -1 : 1)
+  }
+
+  static getList(username: User['username'], id: List['id'] | 'watchlist'): StoredList {
+    if (!(id in UserData.forUser(username).lists)) {
+      throw new Error(`List '${id}' does not exist`)
+    }
+    return UserData.forUser(username).lists[id]
+  }
+
+  static createList(username: User['username'], {name, type}: {name: List['name']; type: ListType}): StoredList {
+    const id = nanoid(10)
+    const newList = UserData.forUser(username).lists[id] = {id, name, type, ids: []}
+    UserData.save()
+    return newList
+  }
+
+  static deleteLists(username: User['username'], ids: List['id'][]): void {
+    for (const id of ids) {
+      delete UserData.forUser(username).lists[id]
+    }
+    UserData.save()
+  }
+
+  static updateList(username: User['username'], id: List['id'], {name}: {name: List['name']}): StoredList {
+    UserData.forUser(username).lists[id] = { ...UserData.forUser(username).lists[id], name }
+    UserData.save()
+    return UserData.forUser(username).lists[id]
+  }
+
+  static addToList(username: User['username'], listId: List['id'], itemId: Movie['id'] | Person['id']): StoredList {
+    if (!(listId in UserData.forUser(username).lists)) {
+      throw new Error(`List '${listId}' does not exist`)
+    }
+    UserData.forUser(username).lists[listId].ids = Array.from(new Set([
+      ...UserData.forUser(username).lists[listId].ids,
+      itemId
+    ]))
+    UserData.save()
+    return UserData.forUser(username).lists[listId]
+  }
+
+  static removeFromList(username: User['username'], listId: List['id'], itemId: Movie['id'] | Person['id']): StoredList {
+    if (!(listId in UserData.forUser(username).lists)) {
+      throw new Error(`List '${listId}' does not exist`)
+    }
+    UserData.forUser(username).lists[listId].ids = UserData.forUser(username).lists[listId].ids.filter(id => id !== itemId)
+    UserData.save()
+    return UserData.forUser(username).lists[listId]
+  }
+
   static getWatchlist(username: User['username']): Movie['id'][] {
-    return UserData.forUser(username).watchlist
+    return UserData.getList(username, 'watchlist').ids
   }
 
   static inWatchlist(username: User['username'], movieId: Movie['id']): boolean {
-    return UserData.forUser(username).watchlist.includes(movieId)
+    return UserData.getList(username, 'watchlist').ids.includes(movieId)
   }
 
   static setInWatchlist(username: User['username'], movieId: Movie['id'], inWatchlist: boolean): void {
     if (inWatchlist) {
-      UserData.forUser(username).watchlist = Array.from(new Set([...UserData.forUser(username).watchlist, movieId]))
+      UserData.forUser(username).lists.watchlist.ids = Array.from(new Set([...UserData.forUser(username).lists.watchlist.ids, movieId]))
     } else {
-      UserData.forUser(username).watchlist = UserData.forUser(username).watchlist.filter(id => id !== movieId)
+      UserData.forUser(username).lists.watchlist.ids = UserData.forUser(username).lists.watchlist.ids.filter(id => id !== movieId)
     }
     UserData.save()
   }

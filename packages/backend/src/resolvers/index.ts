@@ -2,14 +2,22 @@ import { GraphQLError } from 'graphql/error'
 import { GraphQLResolveInfo } from 'graphql/type'
 import {
   isMovieSummary,
+  List,
+  ListType,
   Movie,
   MovieCredit,
+  MovieOrPerson,
+  MutationAddToListArgs,
+  MutationCreateListArgs,
+  MutationDeleteListsArgs,
+  MutationEditListArgs,
   MutationSetFavouriteArgs,
   MutationSetInWatchlistArgs,
   MutationSetSentimentArgs,
   MutationSetWatchedArgs,
   PaginatedMovies,
   PaginatedPeople,
+  PersonInfo,
   PersonWithoutFav,
   QueryCastForMovieArgs,
   QueryCreditsForPersonArgs,
@@ -22,12 +30,11 @@ import {
   QueryUserArgs,
   ResolverFn,
   Resolvers,
-  SearchResult,
   User as ApiUser
 } from '../../types'
 import MovieDb from '../services/MovieDb'
 import RottenTomatoes from '../services/RottenTomatoes'
-import { UserData } from '../services/UserData'
+import { StoredList, UserData } from '../services/UserData'
 import { getUser, getUsers, User } from '../services/users'
 import { paginate } from './pagination'
 import recommendedMoviesResolver from './recommendedMovies'
@@ -79,10 +86,23 @@ const index: Resolvers<{ user?: User }> = {
         UserData.getWatchlist(parent.username)
       ])
       return {favouritePeople: people.length, watched: watched.length, moviesLiked: liked.length, watchlist: watchlist.length}
+    },
+    lists: async (parent, args) => await Promise.all(
+      UserData.getLists(parent.username)
+        .sort((a, b) => a.id === 'watchlist' || (b.id !== 'watchlist' && a.name.toLowerCase() < b.name.toLowerCase()) ? -1 : 1)
+        .filter(list => !args.type || list.type === args.type)
+        .map(convertList)
+    ),
+    list: async (parent, args, {user}) => {
+      const requestedUser = getUser(parent.username)
+      verifyUserAccessible(requestedUser, user)
+      return convertList(UserData.getList(parent.username, args.id))
     }
   },
-  SearchResult: {
-    __resolveType: (obj: SearchResult) => isMovieSummary(obj) ? 'Movie' : 'PersonInfo'
+  MovieOrPerson: {
+    __resolveType: (obj: MovieOrPerson) => {
+      return isMovieSummary(obj) ? 'Movie' : 'PersonInfo'
+    }
   },
   Query: {
     recommendedMovies: requiresLogin((_1, args: QueryRecommendedMoviesArgs, {user}) => recommendedMoviesResolver(user.username, args.size || 18) as unknown as Promise<Movie[]>),
@@ -106,18 +126,10 @@ const index: Resolvers<{ user?: User }> = {
     upcoming: requiresLogin(async (_1, _2, {user}) => await upcomingMoviesResolver(user.username) as Movie[]),
     user: async (_, args: QueryUserArgs, {user}) => {
       const requestedUser = getUser(args.username)
-      const canViewUser = user?.username === requestedUser.username || user?.isAdmin || requestedUser.public
-      if (!canViewUser) {
-        throw new GraphQLError('User not found', {
-          extensions: {
-            code: 'NOT FOUND',
-            http: {status: 404},
-          },
-        })
-      }
+      verifyUserAccessible(requestedUser, user)
       return requestedUser as ApiUser
     },
-    users: requiresAdmin(async () => await getUsers() as ApiUser[])
+    users: requiresAdmin(async () => getUsers() as ApiUser[])
   },
   Mutation: {
     setFavourite: requiresLogin((_, args: MutationSetFavouriteArgs, {user}) => {
@@ -134,8 +146,66 @@ const index: Resolvers<{ user?: User }> = {
     }),
     setSentiment: requiresLogin(async (_, args: MutationSetSentimentArgs, {user}) => {
       UserData.setSentiment(user.username, args.id, args.sentiment)
-      return await  MovieDb.movieInfo(args.id) as Movie
+      return await MovieDb.movieInfo(args.id) as Movie
+    }),
+    createList: requiresLogin(async (_, args: MutationCreateListArgs, {user}) => {
+      return convertList(UserData.createList(user.username, args))
+    }),
+    deleteLists: requiresLogin((_, args: MutationDeleteListsArgs, {user}) => {
+      const existingIds = UserData.getLists(user.username).map(list => list.id)
+      const nonExistentIds = args.ids.filter(id => !existingIds.includes(id))
+      if (nonExistentIds.length) {
+        throw new GraphQLError(`These IDs do not exist: ${nonExistentIds.join(', ')}`, {
+          extensions: {
+            code: 'BAD_REQUEST',
+            http: {status: 400},
+          },
+        })
+      }
+
+      if (args.ids.includes('watchlist')) {
+        throw new GraphQLError('You can not delete your watchlist', {
+          extensions: {
+            code: 'BAD_REQUEST',
+            http: {status: 400},
+          },
+        })
+      }
+      UserData.deleteLists(user.username, args.ids)
+      return true
+    }),
+    editList: requiresLogin(async (_, args: MutationEditListArgs, {user}) => {
+      return await convertList(UserData.updateList(user.username, args.id, {name: args.name}))
+    }),
+    addToList: requiresLogin(async (_, args: MutationAddToListArgs, {user}) => {
+      try {
+        if (UserData.getList(user.username, args.listId).type === ListType.Movie) {
+          await MovieDb.movieInfo(args.itemId)
+        } else {
+          await MovieDb.personInfo(args.itemId)
+        }
+      } catch (e) {
+        throw new GraphQLError(`ID being added to the list is not valid: ${args.itemId}`, {
+          extensions: {
+            code: 'BAD_REQUEST',
+            http: {status: 400},
+          },
+        })
+      }
+      return convertList(UserData.addToList(user.username, args.listId, args.itemId))
+    }),
+    removeFromList: requiresLogin(async (_, args: MutationAddToListArgs, {user}) => {
+      return convertList(UserData.removeFromList(user.username, args.listId, args.itemId))
     })
+  }
+}
+
+async function convertList(list: StoredList): Promise<List> {
+  return {
+    id: list.id,
+    type: list.type,
+    name: list.name,
+    items: await Promise.all(list.ids.map(id => list.type === 'MOVIE' ? MovieDb.movieInfo(id) as Promise<Movie> : MovieDb.personInfo(id) as Promise<PersonInfo>)),
   }
 }
 
@@ -164,6 +234,18 @@ function requiresAdmin<TResult, TParent = {}, TContext extends {user?: User} = {
       })
     }
     return resolver(parent, args, context, info)
+  }
+}
+
+function verifyUserAccessible(requestedUser: User, currentUser?: User) {
+  const canViewUser = currentUser?.username === requestedUser.username || currentUser?.isAdmin || requestedUser.public
+  if (!canViewUser) {
+    throw new GraphQLError('User not found', {
+      extensions: {
+        code: 'NOT FOUND',
+        http: {status: 404},
+      },
+    })
   }
 }
 

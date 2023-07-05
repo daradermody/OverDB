@@ -39,7 +39,7 @@ export default function Watchlist() {
 }
 
 gql`
-  query GetWatchlist($username: String!, $offset: Int, $limit: Int) {
+  query GetWatchlist($username: ID!, $offset: Int, $limit: Int) {
     user(username: $username) {
       watchlist(offset: $offset, limit: $limit) {
         endReached

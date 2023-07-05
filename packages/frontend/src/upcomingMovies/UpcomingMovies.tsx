@@ -7,7 +7,7 @@ import { ErrorMessage } from '../shared/errorHandlers'
 import PageWrapper from '../shared/PageWrapper'
 
 export default function UpcomingMovies() {
-  const {data, error, loading, refetch, fetchMore} = useGetUpcomingMoviesQuery()
+  const {data, error, loading, refetch} = useGetUpcomingMoviesQuery()
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>

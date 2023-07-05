@@ -4,9 +4,9 @@ import * as React from 'react'
 import { Movie, MovieCredit } from '../../../types/graphql'
 import Link from '../general/Link'
 import { getPosterUrl, handlePosterError } from '../general/Poster'
+import MoreActionsButton from '../movieActionButtons/MoreActionsButton'
 import { SentimentSelect } from '../movieActionButtons/SentimentSelect'
 import { WatchedButton } from '../movieActionButtons/WatchedButton'
-import { WatchlistButton } from '../movieActionButtons/WatchlistButton'
 
 export interface MovieCardProps {
   movie: {
@@ -26,11 +26,9 @@ export interface MovieCardProps {
 
 export function MovieCard({movie, compressed, showCharactersOnly}: MovieCardProps) {
   return (
-    <StyledCard sx={{height: compressed ? '75px' : undefined}}>
-      <Link to={`/movie/${movie.id}`} sx={{display: compressed ? 'flex' : 'initial', height: '100%'}}>
-        <MovieImage movie={movie} compressed={compressed}/>
-        <MovieSummary movie={movie} showCharactersOnly={showCharactersOnly} compressed={compressed}/>
-      </Link>
+    <StyledCard sx={{height: compressed ? '75px' : undefined, display: compressed ? 'flex' : undefined}}>
+      <MovieImage movie={movie} compressed={compressed}/>
+      <MovieSummary movie={movie} showCharactersOnly={showCharactersOnly} compressed={compressed}/>
     </StyledCard>
   )
 }
@@ -43,24 +41,26 @@ const StyledCard = styled(Card)`
 function MovieImage({movie, compressed}: MovieCardProps) {
   return (
     <StyledMovieImage>
-      <CardMedia
-        component="img"
-        image={getPosterUrl(movie.posterPath)}
-        onError={handlePosterError}
-        alt={`${movie.title} poster`}
-        style={{
-          height: '100%',
-          width: compressed ? 'unset' : undefined,
-          aspectRatio: '185 / 278',
-          objectFit: 'contain',
-          backgroundColor: movie.posterPath ? 'black' : 'white',
-        }}
-      />
+      <Link to={`/movie/${movie.id}`}>
+        <CardMedia
+          component="img"
+          image={getPosterUrl(movie.posterPath)}
+          onError={handlePosterError}
+          alt={`${movie.title} poster`}
+          style={{
+            height: '100%',
+            width: compressed ? 'unset' : undefined,
+            aspectRatio: '185 / 278',
+            objectFit: 'contain',
+            backgroundColor: movie.posterPath ? 'black' : 'white',
+          }}
+        />
+      </Link>
       {!compressed && ![undefined, null].includes(movie.watched ?? movie.inWatchlist ?? movie.sentiment) && (
-        <StyledActions className="show-on-hover" onClick={e => e.preventDefault()}>
+        <StyledActions className="show-on-hover">
           <WatchedButton id={movie.id} watched={movie.watched}/>
-          <WatchlistButton id={movie.id} inWatchlist={movie.inWatchlist}/>
           <SentimentSelect id={movie.id} sentiment={movie.sentiment} placement="top"/>
+          <MoreActionsButton id={movie.id}/>
         </StyledActions>
       )}
     </StyledMovieImage>
@@ -96,7 +96,7 @@ function MovieSummary({movie, showCharactersOnly, compressed}: MovieCardProps) {
     roles = showCharactersOnly ? movie.character : movie.jobs.join(', ')
   }
   return (
-    <div style={{width: '100%', minWidth: 0, padding: compressed ? '11px 16px' : '16px'}}>
+    <Link to={`/movie/${movie.id}`} sx={{display: 'block', width: '100%', minWidth: 0, padding: compressed ? '11px 16px' : '16px'}}>
       <Tooltip placement="top" title={<Typography>{movie.title}</Typography>}>
         <Typography gutterBottom variant="body1" component="div" style={{textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}>
           {movie.title}
@@ -117,7 +117,7 @@ function MovieSummary({movie, showCharactersOnly, compressed}: MovieCardProps) {
           </Typography>
         </Tooltip>
       )}
-    </div>
+    </Link>
   )
 }
 

@@ -42,7 +42,7 @@ export function LikedMovies({username}: { username: User['username'] }) {
 }
 
 gql`
-  query GetLikedMovies($username: String!, $offset: Int, $limit: Int) {
+  query GetLikedMovies($username: ID!, $offset: Int, $limit: Int) {
     user(username: $username) {
       likedMovies(offset: $offset, limit: $limit) {
         endReached

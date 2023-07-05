@@ -9,9 +9,9 @@ import { PersonCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import { InterestingDivider } from '../shared/general/InterestingDivider'
 import { Poster } from '../shared/general/Poster'
+import MoreActionsButton from '../shared/movieActionButtons/MoreActionsButton'
 import { SentimentSelect } from '../shared/movieActionButtons/SentimentSelect'
 import { WatchedButton } from '../shared/movieActionButtons/WatchedButton'
-import { WatchlistButton } from '../shared/movieActionButtons/WatchlistButton'
 import PageWrapper from '../shared/PageWrapper'
 import ToggleFilter from '../shared/ToggleFilter'
 import RottenTomatoesReview, { LoadingRottenTomatoesReview } from './RottenTomatoesReview'
@@ -35,7 +35,7 @@ export function MovieInfo() {
           exclusive
           options={['Crew', 'Cast']}
           value={peopleType}
-          onChange={(e, peopleType) => {
+          onChange={e => {
             if ((e.target as any).value !== null) {
               navigate(location, {state: {peopleType: (e.target as any).value}, replace: true})
             }
@@ -81,8 +81,8 @@ function MovieSummary({id}: { id: Movie['id'] }) {
           <StyledActionsAndReview>
             <div style={{display: 'flex', flexDirection: 'column', alignItems: 'start', flexShrink: 0}}>
               <WatchedButton id={movie.id} watched={movie.watched} withLabel/>
-              <WatchlistButton id={movie.id} inWatchlist={movie.inWatchlist} withLabel/>
               <SentimentSelect id={movie.id} sentiment={movie.sentiment} withLabel/>
+              <MoreActionsButton id={movie.id} withLabel/>
             </div>
             <RottenTomatoesReview id={movie.id}/>
           </StyledActionsAndReview>

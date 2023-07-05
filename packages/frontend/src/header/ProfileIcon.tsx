@@ -1,4 +1,4 @@
-import { AccountCircle, AlarmOn, Favorite, Logout, Visibility, Event, AdminPanelSettings } from '@mui/icons-material'
+import { AccountCircle, AdminPanelSettings, Event, Favorite, FormatListNumbered, Logout, Visibility } from '@mui/icons-material'
 import { Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material'
 import * as React from 'react'
 import Link from '../shared/general/Link'
@@ -58,12 +58,12 @@ export function ProfileIcon({disabled}: { disabled?: boolean }) {
           </MenuItem>
         </Link>
 
-        <Link to={`/profile/${user.username}/watchlist`}>
+        <Link to={`/profile/${user.username}/lists`}>
           <MenuItem onClick={handleClose}>
             <ListItemIcon>
-              <AlarmOn fontSize="small"/>
+              <FormatListNumbered fontSize="small"/>
             </ListItemIcon>
-            <ListItemText>Watchlist</ListItemText>
+            <ListItemText>Lists</ListItemText>
           </MenuItem>
         </Link>
 
@@ -88,7 +88,7 @@ export function ProfileIcon({disabled}: { disabled?: boolean }) {
         )}
 
         <Divider/>
-        <MenuItem onClick={logout}>
+        <MenuItem onClick={() => logout()}>
           <ListItemIcon>
             <Logout fontSize="small"/>
           </ListItemIcon>

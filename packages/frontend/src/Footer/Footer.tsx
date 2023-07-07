@@ -12,7 +12,9 @@ export default function Footer() {
             <Link href="mailto:daradermody@gmail.com"><Typography variant="subtitle1">Contact</Typography></Link>
           </div>
           <Typography variant="subtitle2" marginTop="10px">
-            © Caʒ Gmbh. Made by fans in Ireland. Movie data from <Link href="https://themoviedb.org" target="_blank" sx={{color: 'inherit'}}>TMDb</Link>
+            © Caʒ Gmbh. Made by fans in Ireland. Movie data from{' '}
+            <Link href="https://themoviedb.org" target="_blank" sx={{color: 'inherit'}}>TMDb</Link> and{' '}
+            <Link href="https://www.justwatch.com/" target="_blank" sx={{color: 'inherit'}}>JustWatch</Link>.
           </Typography>
         </div>
         <Typography variant="subtitle2" sx={{display: 'flex', gap: '10px', flexWrap: 'wrap'}}>

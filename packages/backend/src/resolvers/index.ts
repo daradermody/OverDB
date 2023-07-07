@@ -51,7 +51,8 @@ const index: Resolvers<{ user?: User }> = {
       }
       const releaseYear = parseInt(releaseDate.split('-')[0], 10)
       return RottenTomatoes.getScore(title, releaseYear)
-    }
+    },
+    providers: ({id}) => MovieDb.streamingProviders(id)
   },
   MovieCredit: {
     sentiment: (parent: MovieCredit, _, {user}) => user ? UserData.getSentiment(user.username, parent.id) : null,

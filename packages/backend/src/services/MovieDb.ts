@@ -1,7 +1,18 @@
 import * as fs from 'fs'
 import { Cast, MovieDb as MovieDbApi } from 'moviedb-promise'
 import { Crew, MovieResponse, Person as TmdbPerson, PersonMovieCreditsResponse } from 'moviedb-promise/dist/request-types'
-import { CastCredit, CrewCredit, isMovieSearchResult, isPersonSearchResult, Movie, MovieCredit, MovieInfo, Person, PersonWithoutFav } from '../../types'
+import {
+  CastCredit,
+  CrewCredit,
+  isMovieSearchResult,
+  isPersonSearchResult,
+  Movie,
+  MovieCredit,
+  MovieInfo,
+  Person,
+  PersonWithoutFav,
+  Provider
+} from '../../types'
 import getToken from '../utils/getToken'
 import { dataDir } from './dataStorage'
 
@@ -132,6 +143,15 @@ export default class MovieDb {
     return results!
       .map(pickMovieProperties)
       .slice(0, size)
+  }
+
+  static async streamingProviders(movieId: Movie['id']): Promise<Provider[]> {
+    const providers = await this.movieDbApi.movieWatchProviders({id: movieId})
+    return providers.results?.IE?.flatrate?.map(provider => ({
+      id: `${provider.provider_id!}`,
+      name: provider.provider_name!,
+      logo: provider.logo_path!
+    })) || []
   }
 
   static async save(): Promise<void> {

@@ -1,3 +1,4 @@
+import { Tooltip } from '@mui/material'
 import * as React from 'react'
 import { ImgHTMLAttributes } from 'react'
 
@@ -31,4 +32,12 @@ export function handlePosterError(e) {
   if (attempts < 3) {
     setTimeout(() => e.target.src = e.target.src, 1000)
   }
+}
+
+export function ProviderLogo({ name, path }: { name: string, path: string }) {
+  return (
+    <Tooltip title={name}>
+      <img style={{ width: '50px', borderRadius: '4px' }} alt={name} src={getPosterUrl(path)}/>
+    </Tooltip>
+  )
 }

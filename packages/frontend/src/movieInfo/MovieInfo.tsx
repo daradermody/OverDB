@@ -15,6 +15,7 @@ import { WatchedButton } from '../shared/movieActionButtons/WatchedButton'
 import PageWrapper from '../shared/PageWrapper'
 import ToggleFilter from '../shared/ToggleFilter'
 import RottenTomatoesReview, { LoadingRottenTomatoesReview } from './RottenTomatoesReview'
+import StreamingProviders from './StreamingProviders'
 import { TmdbRating } from './TmdbRating'
 
 export function MovieInfo() {
@@ -77,16 +78,18 @@ function MovieSummary({id}: { id: Movie['id'] }) {
         <Typography variant="body2" sx={{m: '10px 0 20px'}}><i>{movie.tagline}</i></Typography>
         <Typography variant="body1">{movie.overview}</Typography>
 
-        {((movie.watched ?? movie.inWatchlist ?? movie.sentiment) !== null) && (
-          <StyledActionsAndReview>
+        <StyledActionsAndReview>
+          {((movie.watched ?? movie.inWatchlist ?? movie.sentiment) !== null) && (
             <div style={{display: 'flex', flexDirection: 'column', alignItems: 'start', flexShrink: 0}}>
               <WatchedButton id={movie.id} watched={movie.watched} withLabel/>
               <SentimentSelect id={movie.id} sentiment={movie.sentiment} withLabel/>
               <MoreActionsButton id={movie.id} withLabel/>
             </div>
-            <RottenTomatoesReview id={movie.id}/>
-          </StyledActionsAndReview>
-        )}
+          )}
+          <RottenTomatoesReview id={movie.id}/>
+        </StyledActionsAndReview>
+
+        <StreamingProviders id={movie.id}/>
       </Box>
     </StyledWrapper>
   )
@@ -114,7 +117,7 @@ const StyledActionsAndReview = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px 60px;
-  margin-top: 30px;
+  margin: 16px 0;
 
   ${({theme}) => theme.breakpoints.up('sm')} {
     flex-direction: row;

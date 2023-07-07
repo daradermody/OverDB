@@ -51,6 +51,7 @@ export type Movie = {
   inWatchlist?: Maybe<Scalars['Boolean']>;
   overview: Scalars['String'];
   posterPath?: Maybe<Scalars['String']>;
+  providers: Array<Provider>;
   releaseDate?: Maybe<Scalars['String']>;
   sentiment?: Maybe<Sentiment>;
   tagline: Scalars['String'];
@@ -183,6 +184,13 @@ export type PersonInfo = Person & {
   knownForDepartment?: Maybe<Scalars['String']>;
   name: Scalars['String'];
   profilePath?: Maybe<Scalars['String']>;
+};
+
+export type Provider = {
+  __typename?: 'Provider';
+  id: Scalars['ID'];
+  logo: Scalars['String'];
+  name: Scalars['String'];
 };
 
 export type Query = {
@@ -1112,6 +1120,44 @@ export function useGetRottenTomatoesScoreLazyQuery(baseOptions?: Apollo.LazyQuer
 export type GetRottenTomatoesScoreQueryHookResult = ReturnType<typeof useGetRottenTomatoesScoreQuery>;
 export type GetRottenTomatoesScoreLazyQueryHookResult = ReturnType<typeof useGetRottenTomatoesScoreLazyQuery>;
 export type GetRottenTomatoesScoreQueryResult = Apollo.QueryResult<GetRottenTomatoesScoreQuery, GetRottenTomatoesScoreQueryVariables>;
+export const GetStreamingProvidersDocument = gql`
+    query GetStreamingProviders($id: ID!) {
+  movie(id: $id) {
+    providers {
+      logo
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetStreamingProvidersQuery__
+ *
+ * To run a query within a React component, call `useGetStreamingProvidersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStreamingProvidersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStreamingProvidersQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetStreamingProvidersQuery(baseOptions: Apollo.QueryHookOptions<GetStreamingProvidersQuery, GetStreamingProvidersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetStreamingProvidersQuery, GetStreamingProvidersQueryVariables>(GetStreamingProvidersDocument, options);
+      }
+export function useGetStreamingProvidersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetStreamingProvidersQuery, GetStreamingProvidersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetStreamingProvidersQuery, GetStreamingProvidersQueryVariables>(GetStreamingProvidersDocument, options);
+        }
+export type GetStreamingProvidersQueryHookResult = ReturnType<typeof useGetStreamingProvidersQuery>;
+export type GetStreamingProvidersLazyQueryHookResult = ReturnType<typeof useGetStreamingProvidersLazyQuery>;
+export type GetStreamingProvidersQueryResult = Apollo.QueryResult<GetStreamingProvidersQuery, GetStreamingProvidersQueryVariables>;
 export const GetPersonCreditsDocument = gql`
     query GetPersonCredits($id: ID!) {
   creditsForPerson(id: $id) {

@@ -48,6 +48,7 @@ type Movie {
   releaseDate: String
   posterPath: String
   tomatometer: Tomatometer
+  providers: [Provider!]!
   watched: Boolean
   inWatchlist: Boolean
   sentiment: Sentiment
@@ -98,6 +99,12 @@ type Tomatometer {
   score: Int!
   consensus: String
   link: String!
+}
+
+type Provider {
+  id: ID!
+  name: String!
+  logo: String!
 }
 
 type Stats {

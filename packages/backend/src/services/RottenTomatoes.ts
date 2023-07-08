@@ -1,15 +1,15 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { JSDOM } from 'jsdom'
 import { Tomatometer, TomatometerState } from '../../types'
+import getToken from '../utils/getToken'
+
+const OMDB_TOKEN = getToken('OMDB_TOKEN')
 
 export default class RottenTomatoes {
-  static async getScore(title: string, year: number): Promise<Tomatometer | null> {
+  static async getScore(imdbId: string): Promise<Tomatometer | null> {
     try {
-      const moviePageLink = await this.getMoviePageLink(title, year)
-
-      if (!moviePageLink) {
-        return null
-      }
+      const moviePageLink = await this.getMoviePageLink(imdbId)
+      if (!moviePageLink) return null
       return await this.getScoreFromPage(moviePageLink)
     } catch (e) {
       console.error(e)
@@ -17,18 +17,14 @@ export default class RottenTomatoes {
     }
   }
 
-  static async getMoviePageLink(title: string, year: number): Promise<string | null> {
-    const {data} = await axios.get(`https://www.rottentomatoes.com/search?search=${title}`)
-    const dom = new JSDOM(data)
-    const elements = dom.window.document.querySelectorAll(`search-page-media-row[releaseyear="${year}"]`)
-
-    for (const el of Array.from(elements)) {
-      const titleElement = el.querySelector<HTMLAnchorElement>('a[slot="title"]')
-      if (titleElement && titleElement.innerHTML.trim() === title) {
-        return titleElement.href
-      }
+  static async getMoviePageLink(imdbId: string): Promise<string | null> {
+    try {
+      const {data} = await axios.get(`https://www.omdbapi.com/?i=${imdbId}&apikey=${OMDB_TOKEN}&tomatoes=true`, {timeout: 10000})
+      return data.tomatoURL === 'N/A' ? null : data.tomatoURL
+    } catch (e) {
+      if (e instanceof AxiosError && e.code === 'ECONNABORTED') return null
+      throw e
     }
-    return null
   }
 
   static async getScoreFromPage(link: string): Promise<Tomatometer | null> {

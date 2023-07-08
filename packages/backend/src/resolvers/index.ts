@@ -45,13 +45,7 @@ const index: Resolvers<{ user?: User }> = {
     sentiment: (parent, _, {user}) => user ? UserData.getSentiment(user.username, parent.id) : null,
     watched: (parent, _, {user}) => user ? UserData.isWatched(user.username, parent.id) : null,
     inWatchlist: (parent, _, {user}) => user ? UserData.inWatchlist(user.username, parent.id) : null,
-    tomatometer: ({title, releaseDate}) => {
-      if (!releaseDate) {
-        return null
-      }
-      const releaseYear = parseInt(releaseDate.split('-')[0], 10)
-      return RottenTomatoes.getScore(title, releaseYear)
-    },
+    tomatometer: ({imdbId}) => RottenTomatoes.getScore(imdbId),
     providers: ({id}) => MovieDb.streamingProviders(id)
   },
   MovieCredit: {

@@ -48,6 +48,7 @@ export enum ListType {
 export type Movie = {
   __typename?: 'Movie';
   id: Scalars['ID'];
+  imdbId: Scalars['ID'];
   inWatchlist?: Maybe<Scalars['Boolean']>;
   overview: Scalars['String'];
   posterPath?: Maybe<Scalars['String']>;
@@ -77,6 +78,7 @@ export type MovieCredit = {
 export type MovieInfo = {
   __typename?: 'MovieInfo';
   id: Scalars['ID'];
+  imdbId: Scalars['ID'];
   overview: Scalars['String'];
   posterPath?: Maybe<Scalars['String']>;
   releaseDate?: Maybe<Scalars['String']>;

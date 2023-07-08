@@ -48,6 +48,7 @@ export enum ListType {
 export type Movie = {
   __typename?: 'Movie';
   id: Scalars['ID'];
+  imdbId: Scalars['ID'];
   inWatchlist?: Maybe<Scalars['Boolean']>;
   overview: Scalars['String'];
   posterPath?: Maybe<Scalars['String']>;
@@ -77,6 +78,7 @@ export type MovieCredit = {
 export type MovieInfo = {
   __typename?: 'MovieInfo';
   id: Scalars['ID'];
+  imdbId: Scalars['ID'];
   overview: Scalars['String'];
   posterPath?: Maybe<Scalars['String']>;
   releaseDate?: Maybe<Scalars['String']>;
@@ -490,6 +492,7 @@ export type ListResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type MovieResolvers<ContextType = any, ParentType extends ResolversParentTypes['Movie'] = ResolversParentTypes['Movie']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  imdbId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   inWatchlist?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   overview?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   posterPath?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -519,6 +522,7 @@ export type MovieCreditResolvers<ContextType = any, ParentType extends Resolvers
 
 export type MovieInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['MovieInfo'] = ResolversParentTypes['MovieInfo']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  imdbId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   overview?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   posterPath?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   releaseDate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;

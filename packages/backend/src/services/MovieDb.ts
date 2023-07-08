@@ -261,9 +261,10 @@ function pickCastCreditForMovieProperties(credit: Pick<Cast, 'id' | 'name' | 'pr
   }
 }
 
-function pickMovieProperties(movie: Pick<MovieResponse, 'id' | 'title' | 'poster_path' | 'release_date' | 'vote_average' | 'overview' | 'tagline'>): MovieInfo {
+function pickMovieProperties(movie: Pick<MovieResponse, 'id' | 'imdb_id' | 'title' | 'poster_path' | 'release_date' | 'vote_average' | 'overview' | 'tagline'>): MovieInfo {
   return {
     id: `${movie.id}`,
+    imdbId: `${movie.imdb_id}`,
     title: movie.title!,
     posterPath: movie.poster_path,
     releaseDate: movie.release_date || null,

@@ -30,6 +30,7 @@ type CastCredit implements Person {
 
 type MovieInfo {
   id: ID!
+  imdbId: ID!
   title: String!
   tagline: String!
   overview: String!
@@ -41,6 +42,7 @@ type MovieInfo {
 
 type Movie {
   id: ID!
+  imdbId: ID!
   title: String!
   tagline: String!
   overview: String!

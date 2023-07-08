@@ -101,6 +101,7 @@ export type Mutation = {
   setInWatchlist: Movie;
   setSentiment: Movie;
   setWatched: Movie;
+  updateUserSettings: UserSettings;
 };
 
 
@@ -156,6 +157,11 @@ export type MutationSetWatchedArgs = {
   watched: Scalars['Boolean'];
 };
 
+
+export type MutationUpdateUserSettingsArgs = {
+  settings: UserSettingsInput;
+};
+
 export type PaginatedMovies = {
   __typename?: 'PaginatedMovies';
   endReached: Scalars['Boolean'];
@@ -204,6 +210,8 @@ export type Query = {
   person: PersonInfo;
   recommendedMovies: Array<Movie>;
   search: Array<MovieOrPerson>;
+  settings: UserSettings;
+  streamingProviders: Array<Provider>;
   trending: Array<MovieInfo>;
   upcoming: Array<Movie>;
   user: User;
@@ -243,6 +251,11 @@ export type QueryRecommendedMoviesArgs = {
 
 export type QuerySearchArgs = {
   query: Scalars['String'];
+};
+
+
+export type QueryStreamingProvidersArgs = {
+  region: Scalars['String'];
 };
 
 
@@ -330,6 +343,26 @@ export type UserWatchedArgs = {
 export type UserWatchlistArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
+};
+
+export type UserSettings = {
+  __typename?: 'UserSettings';
+  streaming: UserStreamingSettings;
+};
+
+export type UserSettingsInput = {
+  streaming?: InputMaybe<UserStreamingSettingsInput>;
+};
+
+export type UserStreamingSettings = {
+  __typename?: 'UserStreamingSettings';
+  providers: Array<Scalars['ID']>;
+  region?: Maybe<Scalars['ID']>;
+};
+
+export type UserStreamingSettingsInput = {
+  providers?: InputMaybe<Array<Scalars['ID']>>;
+  region?: InputMaybe<Scalars['ID']>;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -437,6 +470,10 @@ export type ResolversTypes = ResolversObject<{
   Tomatometer: ResolverTypeWrapper<Tomatometer>;
   TomatometerState: TomatometerState;
   User: ResolverTypeWrapper<User>;
+  UserSettings: ResolverTypeWrapper<UserSettings>;
+  UserSettingsInput: UserSettingsInput;
+  UserStreamingSettings: ResolverTypeWrapper<UserStreamingSettings>;
+  UserStreamingSettingsInput: UserStreamingSettingsInput;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -463,6 +500,10 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String'];
   Tomatometer: Tomatometer;
   User: User;
+  UserSettings: UserSettings;
+  UserSettingsInput: UserSettingsInput;
+  UserStreamingSettings: UserStreamingSettings;
+  UserStreamingSettingsInput: UserStreamingSettingsInput;
 }>;
 
 export type CastCreditResolvers<ContextType = any, ParentType extends ResolversParentTypes['CastCredit'] = ResolversParentTypes['CastCredit']> = ResolversObject<{
@@ -547,6 +588,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   setInWatchlist?: Resolver<ResolversTypes['Movie'], ParentType, ContextType, RequireFields<MutationSetInWatchlistArgs, 'id' | 'inWatchlist'>>;
   setSentiment?: Resolver<ResolversTypes['Movie'], ParentType, ContextType, RequireFields<MutationSetSentimentArgs, 'id' | 'sentiment'>>;
   setWatched?: Resolver<ResolversTypes['Movie'], ParentType, ContextType, RequireFields<MutationSetWatchedArgs, 'id' | 'watched'>>;
+  updateUserSettings?: Resolver<ResolversTypes['UserSettings'], ParentType, ContextType, RequireFields<MutationUpdateUserSettingsArgs, 'settings'>>;
 }>;
 
 export type PaginatedMoviesResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedMovies'] = ResolversParentTypes['PaginatedMovies']> = ResolversObject<{
@@ -597,6 +639,8 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   person?: Resolver<ResolversTypes['PersonInfo'], ParentType, ContextType, RequireFields<QueryPersonArgs, 'id'>>;
   recommendedMovies?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType, Partial<QueryRecommendedMoviesArgs>>;
   search?: Resolver<Array<ResolversTypes['MovieOrPerson']>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'query'>>;
+  settings?: Resolver<ResolversTypes['UserSettings'], ParentType, ContextType>;
+  streamingProviders?: Resolver<Array<ResolversTypes['Provider']>, ParentType, ContextType, RequireFields<QueryStreamingProvidersArgs, 'region'>>;
   trending?: Resolver<Array<ResolversTypes['MovieInfo']>, ParentType, ContextType, Partial<QueryTrendingArgs>>;
   upcoming?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'username'>>;
@@ -634,6 +678,17 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type UserSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['UserSettings'] = ResolversParentTypes['UserSettings']> = ResolversObject<{
+  streaming?: Resolver<ResolversTypes['UserStreamingSettings'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type UserStreamingSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['UserStreamingSettings'] = ResolversParentTypes['UserStreamingSettings']> = ResolversObject<{
+  providers?: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
+  region?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type Resolvers<ContextType = any> = ResolversObject<{
   CastCredit?: CastCreditResolvers<ContextType>;
   CrewCredit?: CrewCreditResolvers<ContextType>;
@@ -652,5 +707,7 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   Stats?: StatsResolvers<ContextType>;
   Tomatometer?: TomatometerResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
+  UserSettings?: UserSettingsResolvers<ContextType>;
+  UserStreamingSettings?: UserStreamingSettingsResolvers<ContextType>;
 }>;
 

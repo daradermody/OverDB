@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import { nanoid } from 'nanoid'
-import { List, ListType, Movie, Person, Sentiment } from '../../types'
+import { List, ListType, Movie, Person, Provider, Sentiment, UserSettings, UserSettingsInput } from '../../types'
 import { dataDir } from './dataStorage'
 import { User } from './users'
 
@@ -13,6 +13,7 @@ interface Data {
       [id: string]: StoredList;
       watchlist: MovieList;
     };
+    settings: UserSettings;
   };
 }
 
@@ -38,6 +39,11 @@ const emptyObject: Data[User['username']] = {
   watched: [],
   lists: {
     watchlist: {id: 'watchlist', name: 'Watchlist', type: ListType.Movie, ids: []}
+  },
+  settings: {
+    streaming: {
+      providers: []
+    }
   }
 }
 
@@ -175,6 +181,16 @@ export class UserData {
     UserData.save()
   }
 
+  static getSettings(username: User['username']): UserSettings {
+    return UserData.forUser(username).settings
+  }
+
+  static updateSettings(username: User['username'], newSettings: UserSettingsInput): UserSettings {
+    UserData.forUser(username).settings = mergeDeep(UserData.forUser(username).settings, newSettings) as UserSettings
+    UserData.save()
+    return UserData.forUser(username).settings
+  }
+
   private static readCache(): Data {
     if (!fs.existsSync(UserData.FILE_PATH)) {
       fs.writeFileSync(UserData.FILE_PATH, '{}')
@@ -193,4 +209,22 @@ export class UserData {
     }
     return UserData.data[id]
   }
+}
+
+function mergeDeep(target: Record<string, any>, source: Record<string, any>): Record<string, any> {
+  if (isObject(target) && isObject(source)) {
+    for (const key in source) {
+      if (isObject(source[key])) {
+        if (!target[key]) Object.assign(target, { [key]: {} });
+        mergeDeep(target[key], source[key]);
+      } else {
+        Object.assign(target, { [key]: source[key] });
+      }
+    }
+  }
+  return target;
+}
+
+function isObject(item: any): item is Object {
+  return (item && typeof item === 'object' && !Array.isArray(item));
 }

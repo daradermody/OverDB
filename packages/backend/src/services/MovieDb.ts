@@ -146,8 +146,17 @@ export default class MovieDb {
   }
 
   static async streamingProviders(movieId: Movie['id']): Promise<Provider[]> {
-    const providers = await this.movieDbApi.movieWatchProviders({id: movieId})
-    return providers.results?.IE?.flatrate?.map(provider => ({
+    const {results} = await this.movieDbApi.movieWatchProviders({id: movieId})
+    return results?.IE?.flatrate?.map(provider => ({
+      id: `${provider.provider_id!}`,
+      name: provider.provider_name!,
+      logo: provider.logo_path!
+    })) || []
+  }
+
+  static async allStreamingProviders(region: string): Promise<Provider[]> {
+    const {results} = await this.movieDbApi.movieWatchProviderList({watch_region: region})
+    return results?.map(provider => ({
       id: `${provider.provider_id!}`,
       name: provider.provider_name!,
       logo: provider.logo_path!

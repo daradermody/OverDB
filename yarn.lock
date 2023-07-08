@@ -2609,12 +2609,14 @@ __metadata:
     "@overdb/backend": "workspace:*"
     "@preact/signals": ^1.1.3
     "@react-hook/throttle": ^2.2.0
+    "@types/country-list": ^2.1.1
     "@types/js-cookie": ^3.0.3
     "@types/node": ^18.16.1
     apollo3-cache-persist: ^0.14.1
     axios: ^1.3.6
     body-parser: ^1.20.2
     cookie: ^0.5.0
+    country-list: ^2.3.0
     esbuild: ^0.17.18
     esbuild-server: ^0.2.1
     graphql: ^16.6.0
@@ -2931,6 +2933,13 @@ __metadata:
   version: 2.8.12
   resolution: "@types/cors@npm:2.8.12"
   checksum: 8c45f112c7d1d2d831b4b266f2e6ed33a1887a35dcbfe2a18b28370751fababb7cd045e745ef84a523c33a25932678097bf79afaa367c6cb3fa0daa7a6438257
+  languageName: node
+  linkType: hard
+
+"@types/country-list@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "@types/country-list@npm:2.1.1"
+  checksum: 2397760afa7e04b12e3a0eb9578e84cb6aefc19ec88b59f1f4d1c032d41c6c4228bf947e51452d36fb3bfd9e21a99b8a619f43b8aacf37fad15820118acec28d
   languageName: node
   linkType: hard
 
@@ -4612,6 +4621,13 @@ __metadata:
     path-type: ^4.0.0
     yaml: ^1.10.0
   checksum: 4be63e7117955fd88333d7460e4c466a90f556df6ef34efd59034d2463484e339666c41f02b523d574a797ec61f4a91918c5b89a316db2ea2f834e0d2d09465b
+  languageName: node
+  linkType: hard
+
+"country-list@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "country-list@npm:2.3.0"
+  checksum: 91844d3640148cc04488fbbc29e46910018488d112ac8820be7cf7da5fde3aff354de5d89fe1fd4f20b52dcc7a991598cbe345e41ebb7f4397ab1549ac4651ec
   languageName: node
   linkType: hard
 

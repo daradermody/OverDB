@@ -15,6 +15,7 @@ import {
   MutationSetInWatchlistArgs,
   MutationSetSentimentArgs,
   MutationSetWatchedArgs,
+  MutationUpdateUserSettingsArgs,
   PaginatedMovies,
   PaginatedPeople,
   PersonInfo,
@@ -26,6 +27,7 @@ import {
   QueryPersonArgs,
   QueryRecommendedMoviesArgs,
   QuerySearchArgs,
+  QueryStreamingProvidersArgs,
   QueryTrendingArgs,
   QueryUserArgs,
   ResolverFn,
@@ -92,7 +94,7 @@ const index: Resolvers<{ user?: User }> = {
       const requestedUser = getUser(parent.username)
       verifyUserAccessible(requestedUser, user)
       return convertList(UserData.getList(parent.username, args.id))
-    }
+    },
   },
   MovieOrPerson: {
     __resolveType: (obj: MovieOrPerson) => {
@@ -124,7 +126,9 @@ const index: Resolvers<{ user?: User }> = {
       verifyUserAccessible(requestedUser, user)
       return requestedUser as ApiUser
     },
-    users: requiresAdmin(async () => getUsers() as ApiUser[])
+    users: requiresAdmin(async () => getUsers() as ApiUser[]),
+    streamingProviders: (_, args: QueryStreamingProvidersArgs) => MovieDb.allStreamingProviders(args.region),
+    settings: requiresLogin(async (_1, _2, {user}) => UserData.getSettings(user.username))
   },
   Mutation: {
     setFavourite: requiresLogin((_, args: MutationSetFavouriteArgs, {user}) => {
@@ -191,6 +195,9 @@ const index: Resolvers<{ user?: User }> = {
     }),
     removeFromList: requiresLogin(async (_, args: MutationAddToListArgs, {user}) => {
       return convertList(UserData.removeFromList(user.username, args.listId, args.itemId))
+    }),
+    updateUserSettings: requiresLogin(async (_, args: MutationUpdateUserSettingsArgs, {user}) => {
+      return UserData.updateSettings(user.username, args.settings)
     })
   }
 }

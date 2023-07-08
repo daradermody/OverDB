@@ -116,6 +116,15 @@ type Stats {
   watchlist: Int!
 }
 
+type UserSettings {
+  streaming: UserStreamingSettings!
+}
+
+type UserStreamingSettings {
+  region: ID
+  providers: [ID!]!
+}
+
 type User {
   username: ID!
   avatarUrl: String!
@@ -154,6 +163,17 @@ type Query {
   upcoming: [Movie!]!
   user(username: ID!): User!
   users: [User!]!
+  streamingProviders(region: String!): [Provider!]!
+  settings: UserSettings!
+}
+
+input UserSettingsInput {
+  streaming: UserStreamingSettingsInput
+}
+
+input UserStreamingSettingsInput {
+  region: ID
+  providers: [ID!]
 }
 
 type Mutation {
@@ -166,4 +186,5 @@ type Mutation {
   editList(id: ID!, name: String!): List!
   addToList(listId: ID!, itemId: ID!): List!
   removeFromList(listId: ID!, itemId: ID!): List!
+  updateUserSettings(settings: UserSettingsInput!): UserSettings!
 }

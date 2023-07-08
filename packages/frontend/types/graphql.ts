@@ -101,6 +101,7 @@ export type Mutation = {
   setInWatchlist: Movie;
   setSentiment: Movie;
   setWatched: Movie;
+  updateUserSettings: UserSettings;
 };
 
 
@@ -156,6 +157,11 @@ export type MutationSetWatchedArgs = {
   watched: Scalars['Boolean'];
 };
 
+
+export type MutationUpdateUserSettingsArgs = {
+  settings: UserSettingsInput;
+};
+
 export type PaginatedMovies = {
   __typename?: 'PaginatedMovies';
   endReached: Scalars['Boolean'];
@@ -204,6 +210,8 @@ export type Query = {
   person: PersonInfo;
   recommendedMovies: Array<Movie>;
   search: Array<MovieOrPerson>;
+  settings: UserSettings;
+  streamingProviders: Array<Provider>;
   trending: Array<MovieInfo>;
   upcoming: Array<Movie>;
   user: User;
@@ -243,6 +251,11 @@ export type QueryRecommendedMoviesArgs = {
 
 export type QuerySearchArgs = {
   query: Scalars['String'];
+};
+
+
+export type QueryStreamingProvidersArgs = {
+  region: Scalars['String'];
 };
 
 
@@ -330,6 +343,26 @@ export type UserWatchedArgs = {
 export type UserWatchlistArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
+};
+
+export type UserSettings = {
+  __typename?: 'UserSettings';
+  streaming: UserStreamingSettings;
+};
+
+export type UserSettingsInput = {
+  streaming?: InputMaybe<UserStreamingSettingsInput>;
+};
+
+export type UserStreamingSettings = {
+  __typename?: 'UserStreamingSettings';
+  providers: Array<Scalars['ID']>;
+  region?: Maybe<Scalars['ID']>;
+};
+
+export type UserStreamingSettingsInput = {
+  providers?: InputMaybe<Array<Scalars['ID']>>;
+  region?: InputMaybe<Scalars['ID']>;
 };
 
 
@@ -497,6 +530,116 @@ export function useGetUserStatsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type GetUserStatsQueryHookResult = ReturnType<typeof useGetUserStatsQuery>;
 export type GetUserStatsLazyQueryHookResult = ReturnType<typeof useGetUserStatsLazyQuery>;
 export type GetUserStatsQueryResult = Apollo.QueryResult<GetUserStatsQuery, GetUserStatsQueryVariables>;
+export const GetUserSettingsDocument = gql`
+    query GetUserSettings {
+  settings {
+    streaming {
+      region
+      providers
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUserSettingsQuery__
+ *
+ * To run a query within a React component, call `useGetUserSettingsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserSettingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserSettingsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUserSettingsQuery(baseOptions?: Apollo.QueryHookOptions<GetUserSettingsQuery, GetUserSettingsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserSettingsQuery, GetUserSettingsQueryVariables>(GetUserSettingsDocument, options);
+      }
+export function useGetUserSettingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserSettingsQuery, GetUserSettingsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserSettingsQuery, GetUserSettingsQueryVariables>(GetUserSettingsDocument, options);
+        }
+export type GetUserSettingsQueryHookResult = ReturnType<typeof useGetUserSettingsQuery>;
+export type GetUserSettingsLazyQueryHookResult = ReturnType<typeof useGetUserSettingsLazyQuery>;
+export type GetUserSettingsQueryResult = Apollo.QueryResult<GetUserSettingsQuery, GetUserSettingsQueryVariables>;
+export const UpdateUserSettingsDocument = gql`
+    mutation UpdateUserSettings($settings: UserSettingsInput!) {
+  updateUserSettings(settings: $settings) {
+    streaming {
+      region
+      providers
+    }
+  }
+}
+    `;
+export type UpdateUserSettingsMutationFn = Apollo.MutationFunction<UpdateUserSettingsMutation, UpdateUserSettingsMutationVariables>;
+
+/**
+ * __useUpdateUserSettingsMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserSettingsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserSettingsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserSettingsMutation, { data, loading, error }] = useUpdateUserSettingsMutation({
+ *   variables: {
+ *      settings: // value for 'settings'
+ *   },
+ * });
+ */
+export function useUpdateUserSettingsMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserSettingsMutation, UpdateUserSettingsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserSettingsMutation, UpdateUserSettingsMutationVariables>(UpdateUserSettingsDocument, options);
+      }
+export type UpdateUserSettingsMutationHookResult = ReturnType<typeof useUpdateUserSettingsMutation>;
+export type UpdateUserSettingsMutationResult = Apollo.MutationResult<UpdateUserSettingsMutation>;
+export type UpdateUserSettingsMutationOptions = Apollo.BaseMutationOptions<UpdateUserSettingsMutation, UpdateUserSettingsMutationVariables>;
+export const GetAllStreamingProvidersDocument = gql`
+    query GetAllStreamingProviders($region: String!) {
+  streamingProviders(region: $region) {
+    id
+    name
+    logo
+  }
+}
+    `;
+
+/**
+ * __useGetAllStreamingProvidersQuery__
+ *
+ * To run a query within a React component, call `useGetAllStreamingProvidersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllStreamingProvidersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllStreamingProvidersQuery({
+ *   variables: {
+ *      region: // value for 'region'
+ *   },
+ * });
+ */
+export function useGetAllStreamingProvidersQuery(baseOptions: Apollo.QueryHookOptions<GetAllStreamingProvidersQuery, GetAllStreamingProvidersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllStreamingProvidersQuery, GetAllStreamingProvidersQueryVariables>(GetAllStreamingProvidersDocument, options);
+      }
+export function useGetAllStreamingProvidersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllStreamingProvidersQuery, GetAllStreamingProvidersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllStreamingProvidersQuery, GetAllStreamingProvidersQueryVariables>(GetAllStreamingProvidersDocument, options);
+        }
+export type GetAllStreamingProvidersQueryHookResult = ReturnType<typeof useGetAllStreamingProvidersQuery>;
+export type GetAllStreamingProvidersLazyQueryHookResult = ReturnType<typeof useGetAllStreamingProvidersLazyQuery>;
+export type GetAllStreamingProvidersQueryResult = Apollo.QueryResult<GetAllStreamingProvidersQuery, GetAllStreamingProvidersQueryVariables>;
 export const GetWatchedMoviesDocument = gql`
     query GetWatchedMovies($username: ID!, $offset: Int, $limit: Int) {
   user(username: $username) {

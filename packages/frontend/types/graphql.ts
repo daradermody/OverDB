@@ -367,6 +367,248 @@ export type UserStreamingSettingsInput = {
   region?: InputMaybe<Scalars['ID']['input']>;
 };
 
+export type GetFavouritePeopleQueryVariables = Exact<{
+  username: Scalars['ID']['input'];
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetFavouritePeopleQuery = { __typename?: 'Query', user: { __typename?: 'User', favouritePeople: { __typename?: 'PaginatedPeople', endReached: boolean, results: Array<{ __typename?: 'PersonInfo', id: string, profilePath?: string | null, name: string }> } } };
+
+export type GetLikedMoviesQueryVariables = Exact<{
+  username: Scalars['ID']['input'];
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetLikedMoviesQuery = { __typename?: 'Query', user: { __typename?: 'User', likedMovies: { __typename?: 'PaginatedMovies', endReached: boolean, results: Array<{ __typename?: 'Movie', id: string, title: string, posterPath?: string | null, releaseDate?: string | null }> } } };
+
+export type GetUserQueryVariables = Exact<{
+  username: Scalars['ID']['input'];
+}>;
+
+
+export type GetUserQuery = { __typename?: 'Query', user: { __typename?: 'User', avatarUrl: string } };
+
+export type GetUserStatsQueryVariables = Exact<{
+  username: Scalars['ID']['input'];
+}>;
+
+
+export type GetUserStatsQuery = { __typename?: 'Query', user: { __typename?: 'User', stats: { __typename?: 'Stats', favouritePeople: number, watched: number, moviesLiked: number, watchlist: number } } };
+
+export type GetUserSettingsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUserSettingsQuery = { __typename?: 'Query', settings: { __typename?: 'UserSettings', streaming: { __typename?: 'UserStreamingSettings', region?: string | null, providers: Array<string> } } };
+
+export type UpdateUserSettingsMutationVariables = Exact<{
+  settings: UserSettingsInput;
+}>;
+
+
+export type UpdateUserSettingsMutation = { __typename?: 'Mutation', updateUserSettings: { __typename?: 'UserSettings', streaming: { __typename?: 'UserStreamingSettings', region?: string | null, providers: Array<string> } } };
+
+export type GetAllStreamingProvidersQueryVariables = Exact<{
+  region: Scalars['String']['input'];
+}>;
+
+
+export type GetAllStreamingProvidersQuery = { __typename?: 'Query', streamingProviders: Array<{ __typename?: 'Provider', id: string, name: string, logo: string }> };
+
+export type GetWatchedMoviesQueryVariables = Exact<{
+  username: Scalars['ID']['input'];
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetWatchedMoviesQuery = { __typename?: 'Query', user: { __typename?: 'User', watched: { __typename?: 'PaginatedMovies', endReached: boolean, results: Array<{ __typename?: 'Movie', id: string, title: string, posterPath?: string | null, releaseDate?: string | null, watched?: boolean | null, inWatchlist?: boolean | null, sentiment?: Sentiment | null }> } } };
+
+export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', username: string, avatarUrl: string, isAdmin?: boolean | null, stats: { __typename?: 'Stats', favouritePeople: number, moviesLiked: number, watched: number, watchlist: number } }> };
+
+export type SearchQueryVariables = Exact<{
+  query: Scalars['String']['input'];
+}>;
+
+
+export type SearchQuery = { __typename?: 'Query', search: Array<{ __typename?: 'Movie', id: string, title: string, posterPath?: string | null, releaseDate?: string | null } | { __typename?: 'PersonInfo', id: string, name: string, profilePath?: string | null }> };
+
+export type GetTrendingMoviesQueryVariables = Exact<{
+  size: Scalars['Int']['input'];
+}>;
+
+
+export type GetTrendingMoviesQuery = { __typename?: 'Query', trending: Array<{ __typename?: 'MovieInfo', id: string, title: string, posterPath?: string | null, releaseDate?: string | null }> };
+
+export type GetRecommendedMoviesQueryVariables = Exact<{
+  size: Scalars['Int']['input'];
+}>;
+
+
+export type GetRecommendedMoviesQuery = { __typename?: 'Query', recommendedMovies: Array<{ __typename?: 'Movie', id: string, posterPath?: string | null, title: string, releaseDate?: string | null, watched?: boolean | null, inWatchlist?: boolean | null, sentiment?: Sentiment | null }> };
+
+export type CreateListMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  type: ListType;
+}>;
+
+
+export type CreateListMutation = { __typename?: 'Mutation', createList: { __typename?: 'List', id: string } };
+
+export type DeleteListsMutationVariables = Exact<{
+  ids: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type DeleteListsMutation = { __typename?: 'Mutation', deleteLists: boolean };
+
+export type EditListMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+}>;
+
+
+export type EditListMutation = { __typename?: 'Mutation', editList: { __typename?: 'List', id: string } };
+
+export type GetListQueryVariables = Exact<{
+  username: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetListQuery = { __typename?: 'Query', user: { __typename?: 'User', list: { __typename?: 'List', id: string, name: string, type: ListType, items: Array<{ __typename?: 'Movie', id: string, posterPath?: string | null, title: string, releaseDate?: string | null, watched?: boolean | null, inWatchlist?: boolean | null, sentiment?: Sentiment | null } | { __typename?: 'PersonInfo', id: string, name: string, profilePath?: string | null }> } } };
+
+export type GetListsQueryVariables = Exact<{
+  username: Scalars['ID']['input'];
+}>;
+
+
+export type GetListsQuery = { __typename?: 'Query', user: { __typename?: 'User', lists: Array<{ __typename?: 'List', id: string, name: string, items: Array<{ __typename?: 'Movie', id: string } | { __typename?: 'PersonInfo', id: string }> }> } };
+
+export type GetWatchlistQueryVariables = Exact<{
+  username: Scalars['ID']['input'];
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetWatchlistQuery = { __typename?: 'Query', user: { __typename?: 'User', watchlist: { __typename?: 'PaginatedMovies', endReached: boolean, results: Array<{ __typename?: 'Movie', id: string, title: string, posterPath?: string | null, releaseDate?: string | null, watched?: boolean | null, inWatchlist?: boolean | null, sentiment?: Sentiment | null }> } } };
+
+export type GetMovieInfoQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetMovieInfoQuery = { __typename?: 'Query', movie: { __typename?: 'Movie', id: string, title: string, tagline: string, overview: string, voteAverage: number, posterPath?: string | null, releaseDate?: string | null, watched?: boolean | null, inWatchlist?: boolean | null, sentiment?: Sentiment | null } };
+
+export type GetCrewQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetCrewQuery = { __typename?: 'Query', crewForMovie: Array<{ __typename?: 'CrewCredit', id: string, name: string, profilePath?: string | null, jobs: Array<string> }> };
+
+export type GetCastQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetCastQuery = { __typename?: 'Query', castForMovie: Array<{ __typename?: 'CastCredit', character: string, id: string, name: string, order: number, profilePath?: string | null }> };
+
+export type GetRottenTomatoesScoreQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetRottenTomatoesScoreQuery = { __typename?: 'Query', movie: { __typename?: 'Movie', id: string, tomatometer?: { __typename?: 'Tomatometer', score: number, consensus?: string | null, link: string, state: TomatometerState } | null } };
+
+export type GetStreamingProvidersQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetStreamingProvidersQuery = { __typename?: 'Query', movie: { __typename?: 'Movie', providers: Array<{ __typename?: 'Provider', logo: string, name: string }> } };
+
+export type GetPersonCreditsQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetPersonCreditsQuery = { __typename?: 'Query', creditsForPerson: Array<{ __typename?: 'MovieCredit', id: string, title: string, watched?: boolean | null, inWatchlist?: boolean | null, sentiment?: Sentiment | null, posterPath?: string | null, releaseDate?: string | null, jobs: Array<string>, character?: string | null }> };
+
+export type GetPersonInfoQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetPersonInfoQuery = { __typename?: 'Query', person: { __typename?: 'PersonInfo', id: string, profilePath?: string | null, name: string, knownForDepartment?: string | null, biography?: string | null, favourited?: boolean | null } };
+
+export type SetFavouriteMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  favourite: Scalars['Boolean']['input'];
+}>;
+
+
+export type SetFavouriteMutation = { __typename?: 'Mutation', setFavourite: { __typename?: 'PersonInfo', id: string, favourited?: boolean | null } };
+
+export type GetMovieListsQueryVariables = Exact<{
+  username: Scalars['ID']['input'];
+}>;
+
+
+export type GetMovieListsQuery = { __typename?: 'Query', user: { __typename?: 'User', lists: Array<{ __typename?: 'List', id: string, name: string, type: ListType, items: Array<{ __typename?: 'Movie', id: string } | { __typename?: 'PersonInfo' }> }> } };
+
+export type AddToListMutationVariables = Exact<{
+  listId: Scalars['ID']['input'];
+  itemId: Scalars['ID']['input'];
+}>;
+
+
+export type AddToListMutation = { __typename?: 'Mutation', addToList: { __typename?: 'List', id: string } };
+
+export type RemoveFromListMutationVariables = Exact<{
+  listId: Scalars['ID']['input'];
+  itemId: Scalars['ID']['input'];
+}>;
+
+
+export type RemoveFromListMutation = { __typename?: 'Mutation', removeFromList: { __typename?: 'List', id: string } };
+
+export type SetSentimentMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  sentiment: Sentiment;
+}>;
+
+
+export type SetSentimentMutation = { __typename?: 'Mutation', setSentiment: { __typename?: 'Movie', id: string, sentiment?: Sentiment | null } };
+
+export type SetWatchedMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  watched: Scalars['Boolean']['input'];
+}>;
+
+
+export type SetWatchedMutation = { __typename?: 'Mutation', setWatched: { __typename?: 'Movie', id: string, watched?: boolean | null } };
+
+export type SetInWatchlistMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  inWatchlist: Scalars['Boolean']['input'];
+}>;
+
+
+export type SetInWatchlistMutation = { __typename?: 'Mutation', setInWatchlist: { __typename?: 'Movie', id: string, inWatchlist?: boolean | null } };
+
+export type GetUpcomingMoviesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUpcomingMoviesQuery = { __typename?: 'Query', upcoming: Array<{ __typename?: 'Movie', id: string, title: string, posterPath?: string | null, releaseDate?: string | null }> };
+
 
 export const GetFavouritePeopleDocument = gql`
     query GetFavouritePeople($username: ID!, $offset: Int, $limit: Int) {

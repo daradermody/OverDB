@@ -1431,31 +1431,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-codegen/fragment-matcher@npm:5.0.0":
-  version: 5.0.0
-  resolution: "@graphql-codegen/fragment-matcher@npm:5.0.0"
-  dependencies:
-    "@graphql-codegen/plugin-helpers": ^5.0.0
-    tslib: ~2.5.0
-  peerDependencies:
-    graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
-  checksum: 897781e44697f769c34dbbc738192723e5c2cafc6883c0a30ac44d0c7cdaa327a2824c7d6a315aa865809c49b3f33c8600b3ebcd0f7c6bb342120740b0caebac
-  languageName: node
-  linkType: hard
-
-"@graphql-codegen/introspection@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@graphql-codegen/introspection@npm:4.0.0"
-  dependencies:
-    "@graphql-codegen/plugin-helpers": ^5.0.0
-    "@graphql-codegen/visitor-plugin-common": ^4.0.0
-    tslib: ~2.5.0
-  peerDependencies:
-    graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
-  checksum: 2610cd32caece5d4865e2f1c840bb33bbf3c70222d1822e23104fc1a1f1e548bb2cbea4613c221ebea52146cd57ba1ec42646ee37533f9256c5ce71283b42e09
-  languageName: node
-  linkType: hard
-
 "@graphql-codegen/plugin-helpers@npm:^2.7.2":
   version: 2.7.2
   resolution: "@graphql-codegen/plugin-helpers@npm:2.7.2"
@@ -1501,7 +1476,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-codegen/typescript-operations@npm:4.0.1":
+"@graphql-codegen/typescript-operations@npm:^4.0.1":
   version: 4.0.1
   resolution: "@graphql-codegen/typescript-operations@npm:4.0.1"
   dependencies:
@@ -1583,7 +1558,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-codegen/visitor-plugin-common@npm:4.0.1, @graphql-codegen/visitor-plugin-common@npm:^4.0.0":
+"@graphql-codegen/visitor-plugin-common@npm:4.0.1":
   version: 4.0.1
   resolution: "@graphql-codegen/visitor-plugin-common@npm:4.0.1"
   dependencies:
@@ -2414,11 +2389,7 @@ __metadata:
   resolution: "@overdb/backend@workspace:packages/backend"
   dependencies:
     "@graphql-codegen/cli": 4.0.1
-    "@graphql-codegen/fragment-matcher": 5.0.0
-    "@graphql-codegen/introspection": 4.0.0
     "@graphql-codegen/typescript": 4.0.1
-    "@graphql-codegen/typescript-operations": 4.0.1
-    "@graphql-codegen/typescript-react-apollo": 3.3.7
     "@graphql-codegen/typescript-resolvers": 4.0.1
     "@types/cookie-parser": ^1.4.3
     "@types/jsdom": ^21.1.1
@@ -2452,12 +2423,9 @@ __metadata:
     "@emotion/react": ^11.11.1
     "@emotion/styled": ^11.11.0
     "@graphql-codegen/cli": 4.0.1
-    "@graphql-codegen/fragment-matcher": 5.0.0
-    "@graphql-codegen/introspection": 4.0.0
     "@graphql-codegen/typescript": 4.0.1
-    "@graphql-codegen/typescript-operations": 4.0.1
+    "@graphql-codegen/typescript-operations": ^4.0.1
     "@graphql-codegen/typescript-react-apollo": 3.3.7
-    "@graphql-codegen/typescript-resolvers": 4.0.1
     "@mui/icons-material": ^5.13.7
     "@mui/lab": ^5.0.0-alpha.135
     "@mui/material": ^5.13.7

@@ -38,12 +38,9 @@
   },
   "devDependencies": {
     "@graphql-codegen/cli": "4.0.1",
-    "@graphql-codegen/fragment-matcher": "5.0.0",
-    "@graphql-codegen/introspection": "4.0.0",
     "@graphql-codegen/typescript": "4.0.1",
-    "@graphql-codegen/typescript-operations": "4.0.1",
+    "@graphql-codegen/typescript-operations": "^4.0.1",
     "@graphql-codegen/typescript-react-apollo": "3.3.7",
-    "@graphql-codegen/typescript-resolvers": "4.0.1",
     "@overdb/backend": "workspace:*",
     "@types/country-list": "^2.1.1",
     "@types/js-cookie": "^3.0.3",

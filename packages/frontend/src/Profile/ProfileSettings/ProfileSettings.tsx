@@ -9,7 +9,7 @@ import StreamingSettings, { LoadingStreamingSettings } from './StreamingSettings
 
 export default function ProfileSettings() {
   const {data, loading: loadingSettings, error: settingsError, refetch: refetchSettings} = useGetUserSettingsQuery()
-  const [updateSettings, {data: updatedData, loading: updatingSettings, error: updateSettingsError}] = useUpdateUserSettingsMutation({refetchQueries: ['GetUserSettings']})
+  const [updateSettings, {loading: updatingSettings, error: updateSettingsError}] = useUpdateUserSettingsMutation({refetchQueries: ['GetUserSettings']})
   useMutationErrorHandler('Could not update user settings', updateSettingsError)
 
   function handleSettingsChange(newSettings) {

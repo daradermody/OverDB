@@ -7,4 +7,5 @@ generates:
   types/graphql.ts:
     plugins:
       - "typescript"
+      - "typescript-operations"
       - "typescript-react-apollo"

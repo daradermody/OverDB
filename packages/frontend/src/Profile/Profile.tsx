@@ -3,13 +3,16 @@ import styled from '@emotion/styled'
 import { Divider, Typography } from '@mui/material'
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
-import { useGetUserQuery, useGetUserStatsQuery } from '../../types/graphql'
+import { useGetUserQuery, useGetUserStatsQuery, useGetWatchedMoviesQuery, User } from '../../types/graphql'
+import { MovieCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import Link from '../shared/general/Link'
 import PageWrapper from '../shared/PageWrapper'
+import useUser from '../useUser'
 import ProfileSettings from './ProfileSettings/ProfileSettings'
 
 export default function Profile() {
+  const {user} = useUser()
   const {username} = useParams<{ username: string }>()
   const {data, loading, error, refetch} = useGetUserQuery({variables: {username}})
 
@@ -28,7 +31,7 @@ export default function Profile() {
           <img style={{width: 300, aspectRatio: '1', clipPath: 'circle()'}} src={data.user.avatarUrl} alt="profile photo"/>
           <Stats/>
         </div>
-        <ProfileSettings/>
+        {user.username === username ? <ProfileSettings/> : <RecentlyWatchedMovies username={username}/>}
       </StyledProfile>
     </PageWrapper>
   )
@@ -99,6 +102,23 @@ const StatWrapper = styled.div`
     background-color: #ffffff10;
   }
 `
+
+function RecentlyWatchedMovies({username}: {username: User['username']}) {
+  const {user} = useUser()
+  const {data, error, loading, refetch} = useGetWatchedMoviesQuery({variables: {username, limit: 8}})
+
+  if (error) {
+    return <ErrorMessage error={error} onRetry={refetch}/>
+  }
+
+  return (
+    <div style={{width: '100%'}}>
+      <Typography variant="h1">{user?.username === username ? 'Recently Watched' : `${username}'s recently watched`}</Typography>
+      <MovieCards movies={data?.user.watched?.results} loading={loading} loadingCount={4}/>
+    </div>
+  )
+}
+
 
 gql`
   query GetUser($username: ID!) {

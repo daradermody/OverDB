@@ -5,38 +5,40 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string;
-  String: string;
-  Boolean: boolean;
-  Int: number;
-  Float: number;
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
 };
 
 export type CastCredit = Person & {
   __typename?: 'CastCredit';
-  character: Scalars['String'];
-  id: Scalars['ID'];
-  name: Scalars['String'];
-  order: Scalars['Int'];
-  profilePath?: Maybe<Scalars['String']>;
+  character: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  order: Scalars['Int']['output'];
+  profilePath?: Maybe<Scalars['String']['output']>;
 };
 
 export type CrewCredit = Person & {
   __typename?: 'CrewCredit';
-  id: Scalars['ID'];
-  jobs: Array<Scalars['String']>;
-  name: Scalars['String'];
-  profilePath?: Maybe<Scalars['String']>;
+  id: Scalars['ID']['output'];
+  jobs: Array<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  profilePath?: Maybe<Scalars['String']['output']>;
 };
 
 export type List = {
   __typename?: 'List';
-  id: Scalars['ID'];
+  id: Scalars['ID']['output'];
   items: Array<MovieOrPerson>;
-  name: Scalars['String'];
+  name: Scalars['String']['output'];
   type: ListType;
 };
 
@@ -47,45 +49,45 @@ export enum ListType {
 
 export type Movie = {
   __typename?: 'Movie';
-  id: Scalars['ID'];
-  imdbId: Scalars['ID'];
-  inWatchlist?: Maybe<Scalars['Boolean']>;
-  overview: Scalars['String'];
-  posterPath?: Maybe<Scalars['String']>;
+  id: Scalars['ID']['output'];
+  imdbId: Scalars['ID']['output'];
+  inWatchlist?: Maybe<Scalars['Boolean']['output']>;
+  overview: Scalars['String']['output'];
+  posterPath?: Maybe<Scalars['String']['output']>;
   providers: Array<Provider>;
-  releaseDate?: Maybe<Scalars['String']>;
+  releaseDate?: Maybe<Scalars['String']['output']>;
   sentiment?: Maybe<Sentiment>;
-  tagline: Scalars['String'];
-  title: Scalars['String'];
+  tagline: Scalars['String']['output'];
+  title: Scalars['String']['output'];
   tomatometer?: Maybe<Tomatometer>;
-  voteAverage: Scalars['Float'];
-  watched?: Maybe<Scalars['Boolean']>;
+  voteAverage: Scalars['Float']['output'];
+  watched?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type MovieCredit = {
   __typename?: 'MovieCredit';
-  character?: Maybe<Scalars['String']>;
-  id: Scalars['ID'];
-  inWatchlist?: Maybe<Scalars['Boolean']>;
-  jobs: Array<Scalars['String']>;
-  posterPath?: Maybe<Scalars['String']>;
-  releaseDate?: Maybe<Scalars['String']>;
+  character?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  inWatchlist?: Maybe<Scalars['Boolean']['output']>;
+  jobs: Array<Scalars['String']['output']>;
+  posterPath?: Maybe<Scalars['String']['output']>;
+  releaseDate?: Maybe<Scalars['String']['output']>;
   sentiment?: Maybe<Sentiment>;
-  title: Scalars['String'];
-  watched?: Maybe<Scalars['Boolean']>;
+  title: Scalars['String']['output'];
+  watched?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type MovieInfo = {
   __typename?: 'MovieInfo';
-  id: Scalars['ID'];
-  imdbId: Scalars['ID'];
-  overview: Scalars['String'];
-  posterPath?: Maybe<Scalars['String']>;
-  releaseDate?: Maybe<Scalars['String']>;
-  tagline: Scalars['String'];
-  title: Scalars['String'];
+  id: Scalars['ID']['output'];
+  imdbId: Scalars['ID']['output'];
+  overview: Scalars['String']['output'];
+  posterPath?: Maybe<Scalars['String']['output']>;
+  releaseDate?: Maybe<Scalars['String']['output']>;
+  tagline: Scalars['String']['output'];
+  title: Scalars['String']['output'];
   tomatometer?: Maybe<Tomatometer>;
-  voteAverage: Scalars['Float'];
+  voteAverage: Scalars['Float']['output'];
 };
 
 export type MovieOrPerson = Movie | PersonInfo;
@@ -94,7 +96,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addToList: List;
   createList: List;
-  deleteLists: Scalars['Boolean'];
+  deleteLists: Scalars['Boolean']['output'];
   editList: List;
   removeFromList: List;
   setFavourite: PersonInfo;
@@ -106,55 +108,55 @@ export type Mutation = {
 
 
 export type MutationAddToListArgs = {
-  itemId: Scalars['ID'];
-  listId: Scalars['ID'];
+  itemId: Scalars['ID']['input'];
+  listId: Scalars['ID']['input'];
 };
 
 
 export type MutationCreateListArgs = {
-  name: Scalars['String'];
+  name: Scalars['String']['input'];
   type: ListType;
 };
 
 
 export type MutationDeleteListsArgs = {
-  ids: Array<Scalars['ID']>;
+  ids: Array<Scalars['ID']['input']>;
 };
 
 
 export type MutationEditListArgs = {
-  id: Scalars['ID'];
-  name: Scalars['String'];
+  id: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
 };
 
 
 export type MutationRemoveFromListArgs = {
-  itemId: Scalars['ID'];
-  listId: Scalars['ID'];
+  itemId: Scalars['ID']['input'];
+  listId: Scalars['ID']['input'];
 };
 
 
 export type MutationSetFavouriteArgs = {
-  favourited: Scalars['Boolean'];
-  id: Scalars['ID'];
+  favourited: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type MutationSetInWatchlistArgs = {
-  id: Scalars['ID'];
-  inWatchlist: Scalars['Boolean'];
+  id: Scalars['ID']['input'];
+  inWatchlist: Scalars['Boolean']['input'];
 };
 
 
 export type MutationSetSentimentArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
   sentiment: Sentiment;
 };
 
 
 export type MutationSetWatchedArgs = {
-  id: Scalars['ID'];
-  watched: Scalars['Boolean'];
+  id: Scalars['ID']['input'];
+  watched: Scalars['Boolean']['input'];
 };
 
 
@@ -164,41 +166,41 @@ export type MutationUpdateUserSettingsArgs = {
 
 export type PaginatedMovies = {
   __typename?: 'PaginatedMovies';
-  endReached: Scalars['Boolean'];
-  limit: Scalars['Int'];
-  offset: Scalars['Int'];
+  endReached: Scalars['Boolean']['output'];
+  limit: Scalars['Int']['output'];
+  offset: Scalars['Int']['output'];
   results: Array<Movie>;
 };
 
 export type PaginatedPeople = {
   __typename?: 'PaginatedPeople';
-  endReached: Scalars['Boolean'];
-  limit: Scalars['Int'];
-  offset: Scalars['Int'];
+  endReached: Scalars['Boolean']['output'];
+  limit: Scalars['Int']['output'];
+  offset: Scalars['Int']['output'];
   results: Array<PersonInfo>;
 };
 
 export type Person = {
-  id: Scalars['ID'];
-  name: Scalars['String'];
-  profilePath?: Maybe<Scalars['String']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  profilePath?: Maybe<Scalars['String']['output']>;
 };
 
 export type PersonInfo = Person & {
   __typename?: 'PersonInfo';
-  biography?: Maybe<Scalars['String']>;
-  favourited?: Maybe<Scalars['Boolean']>;
-  id: Scalars['ID'];
-  knownForDepartment?: Maybe<Scalars['String']>;
-  name: Scalars['String'];
-  profilePath?: Maybe<Scalars['String']>;
+  biography?: Maybe<Scalars['String']['output']>;
+  favourited?: Maybe<Scalars['Boolean']['output']>;
+  id: Scalars['ID']['output'];
+  knownForDepartment?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  profilePath?: Maybe<Scalars['String']['output']>;
 };
 
 export type Provider = {
   __typename?: 'Provider';
-  id: Scalars['ID'];
-  logo: Scalars['String'];
-  name: Scalars['String'];
+  id: Scalars['ID']['output'];
+  logo: Scalars['String']['output'];
+  name: Scalars['String']['output'];
 };
 
 export type Query = {
@@ -220,52 +222,52 @@ export type Query = {
 
 
 export type QueryCastForMovieArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryCreditsForPersonArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryCrewForMovieArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryMovieArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryPersonArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryRecommendedMoviesArgs = {
-  size?: InputMaybe<Scalars['Int']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
 export type QuerySearchArgs = {
-  query: Scalars['String'];
+  query: Scalars['String']['input'];
 };
 
 
 export type QueryStreamingProvidersArgs = {
-  region: Scalars['String'];
+  region: Scalars['String']['input'];
 };
 
 
 export type QueryTrendingArgs = {
-  size?: InputMaybe<Scalars['Int']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
 export type QueryUserArgs = {
-  username: Scalars['ID'];
+  username: Scalars['ID']['input'];
 };
 
 export enum Sentiment {
@@ -276,17 +278,17 @@ export enum Sentiment {
 
 export type Stats = {
   __typename?: 'Stats';
-  favouritePeople: Scalars['Int'];
-  moviesLiked: Scalars['Int'];
-  watched: Scalars['Int'];
-  watchlist: Scalars['Int'];
+  favouritePeople: Scalars['Int']['output'];
+  moviesLiked: Scalars['Int']['output'];
+  watched: Scalars['Int']['output'];
+  watchlist: Scalars['Int']['output'];
 };
 
 export type Tomatometer = {
   __typename?: 'Tomatometer';
-  consensus?: Maybe<Scalars['String']>;
-  link: Scalars['String'];
-  score: Scalars['Int'];
+  consensus?: Maybe<Scalars['String']['output']>;
+  link: Scalars['String']['output'];
+  score: Scalars['Int']['output'];
   state: TomatometerState;
 };
 
@@ -298,34 +300,34 @@ export enum TomatometerState {
 
 export type User = {
   __typename?: 'User';
-  avatarUrl: Scalars['String'];
+  avatarUrl: Scalars['String']['output'];
   favouritePeople: PaginatedPeople;
-  isAdmin?: Maybe<Scalars['Boolean']>;
+  isAdmin?: Maybe<Scalars['Boolean']['output']>;
   likedMovies: PaginatedMovies;
   list: List;
   lists: Array<List>;
-  public?: Maybe<Scalars['Boolean']>;
+  public?: Maybe<Scalars['Boolean']['output']>;
   stats: Stats;
-  username: Scalars['ID'];
+  username: Scalars['ID']['output'];
   watched: PaginatedMovies;
   watchlist: PaginatedMovies;
 };
 
 
 export type UserFavouritePeopleArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
 export type UserLikedMoviesArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
 export type UserListArgs = {
-  id: Scalars['ID'];
+  id: Scalars['ID']['input'];
 };
 
 
@@ -335,14 +337,14 @@ export type UserListsArgs = {
 
 
 export type UserWatchedArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
 export type UserWatchlistArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type UserSettings = {
@@ -356,13 +358,13 @@ export type UserSettingsInput = {
 
 export type UserStreamingSettings = {
   __typename?: 'UserStreamingSettings';
-  providers: Array<Scalars['ID']>;
-  region?: Maybe<Scalars['ID']>;
+  providers: Array<Scalars['ID']['output']>;
+  region?: Maybe<Scalars['ID']['output']>;
 };
 
 export type UserStreamingSettingsInput = {
-  providers?: InputMaybe<Array<Scalars['ID']>>;
-  region?: InputMaybe<Scalars['ID']>;
+  providers?: InputMaybe<Array<Scalars['ID']['input']>>;
+  region?: InputMaybe<Scalars['ID']['input']>;
 };
 
 

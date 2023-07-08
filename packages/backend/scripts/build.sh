@@ -5,6 +5,7 @@ rm -rf build/*
 yarn graphql-type-gen
 yarn esbuild \
   --bundle \
+  --target=node14 \
   --platform=node \
   src/index.ts \
   --outfile=build/backend.js \

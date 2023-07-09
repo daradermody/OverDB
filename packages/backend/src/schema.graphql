@@ -133,7 +133,7 @@ type User {
   favouritePeople(offset: Int, limit: Int): PaginatedPeople!
   lists(type: ListType): [List!]!
   list(id: ID!): List!
-  watchlist(offset: Int, limit: Int): PaginatedMovies!
+  watchlist(offset: Int, limit: Int, filteredByProviders: Boolean): PaginatedMovies!
   watched(offset: Int, limit: Int): PaginatedMovies!
   likedMovies(offset: Int, limit: Int): PaginatedMovies!
   stats: Stats!

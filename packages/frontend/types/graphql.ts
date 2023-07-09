@@ -343,6 +343,7 @@ export type UserWatchedArgs = {
 
 
 export type UserWatchlistArgs = {
+  filteredByProviders?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -495,10 +496,16 @@ export type GetWatchlistQueryVariables = Exact<{
   username: Scalars['ID']['input'];
   offset?: InputMaybe<Scalars['Int']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
+  filteredByProviders?: InputMaybe<Scalars['Boolean']['input']>;
 }>;
 
 
 export type GetWatchlistQuery = { __typename?: 'Query', user: { __typename?: 'User', watchlist: { __typename?: 'PaginatedMovies', endReached: boolean, results: Array<{ __typename?: 'Movie', id: string, title: string, posterPath?: string | null, releaseDate?: string | null, watched?: boolean | null, inWatchlist?: boolean | null, sentiment?: Sentiment | null }> } } };
+
+export type GetSubscribedStreamingProvidersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetSubscribedStreamingProvidersQuery = { __typename?: 'Query', settings: { __typename?: 'UserSettings', streaming: { __typename?: 'UserStreamingSettings', providers: Array<string> } } };
 
 export type GetMovieInfoQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1300,9 +1307,13 @@ export type GetListsQueryHookResult = ReturnType<typeof useGetListsQuery>;
 export type GetListsLazyQueryHookResult = ReturnType<typeof useGetListsLazyQuery>;
 export type GetListsQueryResult = Apollo.QueryResult<GetListsQuery, GetListsQueryVariables>;
 export const GetWatchlistDocument = gql`
-    query GetWatchlist($username: ID!, $offset: Int, $limit: Int) {
+    query GetWatchlist($username: ID!, $offset: Int, $limit: Int, $filteredByProviders: Boolean) {
   user(username: $username) {
-    watchlist(offset: $offset, limit: $limit) {
+    watchlist(
+      offset: $offset
+      limit: $limit
+      filteredByProviders: $filteredByProviders
+    ) {
       endReached
       results {
         id
@@ -1333,6 +1344,7 @@ export const GetWatchlistDocument = gql`
  *      username: // value for 'username'
  *      offset: // value for 'offset'
  *      limit: // value for 'limit'
+ *      filteredByProviders: // value for 'filteredByProviders'
  *   },
  * });
  */
@@ -1347,6 +1359,42 @@ export function useGetWatchlistLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type GetWatchlistQueryHookResult = ReturnType<typeof useGetWatchlistQuery>;
 export type GetWatchlistLazyQueryHookResult = ReturnType<typeof useGetWatchlistLazyQuery>;
 export type GetWatchlistQueryResult = Apollo.QueryResult<GetWatchlistQuery, GetWatchlistQueryVariables>;
+export const GetSubscribedStreamingProvidersDocument = gql`
+    query GetSubscribedStreamingProviders {
+  settings {
+    streaming {
+      providers
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetSubscribedStreamingProvidersQuery__
+ *
+ * To run a query within a React component, call `useGetSubscribedStreamingProvidersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSubscribedStreamingProvidersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSubscribedStreamingProvidersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetSubscribedStreamingProvidersQuery(baseOptions?: Apollo.QueryHookOptions<GetSubscribedStreamingProvidersQuery, GetSubscribedStreamingProvidersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetSubscribedStreamingProvidersQuery, GetSubscribedStreamingProvidersQueryVariables>(GetSubscribedStreamingProvidersDocument, options);
+      }
+export function useGetSubscribedStreamingProvidersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSubscribedStreamingProvidersQuery, GetSubscribedStreamingProvidersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetSubscribedStreamingProvidersQuery, GetSubscribedStreamingProvidersQueryVariables>(GetSubscribedStreamingProvidersDocument, options);
+        }
+export type GetSubscribedStreamingProvidersQueryHookResult = ReturnType<typeof useGetSubscribedStreamingProvidersQuery>;
+export type GetSubscribedStreamingProvidersLazyQueryHookResult = ReturnType<typeof useGetSubscribedStreamingProvidersLazyQuery>;
+export type GetSubscribedStreamingProvidersQueryResult = Apollo.QueryResult<GetSubscribedStreamingProvidersQuery, GetSubscribedStreamingProvidersQueryVariables>;
 export const GetMovieInfoDocument = gql`
     query GetMovieInfo($id: ID!) {
   movie(id: $id) {

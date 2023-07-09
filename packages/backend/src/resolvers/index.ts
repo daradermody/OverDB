@@ -19,7 +19,7 @@ import {
   PaginatedMovies,
   PaginatedPeople,
   PersonInfo,
-  PersonWithoutFav,
+  PersonWithoutFav, Provider,
   QueryCastForMovieArgs,
   QueryCreditsForPersonArgs,
   QueryCrewForMovieArgs,
@@ -48,7 +48,7 @@ const index: Resolvers<{ user?: User }> = {
     watched: (parent, _, {user}) => user ? UserData.isWatched(user.username, parent.id) : null,
     inWatchlist: (parent, _, {user}) => user ? UserData.inWatchlist(user.username, parent.id) : null,
     tomatometer: ({imdbId}) => RottenTomatoes.getScore(imdbId),
-    providers: ({id}) => MovieDb.streamingProviders(id)
+    providers: ({id}, _, {user}) => MovieDb.streamingProviders(id, user ? UserData.getSettings(user.username).streaming.region || 'IE' : 'IE')
   },
   MovieCredit: {
     sentiment: (parent: MovieCredit, _, {user}) => user ? UserData.getSentiment(user.username, parent.id) : null,
@@ -63,8 +63,16 @@ const index: Resolvers<{ user?: User }> = {
       const ids = UserData.getFavourites(parent.username).slice().reverse()
       return paginate(ids, MovieDb.personInfo, args.offset, args.limit) as Promise<PaginatedPeople>
     },
-    watchlist: (parent, args) => {
-      const ids = UserData.getWatchlist(parent.username).slice().reverse()
+    watchlist: async (parent, args, {user}) => {
+      let ids = UserData.getWatchlist(parent.username).slice().reverse()
+      if (!!args.filteredByProviders && user?.username === parent.username) {
+        const subscribedProviderIds = UserData.getSettings(user.username).streaming.providers
+        const region = UserData.getSettings(user.username).streaming.region || 'IE'
+        const idsAndProviders = await Promise.all(ids.map(async id => [id, await MovieDb.streamingProviders(id, region)] as const))
+        ids = idsAndProviders
+          .filter(([id, providerIds]) => providerIds.some(({id}) => subscribedProviderIds.includes(id)))
+          .map(([id]) => id)
+      }
       return paginate(ids, MovieDb.movieInfo, args.offset, args.limit) as Promise<PaginatedMovies>
     },
     likedMovies: (parent, args) => {

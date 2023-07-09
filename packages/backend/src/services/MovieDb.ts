@@ -32,6 +32,8 @@ interface Cache {
   personInfo: {
     [id: Person['id']]: PersonWithoutFav
   },
+  allProviders: Record<string, Record<Provider['id'], Provider>>,
+  movieProviders: Record<Movie['id'], Record<string, Provider['id'][]>>
 }
 
 const key = getToken('TMDB_TOKEN')
@@ -64,7 +66,6 @@ export default class MovieDb {
           return movie
         })
       MovieDb.save()
-        .catch(console.error)
     }
     return MovieDb.cache.personMovieCredits[id]
   }
@@ -82,7 +83,6 @@ export default class MovieDb {
       const movie = await MovieDb.movieDbApi.movieInfo({id})
       MovieDb.cache.movieInfo[id] = pickMovieProperties(movie)
       MovieDb.save()
-        .catch(console.error)
     }
     return MovieDb.cache.movieInfo[id]
   }
@@ -96,7 +96,6 @@ export default class MovieDb {
         .map(pickCrewCreditForMovieProperties)
         .sort(sortByRole)
       MovieDb.save()
-        .catch(console.error)
     }
     return MovieDb.cache.movieCrew[id]
   }
@@ -108,7 +107,6 @@ export default class MovieDb {
         .map(pickCastCreditForMovieProperties)
         .sort((a, b) => a.order - b.order)
       MovieDb.save()
-        .catch(console.error)
     }
     return MovieDb.cache.movieCast[id]
   }
@@ -145,31 +143,49 @@ export default class MovieDb {
       .slice(0, size)
   }
 
-  static async streamingProviders(movieId: Movie['id']): Promise<Provider[]> {
-    const {results} = await this.movieDbApi.movieWatchProviders({id: movieId})
-    return results?.IE?.flatrate?.map(provider => ({
-      id: `${provider.provider_id!}`,
-      name: provider.provider_name!,
-      logo: provider.logo_path!
-    })) || []
+  static async streamingProviders(movieId: Movie['id'], region: string): Promise<Provider[]> {
+    if (!MovieDb.cache.movieProviders[movieId]) {
+      if (!MovieDb.cache.allProviders[region]) {
+        await MovieDb.allStreamingProviders(region)
+      }
+      const {results} = await this.movieDbApi.movieWatchProviders({id: movieId})
+      const movieProviders: Record<string, Provider['id'][]> = {}
+      for (const [region, {flatrate}] of Object.entries(results!)) {
+        movieProviders[region] = flatrate?.map(provider => `${provider.provider_id}`) || []
+      }
+      MovieDb.cache.movieProviders[movieId] = movieProviders
+      MovieDb.save()
+    }
+    return (MovieDb.cache.movieProviders[movieId][region] || [])
+      .map(providerId => MovieDb.cache.allProviders[region][providerId])
+      .filter(provider => !!provider)
   }
 
   static async allStreamingProviders(region: string): Promise<Provider[]> {
-    const {results} = await this.movieDbApi.movieWatchProviderList({watch_region: region})
-    return results?.map(provider => ({
-      id: `${provider.provider_id!}`,
-      name: provider.provider_name!,
-      logo: provider.logo_path!
-    })) || []
+    if (!MovieDb.cache.allProviders[region]) {
+      const {results} = await this.movieDbApi.movieWatchProviderList({watch_region: region})
+      const providers = results?.map(provider => ({
+        id: `${provider.provider_id!}`,
+        name: provider.provider_name!,
+        logo: provider.logo_path!
+      })) || []
+      const providersMap: Record<Provider['id'], Provider> = {}
+      for (const provider of providers) {
+        providersMap[provider.id] = provider
+      }
+      MovieDb.cache.allProviders[region] = providersMap
+      MovieDb.save()
+    }
+    return Object.values(MovieDb.cache.allProviders[region])
   }
 
-  static async save(): Promise<void> {
+  static save(): void {
     fs.writeFileSync(MovieDb.FILE_PATH, JSON.stringify(MovieDb.cache))
   }
 
   private static readCache(): Cache {
     if (!fs.existsSync(MovieDb.FILE_PATH)) {
-      const initial: Cache = {personInfo: {}, movieCrew: {}, movieCast: {}, personMovieCredits: {}, movieInfo: {}}
+      const initial: Cache = {personInfo: {}, movieCrew: {}, movieCast: {}, personMovieCredits: {}, movieInfo: {}, allProviders: {}, movieProviders: {}}
       fs.writeFileSync(MovieDb.FILE_PATH, JSON.stringify(initial))
     }
     return JSON.parse(fs.readFileSync(MovieDb.FILE_PATH, 'utf-8'))

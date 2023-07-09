@@ -343,6 +343,7 @@ export type UserWatchedArgs = {
 
 
 export type UserWatchlistArgs = {
+  filteredByProviders?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 };

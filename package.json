@@ -1,5 +1,5 @@
 {
-  "name": "over-db",
+  "name": "overdb",
   "version": "0.1.0",
   "author": "Dara Dermody",
   "description": "Web application that allows people to easily follow their favourite cast and crew in movies",
@@ -30,6 +30,18 @@
   "private": true,
   "devDependencies": {
     "concurrently": "^8.2.0",
-    "nexe": "^4.0.0-rc.2"
+    "pkg": "^5.8.1"
+  },
+  "bin": "build/backend.js",
+  "pkg": {
+    "outputPath": "build",
+    "assets": [
+      "build/schema.graphql",
+      "build/static",
+      "build/xhr-sync-worker.js"
+    ],
+    "targets": [
+      "node18-linux-x64"
+    ]
   }
 }

@@ -7,11 +7,11 @@ OverDB's backend uses the following technologies:
 - Typescript
 - Apollo Server
 - Plain JSON files (as database)
-- Nexe
+- Pkg
 
 Almost all requests go through [these resolvers](./src/resolvers/index.ts) (the exception being `/loginWithPassword`) which then user [services](./src/services) to fetch or manipulate data. The registered list of users is [hardcoded](./src/services/users.ts) and user information is stored in the cookie.
 
-`ts-node` is used as the dev server, and a combination of `esbiuld` and `nexe` is used to create an executable that is pushed to AWS EC2. The EC2 server is then hidden behind CloudFront. To start the server, a `TMDB_TOKEN` environment variable needs to be set (e.g. in your `~/.bashrc`).
+`ts-node` is used as the dev server, and a combination of `esbiuld` and `pkg` is used to create an executable that is pushed to AWS EC2. The EC2 server is then hidden behind CloudFront. To start the server, a `TMDB_TOKEN` environment variable needs to be set (e.g. in your `~/.bashrc`).
 
 ## Data
 

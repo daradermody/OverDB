@@ -540,7 +540,7 @@ export type GetStreamingProvidersQueryVariables = Exact<{
 }>;
 
 
-export type GetStreamingProvidersQuery = { __typename?: 'Query', movie: { __typename?: 'Movie', id: string, providers: Array<{ __typename?: 'Provider', logo: string, name: string }> } };
+export type GetStreamingProvidersQuery = { __typename?: 'Query', movie: { __typename?: 'Movie', id: string, providers: Array<{ __typename?: 'Provider', id: string, logo: string, name: string }> } };
 
 export type GetPersonCreditsQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1657,6 +1657,7 @@ export const GetStreamingProvidersDocument = gql`
   movie(id: $id) {
     id
     providers {
+      id
       logo
       name
     }

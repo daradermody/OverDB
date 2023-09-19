@@ -9,7 +9,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n client,server -c green,cyan 'yarn workspace @overdb/frontend dev' 'yarn workspace @overdb/backend dev'",
+    "dev": "concurrently -n client,server -c green,cyan 'cd packages/backend && bun dev' 'cd packages/frontend && bun dev'",
     "graphql-type-gen": "yarn workspaces foreach --parallel run graphql-type-gen",
     "build": "NODE_ENV=production scripts/build.sh",
     "deploy": "scripts/deploy.sh"
@@ -29,6 +29,7 @@
   },
   "private": true,
   "devDependencies": {
+    "bun-types": "^1.0.2",
     "concurrently": "^8.2.2",
     "pkg": "^5.8.1"
   },

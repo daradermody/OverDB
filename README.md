@@ -11,7 +11,7 @@ This project is composed of two workspaces:
 
 These two communicate almost entirely in GraphQL, and uses cookies for session authentication. All movie data is provided by [The Movie Database (TMDB)](https://www.themoviedb.org/).
 
-All workspaces can be built and deployed using `yarn build` and `yarn deploy` (though backend deployment requires extra steps). Both are deployed to AWS services (S3 and EC2) and delivered through AWS CloudFront (which also provides HTTPS), so deployment requires access setup.
+All workspaces can be built and deployed using `bun run build` and `bun run deploy` (though backend deployment requires extra steps). Both are deployed to AWS services (S3 and EC2) and delivered through AWS CloudFront (which also provides HTTPS), so deployment requires access setup.
 
 ## Usage
 

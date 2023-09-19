@@ -1,14 +1,13 @@
+import * as React from 'react'
 import { gql } from '@apollo/client'
 import styled from '@emotion/styled'
-import CloseIcon from '@mui/icons-material/Close'
-import SearchIcon from '@mui/icons-material/Search'
+import { Search as SearchIcon, Close as CloseIcon } from '@mui/icons-material'
 import { Autocomplete, Box, Fab, IconButton, InputAdornment, Modal, Skeleton, TextField, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { useThrottleCallback } from '@react-hook/throttle'
-import * as React from 'react'
 import { HTMLAttributes, useCallback, useEffect, useState } from 'react'
 import { useLocation } from 'react-router'
 import { useNavigate } from 'react-router-dom'
-import { Movie, PersonInfo, MovieOrPerson, useSearchLazyQuery } from '../../types/graphql'
+import { Movie, PersonInfo, MovieOrPerson, useSearchLazyQuery, SearchQuery } from '../../types/graphql'
 import { useMutationErrorHandler } from '../shared/errorHandlers'
 import { Poster } from '../shared/general/Poster'
 
@@ -78,7 +77,7 @@ function SearchInput(props: SearchProps) {
   const [search, {data, loading, error}] = useSearchLazyQuery({notifyOnNetworkStatusChange: true})
   useMutationErrorHandler('Could not search', error)
 
-  const goToSearchPage = useCallback((searchQuery) => {
+  const goToSearchPage = useCallback((searchQuery: string) => {
     if (!searchQuery) return
     setQuery('')
     setIsOpen(false)
@@ -102,7 +101,7 @@ function SearchInput(props: SearchProps) {
   useEffect(() => setIsOpen(!!query), [query, setIsOpen])
 
   return (
-    <Autocomplete<MovieOrPerson, false, false, true>
+    <Autocomplete<SearchQuery['search'][0], false, false, true>
       options={data?.search || []}
       noOptionsText="No results found"
       loadingText={<div style={{ maxHeight: 'calc(40vh - 16px)', margin: '-6px -16px' }}><LoadingResults/></div>}

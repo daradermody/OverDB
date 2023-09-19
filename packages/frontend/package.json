@@ -2,7 +2,7 @@
   "name": "@overdb/frontend",
   "packageManager": "yarn@3.2.2",
   "scripts": {
-    "dev": "NODE_ENV=development node scripts/devServer.js",
+    "dev": "NODE_ENV=development bun --watch scripts/devServer.ts",
     "build": "NODE_ENV=production scripts/build.sh",
     "graphql-type-gen": "graphql-codegen --config codegen.yml"
   },
@@ -46,7 +46,6 @@
     "@types/country-list": "^2.1.4",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^20.11.16",
-    "esbuild-server": "^0.3.0",
     "graphql-tag": "^2.12.6",
     "typescript": "^5.3.3"
   }

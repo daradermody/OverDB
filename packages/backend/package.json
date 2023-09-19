@@ -2,10 +2,9 @@
   "name": "@overdb/backend",
   "packageManager": "yarn@3.2.2",
   "scripts": {
-    "start": "ts-node src",
-    "dev": "NODE_ENV=development nodemon",
+    "dev": "NODE_ENV=development bun --watch run src/index.ts",
     "graphql-type-gen": "graphql-codegen --config codegen.yml",
-    "hash-password": "ts-node scripts/digestPassword.ts",
+    "hash-password": "bun scripts/digestPassword.ts",
     "build": "NODE_ENV=production scripts/build.sh"
   },
   "dependencies": {
@@ -32,16 +31,6 @@
     "@types/node": "^20.11.16",
     "esbuild": "^0.20.0",
     "graphql-tag": "^2.12.6",
-    "nodemon": "^3.0.3",
-    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
-  },
-  "nodemonConfig": {
-    "exec": "yarn start",
-    "ext": "ts",
-    "ignore": [
-      "database/user_data.json",
-      "moviedb_cache.json"
-    ]
   }
 }

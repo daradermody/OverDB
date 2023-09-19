@@ -58,6 +58,7 @@ async function main() {
 }
 
 async function login(req: Request, res: Response) {
+  console.log('loggin in...', req.body)
   if (await isLoginValid(req.body.username, req.body.password)) {
     const user = getUser(req.body.username)
     const cookie = JSON.stringify(user)

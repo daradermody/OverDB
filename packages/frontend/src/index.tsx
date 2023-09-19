@@ -37,5 +37,5 @@ function Root() {
 }
 
 if ('serviceWorker' in navigator) {
-  void navigator.serviceWorker.register('/serviceWorker.js', {scope: '/'})
+  void navigator.serviceWorker.register('/serviceWorker.js', {scope: '/', type: 'module'})
 }

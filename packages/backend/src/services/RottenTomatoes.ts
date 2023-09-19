@@ -12,7 +12,7 @@ export default class RottenTomatoes {
       if (!moviePageLink) return null
       return await this.getScoreFromPage(moviePageLink)
     } catch (e) {
-      console.error((e as Error).message)
+      console.error(`Could not get score for IMDB ID: ${imdbId} -`, (e as Error).message)
       return null
     }
   }

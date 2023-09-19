@@ -6,4 +6,4 @@ yarn workspaces foreach --parallel run build
 
 cp -r packages/backend/build/ build/
 cp -r packages/frontend/build build/static
-yarn pkg package.json
+bun build build/backend.js --compile --target bun

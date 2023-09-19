@@ -2,15 +2,6 @@
 set -e
 
 rm -rf build/*
-yarn graphql-type-gen
-yarn esbuild \
-  --bundle \
-  --target=node18 \
-  --platform=node \
-  src/index.ts \
-  --outfile=build/backend.js \
-  --define:process.env.NODE_ENV=\"production\" \
-  --external:canvas \
-  --external:./xhr-sync-worker.js
-touch build/xhr-sync-worker.js
+bun graphql-type-gen
+bun build src/index.ts --target bun --outfile build/backend.js --minify
 cp src/schema.graphql build

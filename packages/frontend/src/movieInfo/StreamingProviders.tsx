@@ -5,6 +5,7 @@ import * as React from 'react'
 import { Movie, Provider, useGetStreamingProvidersQuery } from '../../types/graphql'
 import { ProviderLogo } from '../shared/general/Poster'
 
+
 export default function StreamingProviders({id}: { id: Movie['id'] }) {
   const {data, loading, error} = useGetStreamingProvidersQuery({variables: {id}})
 
@@ -64,6 +65,7 @@ gql`
     movie(id: $id) {
       id
       providers {
+        id
         logo
         name
       }

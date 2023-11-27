@@ -22,7 +22,6 @@ import useIsOnline from './shared/useIsOnline'
 import UpcomingMovies from './upcomingMovies/UpcomingMovies'
 import useUser, { userSignal } from './useUser'
 import WatchedMovies from './WatchedMovies/WatchedMovies'
-import Watchlist from './lists/Watchlist'
 
 export default function App() {
   const isOnline = useIsOnline()
@@ -62,7 +61,6 @@ function AppRoutes() {
       <Route path="/profile/:username/favourites" element={<Navigate to={`/profile/${user?.username}/favourite/people`} replace/>}/>
       <Route path="/profile/:username/favourite/:type" element={<Favourites/>}/>
       <Route path="/profile/:username/lists" element={<Lists/>}/>
-      <Route path="/profile/:username/list/watchlist" element={<Watchlist/>}/>
       <Route path="/profile/:username/list/:id" element={<List/>}/>
       <Route path="/profile/:username/watched" element={<WatchedMovies/>}/>
       <Route path="/upcoming" element={authed(<UpcomingMovies/>)}/>

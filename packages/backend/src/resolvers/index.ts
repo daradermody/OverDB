@@ -63,18 +63,6 @@ const index: Resolvers<{ user?: User }> = {
       const ids = UserData.getFavourites(parent.username).slice().reverse()
       return paginate(ids, MovieDb.personInfo, args.offset, args.limit) as Promise<PaginatedPeople>
     },
-    watchlist: async (parent, args, {user}) => {
-      let ids = UserData.getWatchlist(parent.username).slice().reverse()
-      if (!!args.filteredByProviders && user?.username === parent.username) {
-        const subscribedProviderIds = UserData.getSettings(user.username).streaming.providers
-        const region = UserData.getSettings(user.username).streaming.region || 'IE'
-        const idsAndProviders = await Promise.all(ids.map(async id => [id, await MovieDb.streamingProviders(id, region)] as const))
-        ids = idsAndProviders
-          .filter(([id, providerIds]) => providerIds.some(({id}) => subscribedProviderIds.includes(id)))
-          .map(([id]) => id)
-      }
-      return paginate(ids, MovieDb.movieInfo, args.offset, args.limit) as Promise<PaginatedMovies>
-    },
     likedMovies: (parent, args) => {
       const ids = UserData.getLikedMovies(parent.username).slice().reverse()
       return paginate(ids, MovieDb.movieInfo, args.offset, args.limit) as Promise<PaginatedMovies>
@@ -92,21 +80,35 @@ const index: Resolvers<{ user?: User }> = {
       ])
       return {favouritePeople: people.length, watched: watched.length, moviesLiked: liked.length, watchlist: watchlist.length}
     },
-    lists: async (parent, args) => await Promise.all(
+    lists: async (parent, args, {user}) => await Promise.all(
       UserData.getLists(parent.username)
         .sort((a, b) => a.id === 'watchlist' || (b.id !== 'watchlist' && a.name.toLowerCase() < b.name.toLowerCase()) ? -1 : 1)
-        .filter(list => !args.type || list.type === args.type)
-        .map(convertList)
+        .filter(list => !args.type || list.type === args.type) as any as List[]
+        // .map(convertList)
     ),
     list: async (parent, args, {user}) => {
       const requestedUser = getUser(parent.username)
       verifyUserAccessible(requestedUser, user)
-      return convertList(UserData.getList(parent.username, args.id))
+      return UserData.getList(parent.username, args.id) as any as List
     },
   },
   MovieOrPerson: {
     __resolveType: (obj: MovieOrPerson) => {
       return isMovieSummary(obj) ? 'Movie' : 'PersonInfo'
+    }
+  },
+  List: {
+    items: async (parent, args, {user}, resolveInfo) => {
+      let ids = UserData.getList(resolveInfo.variableValues.username as string, parent.id).ids.slice().reverse()
+      if (!!args.filteredByProviders && !!user && user?.username === resolveInfo.variableValues.username) {
+        const subscribedProviderIds = UserData.getSettings(user.username).streaming.providers
+        const region = UserData.getSettings(user.username).streaming.region || 'IE'
+        const idsAndProviders = await Promise.all(ids.map(async id => [id, await MovieDb.streamingProviders(id, region)] as const))
+        ids = idsAndProviders
+          .filter(([id, providerIds]) => providerIds.some(({id}) => subscribedProviderIds.includes(id)))
+          .map(([id]) => id)
+      }
+      return await paginate(ids, MovieDb.movieInfo, args.offset, args.limit) as PaginatedMovies
     }
   },
   Query: {
@@ -156,7 +158,7 @@ const index: Resolvers<{ user?: User }> = {
       return await MovieDb.movieInfo(args.id) as Movie
     }),
     createList: requiresLogin(async (_, args: MutationCreateListArgs, {user}) => {
-      return convertList(UserData.createList(user.username, args))
+      return UserData.createList(user.username, args) as any as List
     }),
     deleteLists: requiresLogin((_, args: MutationDeleteListsArgs, {user}) => {
       const existingIds = UserData.getLists(user.username).map(list => list.id)
@@ -182,7 +184,7 @@ const index: Resolvers<{ user?: User }> = {
       return true
     }),
     editList: requiresLogin(async (_, args: MutationEditListArgs, {user}) => {
-      return await convertList(UserData.updateList(user.username, args.id, {name: args.name}))
+      return UserData.updateList(user.username, args.id, {name: args.name}) as any as List
     }),
     addToList: requiresLogin(async (_, args: MutationAddToListArgs, {user}) => {
       try {
@@ -199,10 +201,10 @@ const index: Resolvers<{ user?: User }> = {
           },
         })
       }
-      return convertList(UserData.addToList(user.username, args.listId, args.itemId))
+      return UserData.addToList(user.username, args.listId, args.itemId) as any as List
     }),
     removeFromList: requiresLogin(async (_, args: MutationAddToListArgs, {user}) => {
-      return convertList(UserData.removeFromList(user.username, args.listId, args.itemId))
+      return UserData.removeFromList(user.username, args.listId, args.itemId) as any as List
     }),
     updateUserSettings: requiresLogin(async (_, args: MutationUpdateUserSettingsArgs, {user}) => {
       return UserData.updateSettings(user.username, args.settings)
@@ -210,14 +212,17 @@ const index: Resolvers<{ user?: User }> = {
   }
 }
 
-async function convertList(list: StoredList): Promise<List> {
-  return {
-    id: list.id,
-    type: list.type,
-    name: list.name,
-    items: await Promise.all(list.ids.map(id => list.type === 'MOVIE' ? MovieDb.movieInfo(id) as Promise<Movie> : MovieDb.personInfo(id) as Promise<PersonInfo>)),
-  }
-}
+// async function convertList(list: StoredList): Promise<List> {
+//   return {
+//     id: list.id,
+//     type: list.type,
+//     name: list.name,
+//     items: await Promise.all(
+//       list.ids
+//         .map(id => list.type === 'MOVIE' ? MovieDb.movieInfo(id) as Promise<Movie> : MovieDb.personInfo(id) as Promise<PersonInfo>)
+//     ) as List[]
+//   }
+// }
 
 function requiresLogin<TResult, TParent, TContext extends { user?: User }, TArgs>(resolver: ResolverFn<TResult, TParent, TContext & { user: User }, TArgs>): ResolverFn<TResult, TParent, TContext, TArgs> {
   return (parent: TParent, args: TArgs, context: TContext, info: GraphQLResolveInfo): TResult | Promise<TResult> => {

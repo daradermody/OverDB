@@ -6,25 +6,17 @@ import { useEffect, useState } from 'react'
 
 const cache = new InMemoryCache({
   typePolicies: {
+    List: {
+      fields: {
+        items: {keyArgs: false, merge: mergePaginated}
+      }
+    },
     User: {
       merge: (existing, incoming) => ({...existing, ...incoming}),
       fields: {
-        watched: {
-          keyArgs: false,
-          merge: mergePaginated,
-        },
-        watchlist: {
-          keyArgs: false,
-          merge: mergePaginated,
-        },
-        likedMovies: {
-          keyArgs: false,
-          merge: mergePaginated,
-        },
-        favouritePeople: {
-          keyArgs: false,
-          merge: mergePaginated,
-        }
+        watched: {keyArgs: false, merge: mergePaginated},
+        likedMovies: {keyArgs: false, merge: mergePaginated},
+        favouritePeople: {keyArgs: false, merge: mergePaginated}
       }
     }
   }

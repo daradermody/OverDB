@@ -6,7 +6,6 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -37,9 +36,16 @@ export type CrewCredit = Person & {
 export type List = {
   __typename?: 'List';
   id: Scalars['ID']['output'];
-  items: Array<MovieOrPerson>;
+  items: PaginatedMovies;
   name: Scalars['String']['output'];
   type: ListType;
+};
+
+
+export type ListItemsArgs = {
+  filteredByProviders?: InputMaybe<Scalars['Boolean']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export enum ListType {
@@ -170,6 +176,7 @@ export type PaginatedMovies = {
   limit: Scalars['Int']['output'];
   offset: Scalars['Int']['output'];
   results: Array<Movie>;
+  total: Scalars['Int']['output'];
 };
 
 export type PaginatedPeople = {
@@ -310,7 +317,6 @@ export type User = {
   stats: Stats;
   username: Scalars['ID']['output'];
   watched: PaginatedMovies;
-  watchlist: PaginatedMovies;
 };
 
 
@@ -337,13 +343,6 @@ export type UserListsArgs = {
 
 
 export type UserWatchedArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type UserWatchlistArgs = {
-  filteredByProviders?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -454,7 +453,7 @@ export type ResolversTypes = ResolversObject<{
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
-  List: ResolverTypeWrapper<Omit<List, 'items'> & { items: Array<ResolversTypes['MovieOrPerson']> }>;
+  List: ResolverTypeWrapper<List>;
   ListType: ListType;
   Movie: ResolverTypeWrapper<Movie>;
   MovieCredit: ResolverTypeWrapper<MovieCredit>;
@@ -487,7 +486,7 @@ export type ResolversParentTypes = ResolversObject<{
   Float: Scalars['Float']['output'];
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
-  List: Omit<List, 'items'> & { items: Array<ResolversParentTypes['MovieOrPerson']> };
+  List: List;
   Movie: Movie;
   MovieCredit: MovieCredit;
   MovieInfo: MovieInfo;
@@ -528,7 +527,7 @@ export type CrewCreditResolvers<ContextType = any, ParentType extends ResolversP
 
 export type ListResolvers<ContextType = any, ParentType extends ResolversParentTypes['List'] = ResolversParentTypes['List']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  items?: Resolver<Array<ResolversTypes['MovieOrPerson']>, ParentType, ContextType>;
+  items?: Resolver<ResolversTypes['PaginatedMovies'], ParentType, ContextType, Partial<ListItemsArgs>>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   type?: Resolver<ResolversTypes['ListType'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -599,6 +598,7 @@ export type PaginatedMoviesResolvers<ContextType = any, ParentType extends Resol
   limit?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   offset?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   results?: Resolver<Array<ResolversTypes['Movie']>, ParentType, ContextType>;
+  total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -677,7 +677,6 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   stats?: Resolver<ResolversTypes['Stats'], ParentType, ContextType>;
   username?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   watched?: Resolver<ResolversTypes['PaginatedMovies'], ParentType, ContextType, Partial<UserWatchedArgs>>;
-  watchlist?: Resolver<ResolversTypes['PaginatedMovies'], ParentType, ContextType, Partial<UserWatchlistArgs>>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

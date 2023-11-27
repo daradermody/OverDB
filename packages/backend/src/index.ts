@@ -1,11 +1,15 @@
-import { ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageLocalDefault, } from 'apollo-server-core'
-import { ApolloServer, gql } from 'apollo-server-express'
-import { ExpressContext } from 'apollo-server-express/src/ApolloServer'
+import { ApolloServer } from '@apollo/server'
+import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { ExpressContextFunctionArgument } from '@apollo/server/src/express4'
+
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import * as dotenv from 'dotenv'
-import express, { Request, Response } from 'express'
+import express, { Request, RequestHandler, Response } from 'express'
 import * as fs from 'fs'
+import gql from 'graphql-tag'
 import * as http from 'http'
 import { join } from 'path'
 import resolvers from './resolvers'
@@ -30,13 +34,12 @@ async function main() {
   const server = new ApolloServer({
     typeDefs: gql(fs.readFileSync(__dirname + '/schema.graphql', 'utf-8')),
     resolvers,
-    formatError: (error) => {
+    formatError(error) {
       console.log(JSON.stringify(error, null, 2))
       return error
     },
     csrfPrevention: true,
     cache: 'bounded',
-    context: authContext,
     introspection: true,
     plugins: [
       ApolloServerPluginDrainHttpServer({httpServer}),
@@ -45,8 +48,8 @@ async function main() {
   })
 
   await server.start()
-  server.applyMiddleware({app, cors: {allowedHeaders: ['Content-Type']}})
-  app.get('*', (req, res) => res.sendFile(join(__dirname, 'static/index.html')))
+  app.use('/graphql', expressMiddleware(server, { context: authContext }) as RequestHandler);
+  app.get('*', (_, res) => res.sendFile(join(__dirname, 'static/index.html')))
   await new Promise<void>(resolve => httpServer.listen({port: PORT}, resolve))
   console.log(`🚀 Backend ready at http://localhost:${PORT}`)
 }
@@ -62,7 +65,7 @@ async function login(req: Request, res: Response) {
   }
 }
 
-function authContext({req}: ExpressContext) {
+async function authContext({req}: ExpressContextFunctionArgument) {
   const user = JSON.parse(req.signedCookies.user || null) as User
   return {user}
 }

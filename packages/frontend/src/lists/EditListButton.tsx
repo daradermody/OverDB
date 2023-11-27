@@ -6,7 +6,13 @@ import { useEffect, useState } from 'react'
 import { List, useEditListMutation } from '../../types/graphql'
 import { useMutationErrorHandler } from '../shared/errorHandlers'
 
-export default function EditListButton({list, disabled, onEdit}: { list: List, disabled: boolean, onEdit(): void }) {
+interface EditButtonProps {
+  list?: Pick<List, 'id' | 'name'>;
+  disabled: boolean;
+  onEdit(): void
+}
+
+export default function EditListButton({list, disabled, onEdit}: EditButtonProps) {
   const [modalOpen, setModalOpen] = useState(false)
   const [name, setName] = useState('')
   const [edit, {loading, error}] = useEditListMutation()

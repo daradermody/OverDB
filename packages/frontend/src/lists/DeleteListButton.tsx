@@ -1,12 +1,17 @@
 import { gql } from '@apollo/client'
 import { LoadingButton } from '@mui/lab'
-import { Button, Dialog, List as MuiList, DialogActions, DialogContent, DialogTitle, ListItem, ListItemText, Typography } from '@mui/material'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, List as MuiList, ListItem, ListItemText, Typography } from '@mui/material'
 import * as React from 'react'
 import { useState } from 'react'
 import { List, useDeleteListsMutation } from '../../types/graphql'
 import { useMutationErrorHandler } from '../shared/errorHandlers'
 
-export default function DeleteListsButton({lists, onDelete}: { lists?: List[], onDelete(): void }) {
+interface DeleteListsButtonProps {
+  lists?: (Pick<List, 'id' | 'name'> & {items: {results: any[] }})[];
+  onDelete(): void;
+}
+
+export default function DeleteListsButton({lists, onDelete}: DeleteListsButtonProps) {
   const [modalOpen, setModalOpen] = useState(false)
   const [deleteLists, {loading, error}] = useDeleteListsMutation()
   useMutationErrorHandler('Could not delete list', error)
@@ -28,7 +33,7 @@ export default function DeleteListsButton({lists, onDelete}: { lists?: List[], o
           <MuiList>
             {lists?.map(list => (
               <ListItem key={list.id}>
-                <ListItemText primary={`${list.name} (${list.items.length} items)`}/>
+                <ListItemText primary={`${list.name} (${list.items.results.length} items)`}/>
               </ListItem>
             ))}
           </MuiList>

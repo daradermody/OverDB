@@ -77,6 +77,7 @@ enum Sentiment {
 }
 
 type PaginatedMovies {
+  total: Int!
   offset: Int!
   limit: Int!
   endReached: Boolean!
@@ -133,7 +134,6 @@ type User {
   favouritePeople(offset: Int, limit: Int): PaginatedPeople!
   lists(type: ListType): [List!]!
   list(id: ID!): List!
-  watchlist(offset: Int, limit: Int, filteredByProviders: Boolean): PaginatedMovies!
   watched(offset: Int, limit: Int): PaginatedMovies!
   likedMovies(offset: Int, limit: Int): PaginatedMovies!
   stats: Stats!
@@ -148,7 +148,7 @@ type List {
   id: ID!
   name: String!
   type: ListType!
-  items: [MovieOrPerson!]!
+  items(offset: Int, limit: Int, filteredByProviders: Boolean): PaginatedMovies!
 }
 
 type Query {

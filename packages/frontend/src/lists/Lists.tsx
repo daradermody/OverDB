@@ -17,7 +17,7 @@ import EditListButton from './EditListButton'
 
 export default function Lists() {
   const {user} = useUser()
-  const {username} = useParams<{ username: string }>()
+  const {username} = useParams<{username: string}>()
   const {data, loading, error, refetch} = useGetListsQuery({variables: {username}})
   const [selected, setSelected] = useState([])
 
@@ -66,7 +66,7 @@ const columns: GridColDef<UserList>[] = [
   {
     headerName: 'Size',
     field: 'size',
-    renderCell: (params) => params.row.items?.length
+    renderCell: (params) => params.row.items?.results.length
   },
 ]
 
@@ -77,14 +77,12 @@ gql`
       lists {
         id
         name
-        items {
-          ... on Movie {
-            id
-          }
-          ... on Person {
-            id
-          }
-        }
+        type
+#        items {
+#          results {
+#            id
+#          }
+#        }
       }
     }
   }

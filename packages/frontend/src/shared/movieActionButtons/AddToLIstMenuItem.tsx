@@ -20,14 +20,14 @@ export function useAddToListMenuItem(id: Movie['id']) {
 function AddToListDialog({movieId, onClose}: { movieId: Movie['id'], onClose: () => void }) {
   const {user} = useUser()
   const {data, error} = useGetMovieListsQuery({variables: {username: user.username}})
-  const [addToList, {loading: addLoading, error: addError}] = useAddToListMutation({variables: {itemId: movieId}, refetchQueries: ['GetMovieLists']})
-  const [removeFromList, {loading: removeLoading, error: removeError}] = useRemoveFromListMutation({variables: {itemId: movieId}, refetchQueries: ['GetMovieLists']})
+  const [addToList, {loading: addLoading, error: addError}] = useAddToListMutation({refetchQueries: ['GetMovieLists']})
+  const [removeFromList, {loading: removeLoading, error: removeError}] = useRemoveFromListMutation({refetchQueries: ['GetMovieLists']})
   useMutationErrorHandler('Could not add item to list', addError)
   useMutationErrorHandler('Could not remove item from list', removeError)
   const [selectedListIds, setSelectedListIds] = useState<List['id'][]>([])
 
   const includedInLists = data?.user.lists
-    .filter(list => list.items.find(item => item.id === movieId))
+    .filter(list => list.items.results.find(item => item.id === movieId))
     .map(list => list.id) || []
 
   useEffect(() => {
@@ -39,12 +39,12 @@ function AddToListDialog({movieId, onClose}: { movieId: Movie['id'], onClose: ()
   async function handleAddToLists() {
     for (const listId of selectedListIds) {
       if (!includedInLists.includes(listId)) {
-        await addToList({variables: {listId}})
+        await addToList({variables: {listId, itemId: movieId}})
       }
     }
     for (const listId of includedInLists) {
       if (!selectedListIds.includes(listId)) {
-        await removeFromList({variables: {listId}})
+        await removeFromList({variables: {listId, itemId: movieId}})
       }
     }
     onClose()
@@ -53,7 +53,7 @@ function AddToListDialog({movieId, onClose}: { movieId: Movie['id'], onClose: ()
   const numChanges = includedInLists.filter(id => !selectedListIds.includes(id)).length + selectedListIds.filter(id => !includedInLists.includes(id)).length
 
   return (
-    <Dialog fullWidth onClose={onClose} open>
+    <Dialog fullWidth onClose={onClose} open={true}>
       <DialogTitle>Add/remove from your lists</DialogTitle>
 
       <DialogContent>
@@ -73,7 +73,7 @@ function AddToListDialog({movieId, onClose}: { movieId: Movie['id'], onClose: ()
                     })
                   }}
                 />}
-                label={`${list.name} (${list.items.length} items)`}
+                label={`${list.name} (${list.items.results.length} items)`}
               />
             ))}
           </FormGroup>
@@ -98,7 +98,7 @@ gql`
         name
         type
         items {
-          ... on Movie {
+          results {
             id
           }
         }

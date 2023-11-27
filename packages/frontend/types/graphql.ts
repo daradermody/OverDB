@@ -37,9 +37,16 @@ export type CrewCredit = Person & {
 export type List = {
   __typename?: 'List';
   id: Scalars['ID']['output'];
-  items: Array<MovieOrPerson>;
+  items: PaginatedMovies;
   name: Scalars['String']['output'];
   type: ListType;
+};
+
+
+export type ListItemsArgs = {
+  filteredByProviders?: InputMaybe<Scalars['Boolean']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export enum ListType {
@@ -170,6 +177,7 @@ export type PaginatedMovies = {
   limit: Scalars['Int']['output'];
   offset: Scalars['Int']['output'];
   results: Array<Movie>;
+  total: Scalars['Int']['output'];
 };
 
 export type PaginatedPeople = {
@@ -310,7 +318,6 @@ export type User = {
   stats: Stats;
   username: Scalars['ID']['output'];
   watched: PaginatedMovies;
-  watchlist: PaginatedMovies;
 };
 
 
@@ -337,13 +344,6 @@ export type UserListsArgs = {
 
 
 export type UserWatchedArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type UserWatchlistArgs = {
-  filteredByProviders?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -480,32 +480,25 @@ export type EditListMutation = { __typename?: 'Mutation', editList: { __typename
 export type GetListQueryVariables = Exact<{
   username: Scalars['ID']['input'];
   id: Scalars['ID']['input'];
-}>;
-
-
-export type GetListQuery = { __typename?: 'Query', user: { __typename?: 'User', list: { __typename?: 'List', id: string, name: string, type: ListType, items: Array<{ __typename?: 'Movie', id: string, posterPath?: string | null, title: string, releaseDate?: string | null, watched?: boolean | null, inWatchlist?: boolean | null, sentiment?: Sentiment | null } | { __typename?: 'PersonInfo', id: string, name: string, profilePath?: string | null }> } } };
-
-export type GetListsQueryVariables = Exact<{
-  username: Scalars['ID']['input'];
-}>;
-
-
-export type GetListsQuery = { __typename?: 'Query', user: { __typename?: 'User', lists: Array<{ __typename?: 'List', id: string, name: string, items: Array<{ __typename?: 'Movie', id: string } | { __typename?: 'PersonInfo', id: string }> }> } };
-
-export type GetWatchlistQueryVariables = Exact<{
-  username: Scalars['ID']['input'];
   offset?: InputMaybe<Scalars['Int']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   filteredByProviders?: InputMaybe<Scalars['Boolean']['input']>;
 }>;
 
 
-export type GetWatchlistQuery = { __typename?: 'Query', user: { __typename?: 'User', watchlist: { __typename?: 'PaginatedMovies', endReached: boolean, results: Array<{ __typename?: 'Movie', id: string, title: string, posterPath?: string | null, releaseDate?: string | null, watched?: boolean | null, inWatchlist?: boolean | null, sentiment?: Sentiment | null }> } } };
+export type GetListQuery = { __typename?: 'Query', user: { __typename?: 'User', list: { __typename?: 'List', id: string, name: string, type: ListType, items: { __typename?: 'PaginatedMovies', endReached: boolean, results: Array<{ __typename?: 'Movie', id: string, posterPath?: string | null, title: string, releaseDate?: string | null, watched?: boolean | null, inWatchlist?: boolean | null, sentiment?: Sentiment | null }> } } } };
 
 export type GetSubscribedStreamingProvidersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetSubscribedStreamingProvidersQuery = { __typename?: 'Query', settings: { __typename?: 'UserSettings', streaming: { __typename?: 'UserStreamingSettings', providers: Array<string> } } };
+
+export type GetListsQueryVariables = Exact<{
+  username: Scalars['ID']['input'];
+}>;
+
+
+export type GetListsQuery = { __typename?: 'Query', user: { __typename?: 'User', lists: Array<{ __typename?: 'List', id: string, name: string, type: ListType }> } };
 
 export type GetMovieInfoQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -569,7 +562,7 @@ export type GetMovieListsQueryVariables = Exact<{
 }>;
 
 
-export type GetMovieListsQuery = { __typename?: 'Query', user: { __typename?: 'User', lists: Array<{ __typename?: 'List', id: string, name: string, type: ListType, items: Array<{ __typename?: 'Movie', id: string } | { __typename?: 'PersonInfo' }> }> } };
+export type GetMovieListsQuery = { __typename?: 'Query', user: { __typename?: 'User', lists: Array<{ __typename?: 'List', id: string, name: string, type: ListType, items: { __typename?: 'PaginatedMovies', results: Array<{ __typename?: 'Movie', id: string }> } }> } };
 
 export type AddToListMutationVariables = Exact<{
   listId: Scalars['ID']['input'];
@@ -1205,14 +1198,15 @@ export type EditListMutationHookResult = ReturnType<typeof useEditListMutation>;
 export type EditListMutationResult = Apollo.MutationResult<EditListMutation>;
 export type EditListMutationOptions = Apollo.BaseMutationOptions<EditListMutation, EditListMutationVariables>;
 export const GetListDocument = gql`
-    query GetList($username: ID!, $id: ID!) {
+    query GetList($username: ID!, $id: ID!, $offset: Int, $limit: Int, $filteredByProviders: Boolean) {
   user(username: $username) {
     list(id: $id) {
       id
       name
       type
-      items {
-        ... on Movie {
+      items(offset: $offset, limit: $limit, filteredByProviders: $filteredByProviders) {
+        endReached
+        results {
           id
           posterPath
           title
@@ -1220,11 +1214,6 @@ export const GetListDocument = gql`
           watched
           inWatchlist
           sentiment
-        }
-        ... on Person {
-          id
-          name
-          profilePath
         }
       }
     }
@@ -1246,6 +1235,9 @@ export const GetListDocument = gql`
  *   variables: {
  *      username: // value for 'username'
  *      id: // value for 'id'
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *      filteredByProviders: // value for 'filteredByProviders'
  *   },
  * });
  */
@@ -1260,105 +1252,6 @@ export function useGetListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Ge
 export type GetListQueryHookResult = ReturnType<typeof useGetListQuery>;
 export type GetListLazyQueryHookResult = ReturnType<typeof useGetListLazyQuery>;
 export type GetListQueryResult = Apollo.QueryResult<GetListQuery, GetListQueryVariables>;
-export const GetListsDocument = gql`
-    query GetLists($username: ID!) {
-  user(username: $username) {
-    lists {
-      id
-      name
-      items {
-        ... on Movie {
-          id
-        }
-        ... on Person {
-          id
-        }
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useGetListsQuery__
- *
- * To run a query within a React component, call `useGetListsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetListsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetListsQuery({
- *   variables: {
- *      username: // value for 'username'
- *   },
- * });
- */
-export function useGetListsQuery(baseOptions: Apollo.QueryHookOptions<GetListsQuery, GetListsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetListsQuery, GetListsQueryVariables>(GetListsDocument, options);
-      }
-export function useGetListsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetListsQuery, GetListsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetListsQuery, GetListsQueryVariables>(GetListsDocument, options);
-        }
-export type GetListsQueryHookResult = ReturnType<typeof useGetListsQuery>;
-export type GetListsLazyQueryHookResult = ReturnType<typeof useGetListsLazyQuery>;
-export type GetListsQueryResult = Apollo.QueryResult<GetListsQuery, GetListsQueryVariables>;
-export const GetWatchlistDocument = gql`
-    query GetWatchlist($username: ID!, $offset: Int, $limit: Int, $filteredByProviders: Boolean) {
-  user(username: $username) {
-    watchlist(
-      offset: $offset
-      limit: $limit
-      filteredByProviders: $filteredByProviders
-    ) {
-      endReached
-      results {
-        id
-        title
-        posterPath
-        releaseDate
-        watched
-        inWatchlist
-        sentiment
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useGetWatchlistQuery__
- *
- * To run a query within a React component, call `useGetWatchlistQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetWatchlistQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetWatchlistQuery({
- *   variables: {
- *      username: // value for 'username'
- *      offset: // value for 'offset'
- *      limit: // value for 'limit'
- *      filteredByProviders: // value for 'filteredByProviders'
- *   },
- * });
- */
-export function useGetWatchlistQuery(baseOptions: Apollo.QueryHookOptions<GetWatchlistQuery, GetWatchlistQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetWatchlistQuery, GetWatchlistQueryVariables>(GetWatchlistDocument, options);
-      }
-export function useGetWatchlistLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWatchlistQuery, GetWatchlistQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetWatchlistQuery, GetWatchlistQueryVariables>(GetWatchlistDocument, options);
-        }
-export type GetWatchlistQueryHookResult = ReturnType<typeof useGetWatchlistQuery>;
-export type GetWatchlistLazyQueryHookResult = ReturnType<typeof useGetWatchlistLazyQuery>;
-export type GetWatchlistQueryResult = Apollo.QueryResult<GetWatchlistQuery, GetWatchlistQueryVariables>;
 export const GetSubscribedStreamingProvidersDocument = gql`
     query GetSubscribedStreamingProviders {
   settings {
@@ -1395,6 +1288,45 @@ export function useGetSubscribedStreamingProvidersLazyQuery(baseOptions?: Apollo
 export type GetSubscribedStreamingProvidersQueryHookResult = ReturnType<typeof useGetSubscribedStreamingProvidersQuery>;
 export type GetSubscribedStreamingProvidersLazyQueryHookResult = ReturnType<typeof useGetSubscribedStreamingProvidersLazyQuery>;
 export type GetSubscribedStreamingProvidersQueryResult = Apollo.QueryResult<GetSubscribedStreamingProvidersQuery, GetSubscribedStreamingProvidersQueryVariables>;
+export const GetListsDocument = gql`
+    query GetLists($username: ID!) {
+  user(username: $username) {
+    lists {
+      id
+      name
+      type
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetListsQuery__
+ *
+ * To run a query within a React component, call `useGetListsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetListsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetListsQuery({
+ *   variables: {
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useGetListsQuery(baseOptions: Apollo.QueryHookOptions<GetListsQuery, GetListsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetListsQuery, GetListsQueryVariables>(GetListsDocument, options);
+      }
+export function useGetListsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetListsQuery, GetListsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetListsQuery, GetListsQueryVariables>(GetListsDocument, options);
+        }
+export type GetListsQueryHookResult = ReturnType<typeof useGetListsQuery>;
+export type GetListsLazyQueryHookResult = ReturnType<typeof useGetListsLazyQuery>;
+export type GetListsQueryResult = Apollo.QueryResult<GetListsQuery, GetListsQueryVariables>;
 export const GetMovieInfoDocument = gql`
     query GetMovieInfo($id: ID!) {
   movie(id: $id) {
@@ -1721,7 +1653,7 @@ export const GetMovieListsDocument = gql`
       name
       type
       items {
-        ... on Movie {
+        results {
           id
         }
       }

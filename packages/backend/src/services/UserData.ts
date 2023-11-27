@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import { nanoid } from 'nanoid'
-import { List, ListType, Movie, Person, Provider, Sentiment, UserSettings, UserSettingsInput } from '../../types'
+import { List, ListType, Movie, Person, Sentiment, UserSettings, UserSettingsInput } from '../../types'
 import { dataDir } from './dataStorage'
 import { User } from './users'
 

@@ -1,10 +1,11 @@
-import { ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageLocalDefault, } from 'apollo-server-core'
-import { ApolloServer, gql } from 'apollo-server-express'
-import { ExpressContext } from 'apollo-server-express/src/ApolloServer'
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware, ExpressContextFunctionArgument } from '@apollo/server/express4'
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import * as dotenv from 'dotenv'
-import express, { Request, Response } from 'express'
+import express, { Request, RequestHandler, Response } from 'express'
 import * as fs from 'fs'
 import * as http from 'http'
 import { join } from 'path'
@@ -23,12 +24,12 @@ async function main() {
   const app = express()
   app.use(cors({allowedHeaders: ['Content-Type']}))
   app.use(express.json())
-  app.use(cookieParser(getToken('COOKIE_SECRET')))
+  app.use(cookieParser(getToken('COOKIE_SECRET')) as RequestHandler)
   app.use(express.static(join(__dirname, 'static')))
   app.post('/loginWithPassword', login)
   const httpServer = http.createServer(app)
   const server = new ApolloServer({
-    typeDefs: gql(fs.readFileSync(__dirname + '/schema.graphql', 'utf-8')),
+    typeDefs: fs.readFileSync(__dirname + '/schema.graphql', 'utf-8'),
     resolvers,
     formatError: (error) => {
       console.log(JSON.stringify(error, null, 2))
@@ -36,7 +37,6 @@ async function main() {
     },
     csrfPrevention: true,
     cache: 'bounded',
-    context: authContext,
     introspection: true,
     plugins: [
       ApolloServerPluginDrainHttpServer({httpServer}),
@@ -45,7 +45,13 @@ async function main() {
   })
 
   await server.start()
-  server.applyMiddleware({app, cors: {allowedHeaders: ['Content-Type']}})
+  app.use(
+    '/graphql',
+    cors<cors.CorsRequest>(),
+    express.json(),
+    expressMiddleware(server, { context: context })
+  );
+
   app.get('*', (req, res) => res.sendFile(join(__dirname, 'static/index.html')))
   await new Promise<void>(resolve => httpServer.listen({port: PORT}, resolve))
   console.log(`🚀 Backend ready at http://localhost:${PORT}`)
@@ -62,7 +68,7 @@ async function login(req: Request, res: Response) {
   }
 }
 
-function authContext({req}: ExpressContext) {
+async function context({req}: ExpressContextFunctionArgument) {
   const user = JSON.parse(req.signedCookies.user || null) as User
   return {user}
 }

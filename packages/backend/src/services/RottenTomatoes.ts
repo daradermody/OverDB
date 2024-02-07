@@ -12,7 +12,7 @@ export default class RottenTomatoes {
       if (!moviePageLink) return null
       return await this.getScoreFromPage(moviePageLink)
     } catch (e) {
-      console.error(e)
+      console.error((e as Error).message)
       return null
     }
   }
@@ -30,7 +30,7 @@ export default class RottenTomatoes {
   static async getScoreFromPage(link: string): Promise<Tomatometer | null> {
     const {data} = await axios.get(link)
     const dom = new JSDOM(data)
-    const scoreboard = dom.window.document.getElementsByTagName('score-board').item(0)
+    const scoreboard = dom.window.document.getElementsByTagName('score-board-deprecated').item(0)
     const state = stateMap[scoreboard!.getAttribute('tomatometerstate') as string]
     const score = parseInt(scoreboard!.getAttribute('tomatometerscore') as string, 10)
     const consensus = dom.window.document.querySelector<HTMLSpanElement>('[data-qa="critics-consensus"]')?.innerHTML

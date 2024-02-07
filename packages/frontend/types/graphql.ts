@@ -540,7 +540,7 @@ export type GetStreamingProvidersQueryVariables = Exact<{
 }>;
 
 
-export type GetStreamingProvidersQuery = { __typename?: 'Query', movie: { __typename?: 'Movie', providers: Array<{ __typename?: 'Provider', logo: string, name: string }> } };
+export type GetStreamingProvidersQuery = { __typename?: 'Query', movie: { __typename?: 'Movie', id: string, providers: Array<{ __typename?: 'Provider', logo: string, name: string }> } };
 
 export type GetPersonCreditsQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -658,8 +658,13 @@ export function useGetFavouritePeopleLazyQuery(baseOptions?: Apollo.LazyQueryHoo
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>(GetFavouritePeopleDocument, options);
         }
+export function useGetFavouritePeopleSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>(GetFavouritePeopleDocument, options);
+        }
 export type GetFavouritePeopleQueryHookResult = ReturnType<typeof useGetFavouritePeopleQuery>;
 export type GetFavouritePeopleLazyQueryHookResult = ReturnType<typeof useGetFavouritePeopleLazyQuery>;
+export type GetFavouritePeopleSuspenseQueryHookResult = ReturnType<typeof useGetFavouritePeopleSuspenseQuery>;
 export type GetFavouritePeopleQueryResult = Apollo.QueryResult<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>;
 export const GetLikedMoviesDocument = gql`
     query GetLikedMovies($username: ID!, $offset: Int, $limit: Int) {
@@ -703,8 +708,13 @@ export function useGetLikedMoviesLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>(GetLikedMoviesDocument, options);
         }
+export function useGetLikedMoviesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>(GetLikedMoviesDocument, options);
+        }
 export type GetLikedMoviesQueryHookResult = ReturnType<typeof useGetLikedMoviesQuery>;
 export type GetLikedMoviesLazyQueryHookResult = ReturnType<typeof useGetLikedMoviesLazyQuery>;
+export type GetLikedMoviesSuspenseQueryHookResult = ReturnType<typeof useGetLikedMoviesSuspenseQuery>;
 export type GetLikedMoviesQueryResult = Apollo.QueryResult<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>;
 export const GetUserDocument = gql`
     query GetUser($username: ID!) {
@@ -738,8 +748,13 @@ export function useGetUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Ge
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, options);
         }
+export function useGetUserSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetUserQuery, GetUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, options);
+        }
 export type GetUserQueryHookResult = ReturnType<typeof useGetUserQuery>;
 export type GetUserLazyQueryHookResult = ReturnType<typeof useGetUserLazyQuery>;
+export type GetUserSuspenseQueryHookResult = ReturnType<typeof useGetUserSuspenseQuery>;
 export type GetUserQueryResult = Apollo.QueryResult<GetUserQuery, GetUserQueryVariables>;
 export const GetUserStatsDocument = gql`
     query GetUserStats($username: ID!) {
@@ -778,8 +793,13 @@ export function useGetUserStatsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetUserStatsQuery, GetUserStatsQueryVariables>(GetUserStatsDocument, options);
         }
+export function useGetUserStatsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetUserStatsQuery, GetUserStatsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetUserStatsQuery, GetUserStatsQueryVariables>(GetUserStatsDocument, options);
+        }
 export type GetUserStatsQueryHookResult = ReturnType<typeof useGetUserStatsQuery>;
 export type GetUserStatsLazyQueryHookResult = ReturnType<typeof useGetUserStatsLazyQuery>;
+export type GetUserStatsSuspenseQueryHookResult = ReturnType<typeof useGetUserStatsSuspenseQuery>;
 export type GetUserStatsQueryResult = Apollo.QueryResult<GetUserStatsQuery, GetUserStatsQueryVariables>;
 export const GetUserSettingsDocument = gql`
     query GetUserSettings {
@@ -815,8 +835,13 @@ export function useGetUserSettingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetUserSettingsQuery, GetUserSettingsQueryVariables>(GetUserSettingsDocument, options);
         }
+export function useGetUserSettingsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetUserSettingsQuery, GetUserSettingsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetUserSettingsQuery, GetUserSettingsQueryVariables>(GetUserSettingsDocument, options);
+        }
 export type GetUserSettingsQueryHookResult = ReturnType<typeof useGetUserSettingsQuery>;
 export type GetUserSettingsLazyQueryHookResult = ReturnType<typeof useGetUserSettingsLazyQuery>;
+export type GetUserSettingsSuspenseQueryHookResult = ReturnType<typeof useGetUserSettingsSuspenseQuery>;
 export type GetUserSettingsQueryResult = Apollo.QueryResult<GetUserSettingsQuery, GetUserSettingsQueryVariables>;
 export const UpdateUserSettingsDocument = gql`
     mutation UpdateUserSettings($settings: UserSettingsInput!) {
@@ -888,8 +913,13 @@ export function useGetAllStreamingProvidersLazyQuery(baseOptions?: Apollo.LazyQu
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetAllStreamingProvidersQuery, GetAllStreamingProvidersQueryVariables>(GetAllStreamingProvidersDocument, options);
         }
+export function useGetAllStreamingProvidersSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetAllStreamingProvidersQuery, GetAllStreamingProvidersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAllStreamingProvidersQuery, GetAllStreamingProvidersQueryVariables>(GetAllStreamingProvidersDocument, options);
+        }
 export type GetAllStreamingProvidersQueryHookResult = ReturnType<typeof useGetAllStreamingProvidersQuery>;
 export type GetAllStreamingProvidersLazyQueryHookResult = ReturnType<typeof useGetAllStreamingProvidersLazyQuery>;
+export type GetAllStreamingProvidersSuspenseQueryHookResult = ReturnType<typeof useGetAllStreamingProvidersSuspenseQuery>;
 export type GetAllStreamingProvidersQueryResult = Apollo.QueryResult<GetAllStreamingProvidersQuery, GetAllStreamingProvidersQueryVariables>;
 export const GetWatchedMoviesDocument = gql`
     query GetWatchedMovies($username: ID!, $offset: Int, $limit: Int) {
@@ -936,8 +966,13 @@ export function useGetWatchedMoviesLazyQuery(baseOptions?: Apollo.LazyQueryHookO
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetWatchedMoviesQuery, GetWatchedMoviesQueryVariables>(GetWatchedMoviesDocument, options);
         }
+export function useGetWatchedMoviesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetWatchedMoviesQuery, GetWatchedMoviesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetWatchedMoviesQuery, GetWatchedMoviesQueryVariables>(GetWatchedMoviesDocument, options);
+        }
 export type GetWatchedMoviesQueryHookResult = ReturnType<typeof useGetWatchedMoviesQuery>;
 export type GetWatchedMoviesLazyQueryHookResult = ReturnType<typeof useGetWatchedMoviesLazyQuery>;
+export type GetWatchedMoviesSuspenseQueryHookResult = ReturnType<typeof useGetWatchedMoviesSuspenseQuery>;
 export type GetWatchedMoviesQueryResult = Apollo.QueryResult<GetWatchedMoviesQuery, GetWatchedMoviesQueryVariables>;
 export const GetUsersDocument = gql`
     query GetUsers {
@@ -978,8 +1013,13 @@ export function useGetUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<G
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
         }
+export function useGetUsersSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetUsersQuery, GetUsersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
+        }
 export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
 export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery>;
+export type GetUsersSuspenseQueryHookResult = ReturnType<typeof useGetUsersSuspenseQuery>;
 export type GetUsersQueryResult = Apollo.QueryResult<GetUsersQuery, GetUsersQueryVariables>;
 export const SearchDocument = gql`
     query Search($query: String!) {
@@ -1023,8 +1063,13 @@ export function useSearchLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Sea
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<SearchQuery, SearchQueryVariables>(SearchDocument, options);
         }
+export function useSearchSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SearchQuery, SearchQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SearchQuery, SearchQueryVariables>(SearchDocument, options);
+        }
 export type SearchQueryHookResult = ReturnType<typeof useSearchQuery>;
 export type SearchLazyQueryHookResult = ReturnType<typeof useSearchLazyQuery>;
+export type SearchSuspenseQueryHookResult = ReturnType<typeof useSearchSuspenseQuery>;
 export type SearchQueryResult = Apollo.QueryResult<SearchQuery, SearchQueryVariables>;
 export const GetTrendingMoviesDocument = gql`
     query GetTrendingMovies($size: Int!) {
@@ -1061,8 +1106,13 @@ export function useGetTrendingMoviesLazyQuery(baseOptions?: Apollo.LazyQueryHook
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>(GetTrendingMoviesDocument, options);
         }
+export function useGetTrendingMoviesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>(GetTrendingMoviesDocument, options);
+        }
 export type GetTrendingMoviesQueryHookResult = ReturnType<typeof useGetTrendingMoviesQuery>;
 export type GetTrendingMoviesLazyQueryHookResult = ReturnType<typeof useGetTrendingMoviesLazyQuery>;
+export type GetTrendingMoviesSuspenseQueryHookResult = ReturnType<typeof useGetTrendingMoviesSuspenseQuery>;
 export type GetTrendingMoviesQueryResult = Apollo.QueryResult<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>;
 export const GetRecommendedMoviesDocument = gql`
     query GetRecommendedMovies($size: Int!) {
@@ -1102,8 +1152,13 @@ export function useGetRecommendedMoviesLazyQuery(baseOptions?: Apollo.LazyQueryH
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetRecommendedMoviesQuery, GetRecommendedMoviesQueryVariables>(GetRecommendedMoviesDocument, options);
         }
+export function useGetRecommendedMoviesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetRecommendedMoviesQuery, GetRecommendedMoviesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetRecommendedMoviesQuery, GetRecommendedMoviesQueryVariables>(GetRecommendedMoviesDocument, options);
+        }
 export type GetRecommendedMoviesQueryHookResult = ReturnType<typeof useGetRecommendedMoviesQuery>;
 export type GetRecommendedMoviesLazyQueryHookResult = ReturnType<typeof useGetRecommendedMoviesLazyQuery>;
+export type GetRecommendedMoviesSuspenseQueryHookResult = ReturnType<typeof useGetRecommendedMoviesSuspenseQuery>;
 export type GetRecommendedMoviesQueryResult = Apollo.QueryResult<GetRecommendedMoviesQuery, GetRecommendedMoviesQueryVariables>;
 export const CreateListDocument = gql`
     mutation CreateList($name: String!, $type: ListType!) {
@@ -1257,8 +1312,13 @@ export function useGetListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Ge
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetListQuery, GetListQueryVariables>(GetListDocument, options);
         }
+export function useGetListSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetListQuery, GetListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetListQuery, GetListQueryVariables>(GetListDocument, options);
+        }
 export type GetListQueryHookResult = ReturnType<typeof useGetListQuery>;
 export type GetListLazyQueryHookResult = ReturnType<typeof useGetListLazyQuery>;
+export type GetListSuspenseQueryHookResult = ReturnType<typeof useGetListSuspenseQuery>;
 export type GetListQueryResult = Apollo.QueryResult<GetListQuery, GetListQueryVariables>;
 export const GetListsDocument = gql`
     query GetLists($username: ID!) {
@@ -1303,8 +1363,13 @@ export function useGetListsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<G
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetListsQuery, GetListsQueryVariables>(GetListsDocument, options);
         }
+export function useGetListsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetListsQuery, GetListsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetListsQuery, GetListsQueryVariables>(GetListsDocument, options);
+        }
 export type GetListsQueryHookResult = ReturnType<typeof useGetListsQuery>;
 export type GetListsLazyQueryHookResult = ReturnType<typeof useGetListsLazyQuery>;
+export type GetListsSuspenseQueryHookResult = ReturnType<typeof useGetListsSuspenseQuery>;
 export type GetListsQueryResult = Apollo.QueryResult<GetListsQuery, GetListsQueryVariables>;
 export const GetWatchlistDocument = gql`
     query GetWatchlist($username: ID!, $offset: Int, $limit: Int, $filteredByProviders: Boolean) {
@@ -1356,8 +1421,13 @@ export function useGetWatchlistLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetWatchlistQuery, GetWatchlistQueryVariables>(GetWatchlistDocument, options);
         }
+export function useGetWatchlistSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetWatchlistQuery, GetWatchlistQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetWatchlistQuery, GetWatchlistQueryVariables>(GetWatchlistDocument, options);
+        }
 export type GetWatchlistQueryHookResult = ReturnType<typeof useGetWatchlistQuery>;
 export type GetWatchlistLazyQueryHookResult = ReturnType<typeof useGetWatchlistLazyQuery>;
+export type GetWatchlistSuspenseQueryHookResult = ReturnType<typeof useGetWatchlistSuspenseQuery>;
 export type GetWatchlistQueryResult = Apollo.QueryResult<GetWatchlistQuery, GetWatchlistQueryVariables>;
 export const GetSubscribedStreamingProvidersDocument = gql`
     query GetSubscribedStreamingProviders {
@@ -1392,8 +1462,13 @@ export function useGetSubscribedStreamingProvidersLazyQuery(baseOptions?: Apollo
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetSubscribedStreamingProvidersQuery, GetSubscribedStreamingProvidersQueryVariables>(GetSubscribedStreamingProvidersDocument, options);
         }
+export function useGetSubscribedStreamingProvidersSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetSubscribedStreamingProvidersQuery, GetSubscribedStreamingProvidersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetSubscribedStreamingProvidersQuery, GetSubscribedStreamingProvidersQueryVariables>(GetSubscribedStreamingProvidersDocument, options);
+        }
 export type GetSubscribedStreamingProvidersQueryHookResult = ReturnType<typeof useGetSubscribedStreamingProvidersQuery>;
 export type GetSubscribedStreamingProvidersLazyQueryHookResult = ReturnType<typeof useGetSubscribedStreamingProvidersLazyQuery>;
+export type GetSubscribedStreamingProvidersSuspenseQueryHookResult = ReturnType<typeof useGetSubscribedStreamingProvidersSuspenseQuery>;
 export type GetSubscribedStreamingProvidersQueryResult = Apollo.QueryResult<GetSubscribedStreamingProvidersQuery, GetSubscribedStreamingProvidersQueryVariables>;
 export const GetMovieInfoDocument = gql`
     query GetMovieInfo($id: ID!) {
@@ -1436,8 +1511,13 @@ export function useGetMovieInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetMovieInfoQuery, GetMovieInfoQueryVariables>(GetMovieInfoDocument, options);
         }
+export function useGetMovieInfoSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetMovieInfoQuery, GetMovieInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetMovieInfoQuery, GetMovieInfoQueryVariables>(GetMovieInfoDocument, options);
+        }
 export type GetMovieInfoQueryHookResult = ReturnType<typeof useGetMovieInfoQuery>;
 export type GetMovieInfoLazyQueryHookResult = ReturnType<typeof useGetMovieInfoLazyQuery>;
+export type GetMovieInfoSuspenseQueryHookResult = ReturnType<typeof useGetMovieInfoSuspenseQuery>;
 export type GetMovieInfoQueryResult = Apollo.QueryResult<GetMovieInfoQuery, GetMovieInfoQueryVariables>;
 export const GetCrewDocument = gql`
     query GetCrew($id: ID!) {
@@ -1474,8 +1554,13 @@ export function useGetCrewLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Ge
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetCrewQuery, GetCrewQueryVariables>(GetCrewDocument, options);
         }
+export function useGetCrewSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetCrewQuery, GetCrewQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetCrewQuery, GetCrewQueryVariables>(GetCrewDocument, options);
+        }
 export type GetCrewQueryHookResult = ReturnType<typeof useGetCrewQuery>;
 export type GetCrewLazyQueryHookResult = ReturnType<typeof useGetCrewLazyQuery>;
+export type GetCrewSuspenseQueryHookResult = ReturnType<typeof useGetCrewSuspenseQuery>;
 export type GetCrewQueryResult = Apollo.QueryResult<GetCrewQuery, GetCrewQueryVariables>;
 export const GetCastDocument = gql`
     query GetCast($id: ID!) {
@@ -1513,8 +1598,13 @@ export function useGetCastLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Ge
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetCastQuery, GetCastQueryVariables>(GetCastDocument, options);
         }
+export function useGetCastSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetCastQuery, GetCastQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetCastQuery, GetCastQueryVariables>(GetCastDocument, options);
+        }
 export type GetCastQueryHookResult = ReturnType<typeof useGetCastQuery>;
 export type GetCastLazyQueryHookResult = ReturnType<typeof useGetCastLazyQuery>;
+export type GetCastSuspenseQueryHookResult = ReturnType<typeof useGetCastSuspenseQuery>;
 export type GetCastQueryResult = Apollo.QueryResult<GetCastQuery, GetCastQueryVariables>;
 export const GetRottenTomatoesScoreDocument = gql`
     query GetRottenTomatoesScore($id: ID!) {
@@ -1554,12 +1644,18 @@ export function useGetRottenTomatoesScoreLazyQuery(baseOptions?: Apollo.LazyQuer
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetRottenTomatoesScoreQuery, GetRottenTomatoesScoreQueryVariables>(GetRottenTomatoesScoreDocument, options);
         }
+export function useGetRottenTomatoesScoreSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetRottenTomatoesScoreQuery, GetRottenTomatoesScoreQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetRottenTomatoesScoreQuery, GetRottenTomatoesScoreQueryVariables>(GetRottenTomatoesScoreDocument, options);
+        }
 export type GetRottenTomatoesScoreQueryHookResult = ReturnType<typeof useGetRottenTomatoesScoreQuery>;
 export type GetRottenTomatoesScoreLazyQueryHookResult = ReturnType<typeof useGetRottenTomatoesScoreLazyQuery>;
+export type GetRottenTomatoesScoreSuspenseQueryHookResult = ReturnType<typeof useGetRottenTomatoesScoreSuspenseQuery>;
 export type GetRottenTomatoesScoreQueryResult = Apollo.QueryResult<GetRottenTomatoesScoreQuery, GetRottenTomatoesScoreQueryVariables>;
 export const GetStreamingProvidersDocument = gql`
     query GetStreamingProviders($id: ID!) {
   movie(id: $id) {
+    id
     providers {
       logo
       name
@@ -1592,8 +1688,13 @@ export function useGetStreamingProvidersLazyQuery(baseOptions?: Apollo.LazyQuery
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetStreamingProvidersQuery, GetStreamingProvidersQueryVariables>(GetStreamingProvidersDocument, options);
         }
+export function useGetStreamingProvidersSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetStreamingProvidersQuery, GetStreamingProvidersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetStreamingProvidersQuery, GetStreamingProvidersQueryVariables>(GetStreamingProvidersDocument, options);
+        }
 export type GetStreamingProvidersQueryHookResult = ReturnType<typeof useGetStreamingProvidersQuery>;
 export type GetStreamingProvidersLazyQueryHookResult = ReturnType<typeof useGetStreamingProvidersLazyQuery>;
+export type GetStreamingProvidersSuspenseQueryHookResult = ReturnType<typeof useGetStreamingProvidersSuspenseQuery>;
 export type GetStreamingProvidersQueryResult = Apollo.QueryResult<GetStreamingProvidersQuery, GetStreamingProvidersQueryVariables>;
 export const GetPersonCreditsDocument = gql`
     query GetPersonCredits($id: ID!) {
@@ -1635,8 +1736,13 @@ export function useGetPersonCreditsLazyQuery(baseOptions?: Apollo.LazyQueryHookO
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetPersonCreditsQuery, GetPersonCreditsQueryVariables>(GetPersonCreditsDocument, options);
         }
+export function useGetPersonCreditsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetPersonCreditsQuery, GetPersonCreditsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetPersonCreditsQuery, GetPersonCreditsQueryVariables>(GetPersonCreditsDocument, options);
+        }
 export type GetPersonCreditsQueryHookResult = ReturnType<typeof useGetPersonCreditsQuery>;
 export type GetPersonCreditsLazyQueryHookResult = ReturnType<typeof useGetPersonCreditsLazyQuery>;
+export type GetPersonCreditsSuspenseQueryHookResult = ReturnType<typeof useGetPersonCreditsSuspenseQuery>;
 export type GetPersonCreditsQueryResult = Apollo.QueryResult<GetPersonCreditsQuery, GetPersonCreditsQueryVariables>;
 export const GetPersonInfoDocument = gql`
     query GetPersonInfo($id: ID!) {
@@ -1675,8 +1781,13 @@ export function useGetPersonInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetPersonInfoQuery, GetPersonInfoQueryVariables>(GetPersonInfoDocument, options);
         }
+export function useGetPersonInfoSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetPersonInfoQuery, GetPersonInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetPersonInfoQuery, GetPersonInfoQueryVariables>(GetPersonInfoDocument, options);
+        }
 export type GetPersonInfoQueryHookResult = ReturnType<typeof useGetPersonInfoQuery>;
 export type GetPersonInfoLazyQueryHookResult = ReturnType<typeof useGetPersonInfoLazyQuery>;
+export type GetPersonInfoSuspenseQueryHookResult = ReturnType<typeof useGetPersonInfoSuspenseQuery>;
 export type GetPersonInfoQueryResult = Apollo.QueryResult<GetPersonInfoQuery, GetPersonInfoQueryVariables>;
 export const SetFavouriteDocument = gql`
     mutation SetFavourite($id: ID!, $favourite: Boolean!) {
@@ -1754,8 +1865,13 @@ export function useGetMovieListsLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetMovieListsQuery, GetMovieListsQueryVariables>(GetMovieListsDocument, options);
         }
+export function useGetMovieListsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetMovieListsQuery, GetMovieListsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetMovieListsQuery, GetMovieListsQueryVariables>(GetMovieListsDocument, options);
+        }
 export type GetMovieListsQueryHookResult = ReturnType<typeof useGetMovieListsQuery>;
 export type GetMovieListsLazyQueryHookResult = ReturnType<typeof useGetMovieListsLazyQuery>;
+export type GetMovieListsSuspenseQueryHookResult = ReturnType<typeof useGetMovieListsSuspenseQuery>;
 export type GetMovieListsQueryResult = Apollo.QueryResult<GetMovieListsQuery, GetMovieListsQueryVariables>;
 export const AddToListDocument = gql`
     mutation AddToList($listId: ID!, $itemId: ID!) {
@@ -1964,6 +2080,11 @@ export function useGetUpcomingMoviesLazyQuery(baseOptions?: Apollo.LazyQueryHook
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<GetUpcomingMoviesQuery, GetUpcomingMoviesQueryVariables>(GetUpcomingMoviesDocument, options);
         }
+export function useGetUpcomingMoviesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetUpcomingMoviesQuery, GetUpcomingMoviesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetUpcomingMoviesQuery, GetUpcomingMoviesQueryVariables>(GetUpcomingMoviesDocument, options);
+        }
 export type GetUpcomingMoviesQueryHookResult = ReturnType<typeof useGetUpcomingMoviesQuery>;
 export type GetUpcomingMoviesLazyQueryHookResult = ReturnType<typeof useGetUpcomingMoviesLazyQuery>;
+export type GetUpcomingMoviesSuspenseQueryHookResult = ReturnType<typeof useGetUpcomingMoviesSuspenseQuery>;
 export type GetUpcomingMoviesQueryResult = Apollo.QueryResult<GetUpcomingMoviesQuery, GetUpcomingMoviesQueryVariables>;

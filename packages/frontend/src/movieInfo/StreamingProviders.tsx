@@ -62,6 +62,7 @@ const StyledRoot = styled.div`
 gql`
   query GetStreamingProviders($id: ID!) {
     movie(id: $id) {
+      id
       providers {
         logo
         name

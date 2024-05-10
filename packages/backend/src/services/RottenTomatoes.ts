@@ -12,7 +12,7 @@ export default class RottenTomatoes {
       if (!moviePageLink) return null
       return await this.getScoreFromPage(moviePageLink)
     } catch (e) {
-      console.error((e as Error).message)
+      console.error((e as Error))
       return null
     }
   }
@@ -30,17 +30,19 @@ export default class RottenTomatoes {
   static async getScoreFromPage(link: string): Promise<Tomatometer | null> {
     const {data} = await axios.get(link)
     const dom = new JSDOM(data)
-    const scoreboard = dom.window.document.getElementsByTagName('score-board-deprecated').item(0)
-    const state = stateMap[scoreboard!.getAttribute('tomatometerstate') as string]
-    const score = parseInt(scoreboard!.getAttribute('tomatometerscore') as string, 10)
-    const consensus = dom.window.document.querySelector<HTMLSpanElement>('[data-qa="critics-consensus"]')?.innerHTML
+
+    const score = parseInt(dom.window.document.querySelector('[slot="criticsScore"]')?.textContent?.trim() || '')
+    const criticsScoreIcon = dom.window.document.querySelector('[slot="criticsScoreIcon"]')!
+    const state = stateMap[`${criticsScoreIcon.getAttribute('sentiment')}:${criticsScoreIcon.getAttribute('certified')}`]
+    const consensus = dom.window.document.querySelector('#critics-consensus > p')?.textContent?.trim()
 
     return state ?? score ? {state, score, consensus, link} : null
   }
 }
 
 const stateMap: Record<string, TomatometerState> = {
-  'certified-fresh': TomatometerState.CertifiedFresh,
-  fresh: TomatometerState.Fresh,
-  rotten: TomatometerState.Rotten,
+  'POSITIVE:true': TomatometerState.CertifiedFresh,
+  'POSITIVE:false': TomatometerState.Fresh,
+  'NEGATIVE:true': TomatometerState.Rotten,
+  'NEGATIVE:false': TomatometerState.Rotten,
 }

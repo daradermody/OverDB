@@ -1,5 +1,6 @@
 import { GraphQLError } from 'graphql/error'
 import { GraphQLResolveInfo } from 'graphql/type'
+import { isAxiosError } from 'axios'
 import {
   isMovieSummary,
   List,
@@ -115,15 +116,24 @@ const index: Resolvers<{ user?: User }> = {
     crewForMovie: (_, args: QueryCrewForMovieArgs) => MovieDb.movieCrew(args.id),
     castForMovie: (_, args: QueryCastForMovieArgs) => MovieDb.movieCast(args.id),
     creditsForPerson: async (_, args: QueryCreditsForPersonArgs) => {
-      try {
-        const credits = await MovieDb.personMovieCredits(args.id)
-        return await Promise.all(credits.map(async credit => ({
-          ...(await MovieDb.movieInfo(credit.id)),
-          ...credit
-        }))) as any
-      } catch (e) {
-        console.error(e)
-      }
+      const credits = await MovieDb.personMovieCredits(args.id)
+      const fullCredits: MovieCredit[] = []
+      await Promise.all(credits.map(async credit => {
+        try {
+          fullCredits.push({
+            ...await MovieDb.movieInfo(credit.id),
+            ...credit,
+            __typename: 'MovieCredit'
+          })
+        } catch (e) {
+          if (isAxiosError(e) && e.response?.status === 404) {
+            console.log('Credit probably a collection:', credit)
+          } else {
+            console.error(e)
+          }
+        }
+      }))
+      return fullCredits
     },
     search: async (_, args: QuerySearchArgs) => await MovieDb.search(args.query) as (PersonWithoutFav | Movie)[],
     person: (_, args: QueryPersonArgs) => MovieDb.personInfo(args.id),

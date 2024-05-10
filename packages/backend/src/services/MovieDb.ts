@@ -49,7 +49,7 @@ export default class MovieDb {
       const cast = response.cast as Required<NonNullable<PersonMovieCreditsResponse['cast']>[0]>[]
       const crew = response.crew as Required<NonNullable<PersonMovieCreditsResponse['crew']>[0]>[]
       const crewMovies = filterInvalidMovies(crew)
-      const castMovies = cast.map(c => ({...c, job: 'Actor'}))
+      const castMovies = filterInvalidMovies(cast.map(c => ({...c, job: 'Actor'})))
       const movies = aggregateAndNormalizeJobs([...castMovies, ...crewMovies])
       MovieDb.cache.personMovieCredits[id] = movies
         .sort((m1, m2) => m1.release_date < m2.release_date ? 1 : -1)

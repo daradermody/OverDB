@@ -103,7 +103,7 @@ function MovieSummary({movie, showCharactersOnly, compressed}: MovieCardProps) {
         </Typography>
       </Tooltip>
       <Typography gutterBottom variant="caption" component="div">
-        {movie.releaseDate ? movie.releaseDate.split('-')[0] : ''}
+        {movie.releaseDate ? movie.releaseDate.split('-')[0] : 'TBD'}
       </Typography>
       {!compressed && roles && (
         <Tooltip placement="top" title={<Typography>{roles}</Typography>}>

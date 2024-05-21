@@ -32,7 +32,7 @@ export default class RottenTomatoes {
     const dom = new JSDOM(data)
 
     const score = parseInt(dom.window.document.querySelector('[slot="criticsScore"]')?.textContent?.trim() || '')
-    const criticsScoreIcon = dom.window.document.querySelector('[slot="criticsScoreIcon"]')!
+    const criticsScoreIcon = dom.window.document.querySelector('media-scorecard score-icon-critics')!
     const state = stateMap[`${criticsScoreIcon.getAttribute('sentiment')}:${criticsScoreIcon.getAttribute('certified')}`]
     const consensus = dom.window.document.querySelector('#critics-consensus > p')?.textContent?.trim()
 

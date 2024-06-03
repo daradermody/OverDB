@@ -2,6 +2,7 @@ import { MovieInfo } from '../../types'
 import MovieDb from '../services/MovieDb'
 import { UserData } from '../services/UserData'
 import { User } from '../services/users'
+import {sortMoviesByReleaseDateDesc} from '../utils/sorting';
 
 export default async function upcomingMoviesResolver(username: User['username']): Promise<MovieInfo[]> {
   const peopleIds = UserData.getFavourites(username)
@@ -16,13 +17,5 @@ export default async function upcomingMoviesResolver(username: User['username'])
   }
 
   const movies = await Promise.all(movieIds.map(MovieDb.movieInfo))
-  return movies.sort((a, b) => {
-    if (a.releaseDate && b.releaseDate) {
-      return new Date(a.releaseDate) < new Date(b.releaseDate) ? -1 : 1
-    } else if (a.releaseDate || b.releaseDate) {
-      return a.releaseDate ? -1 : 1
-    } else {
-      return a.posterPath ? -1 : 1
-    }
-  })
+  return movies.sort(sortMoviesByReleaseDateDesc)
 }

@@ -1,45 +1,13 @@
-import { GraphQLError } from 'graphql/error'
-import { GraphQLResolveInfo } from 'graphql/type'
-import { isAxiosError } from 'axios'
-import {
-  isMovieSummary,
-  List,
-  ListType,
-  Movie,
-  MovieCredit,
-  MovieOrPerson,
-  MutationAddToListArgs,
-  MutationCreateListArgs,
-  MutationDeleteListsArgs,
-  MutationEditListArgs,
-  MutationSetFavouriteArgs,
-  MutationSetInWatchlistArgs,
-  MutationSetSentimentArgs,
-  MutationSetWatchedArgs,
-  MutationUpdateUserSettingsArgs,
-  PaginatedMovies,
-  PaginatedPeople,
-  PersonInfo,
-  PersonWithoutFav, Provider,
-  QueryCastForMovieArgs,
-  QueryCreditsForPersonArgs,
-  QueryCrewForMovieArgs,
-  QueryMovieArgs,
-  QueryPersonArgs,
-  QueryRecommendedMoviesArgs,
-  QuerySearchArgs,
-  QueryStreamingProvidersArgs,
-  QueryTrendingArgs,
-  QueryUserArgs,
-  ResolverFn,
-  Resolvers,
-  User as ApiUser
-} from '../../types'
+import {isAxiosError} from 'axios'
+import {GraphQLError} from 'graphql/error'
+import {GraphQLResolveInfo} from 'graphql/type'
+import {isMovieSummary, List, ListType, Movie, MovieCredit, MovieOrPerson, MutationAddToListArgs, MutationCreateListArgs, MutationDeleteListsArgs, MutationEditListArgs, MutationSetFavouriteArgs, MutationSetInWatchlistArgs, MutationSetSentimentArgs, MutationSetWatchedArgs, MutationUpdateUserSettingsArgs, PaginatedMovies, PaginatedPeople, PersonInfo, PersonWithoutFav, QueryCastForMovieArgs, QueryCreditsForPersonArgs, QueryCrewForMovieArgs, QueryMovieArgs, QueryPersonArgs, QueryRecommendedMoviesArgs, QuerySearchArgs, QueryStreamingProvidersArgs, QueryTrendingArgs, QueryUserArgs, ResolverFn, Resolvers, User as ApiUser} from '../../types'
 import MovieDb from '../services/MovieDb'
 import RottenTomatoes from '../services/RottenTomatoes'
-import { StoredList, UserData } from '../services/UserData'
-import { getUser, getUsers, User } from '../services/users'
-import { paginate } from './pagination'
+import {StoredList, UserData} from '../services/UserData'
+import {getUser, getUsers, User} from '../services/users'
+import {sortMoviesByReleaseDateAsc} from '../utils/sorting';
+import {paginate} from './pagination'
 import recommendedMoviesResolver from './recommendedMovies'
 import upcomingMoviesResolver from './upcomingMoviesResolver'
 
@@ -133,7 +101,7 @@ const index: Resolvers<{ user?: User }> = {
           }
         }
       }))
-      return fullCredits
+      return fullCredits.sort(sortMoviesByReleaseDateAsc)
     },
     search: async (_, args: QuerySearchArgs) => await MovieDb.search(args.query) as (PersonWithoutFav | Movie)[],
     person: (_, args: QueryPersonArgs) => MovieDb.personInfo(args.id),

@@ -5,6 +5,7 @@ import * as React from 'react'
 import { useState } from 'react'
 import { Movie, Sentiment, useSetSentimentMutation, useSetWatchedMutation } from '../../../types/graphql'
 import { useMutationErrorHandler } from '../errorHandlers'
+import refetchQueries from '../refetchQueries';
 
 interface SentimentSelectProps {
   id: Movie['id'];
@@ -25,7 +26,7 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
     setAnchor(null)
     void setSentiment({
       variables: {id, sentiment},
-      refetchQueries: ['GetPersonCredits', 'GetWatchedMovies', 'GetWatchlist'],
+      update: refetchQueries(['user.likedMovies']),
       optimisticResponse: {
         setSentiment: {
           __typename: 'Movie',

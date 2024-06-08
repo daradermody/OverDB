@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import {ApolloCache, gql} from '@apollo/client'
 import styled from '@emotion/styled'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
@@ -7,11 +7,14 @@ import * as React from 'react'
 import { Person, useGetPersonInfoQuery, useSetFavouriteMutation } from '../../types/graphql'
 import { ErrorMessage, useMutationErrorHandler } from '../shared/errorHandlers'
 import { Poster } from '../shared/general/Poster'
-
+import refetchQueries from '../shared/refetchQueries';
 
 export function PersonSummary({id}: { id: Person['id'] }) {
   const {data, error: fetchError, loading: loadingPerson, refetch} = useGetPersonInfoQuery({variables: {id}})
-  const [setFavourite, {loading: loadingFavourite, error: mutationError}] = useSetFavouriteMutation({variables: {id, favourite: true}})
+  const [setFavourite, {loading: loadingFavourite, error: mutationError}] = useSetFavouriteMutation({
+    variables: {id, favourite: true},
+    update: refetchQueries(['user.favouritePeople'])
+  })
   useMutationErrorHandler(`Could not ${data?.person?.favourited ? 'unfavourite' : 'favourite'}`, mutationError)
 
   if (fetchError) {
@@ -41,7 +44,7 @@ export function PersonSummary({id}: { id: Person['id'] }) {
             style={{marginTop: 20}}
             variant="contained"
             startIcon={person.favourited ? <FavoriteIcon style={{color: 'red'}}/> : <FavoriteBorderIcon style={{color: 'red'}}/>}
-            onClick={() => setFavourite({variables: {id, favourite: !person.favourited}})}
+            onClick={() => setFavourite({variables: {id, favourite: !person.favourited}, refetchQueries: 'all'})}
           >
             {person.favourited ? 'Favourited' : 'Favourite'}
           </Button>
@@ -98,3 +101,4 @@ gql`
     }
   }
 `
+

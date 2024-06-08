@@ -4,6 +4,7 @@ import { Button, Tooltip, Typography } from '@mui/material'
 import * as React from 'react'
 import { Movie, useSetWatchedMutation } from '../../../types/graphql'
 import { useMutationErrorHandler } from '../errorHandlers'
+import refetchQueries from '../refetchQueries';
 
 interface WatchedButtonProps {
   id: Movie['id'];
@@ -18,7 +19,7 @@ export function WatchedButton({id, watched, withLabel}: WatchedButtonProps) {
   function handleClick() {
     return setWatched({
       variables: {id, watched: !watched},
-      refetchQueries: ['GetPersonCredits', 'GetWatchedMovies', 'GetWatchlist'],
+      update: refetchQueries(['user.watched']),
       optimisticResponse: {
         setWatched: {
           __typename: "Movie",

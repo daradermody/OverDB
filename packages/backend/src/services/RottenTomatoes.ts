@@ -36,7 +36,7 @@ export default class RottenTomatoes {
     const state = stateMap[`${criticsScoreIcon.getAttribute('sentiment')}:${criticsScoreIcon.getAttribute('certified')}`]
     const consensus = dom.window.document.querySelector('#critics-consensus > p')?.textContent?.trim()
 
-    return state ?? score ? {state, score, consensus, link} : null
+    return (state && score) ? {state, score, consensus, link} : null
   }
 }
 

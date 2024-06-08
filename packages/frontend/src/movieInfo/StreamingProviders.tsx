@@ -1,7 +1,7 @@
+import * as React from 'react'
 import { gql } from '@apollo/client'
 import styled from '@emotion/styled'
 import { Skeleton, Typography } from '@mui/material'
-import * as React from 'react'
 import { Movie, Provider, useGetStreamingProvidersQuery } from '../../types/graphql'
 import { ProviderLogo } from '../shared/general/Poster'
 
@@ -64,6 +64,7 @@ gql`
     movie(id: $id) {
       id
       providers {
+        id
         logo
         name
       }

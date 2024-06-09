@@ -642,7 +642,7 @@ export const GetFavouritePeopleDocument = gql`
  *   },
  * });
  */
-export function useGetFavouritePeopleQuery(baseOptions: Apollo.QueryHookOptions<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables> & ({ variables: GetFavouritePeopleQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetFavouritePeopleQuery(baseOptions: Apollo.QueryHookOptions<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetFavouritePeopleQuery, GetFavouritePeopleQueryVariables>(GetFavouritePeopleDocument, options);
       }
@@ -692,7 +692,7 @@ export const GetLikedMoviesDocument = gql`
  *   },
  * });
  */
-export function useGetLikedMoviesQuery(baseOptions: Apollo.QueryHookOptions<GetLikedMoviesQuery, GetLikedMoviesQueryVariables> & ({ variables: GetLikedMoviesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetLikedMoviesQuery(baseOptions: Apollo.QueryHookOptions<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetLikedMoviesQuery, GetLikedMoviesQueryVariables>(GetLikedMoviesDocument, options);
       }
@@ -732,7 +732,7 @@ export const GetUserDocument = gql`
  *   },
  * });
  */
-export function useGetUserQuery(baseOptions: Apollo.QueryHookOptions<GetUserQuery, GetUserQueryVariables> & ({ variables: GetUserQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetUserQuery(baseOptions: Apollo.QueryHookOptions<GetUserQuery, GetUserQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, options);
       }
@@ -777,7 +777,7 @@ export const GetUserStatsDocument = gql`
  *   },
  * });
  */
-export function useGetUserStatsQuery(baseOptions: Apollo.QueryHookOptions<GetUserStatsQuery, GetUserStatsQueryVariables> & ({ variables: GetUserStatsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetUserStatsQuery(baseOptions: Apollo.QueryHookOptions<GetUserStatsQuery, GetUserStatsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetUserStatsQuery, GetUserStatsQueryVariables>(GetUserStatsDocument, options);
       }
@@ -897,7 +897,7 @@ export const GetAllStreamingProvidersDocument = gql`
  *   },
  * });
  */
-export function useGetAllStreamingProvidersQuery(baseOptions: Apollo.QueryHookOptions<GetAllStreamingProvidersQuery, GetAllStreamingProvidersQueryVariables> & ({ variables: GetAllStreamingProvidersQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetAllStreamingProvidersQuery(baseOptions: Apollo.QueryHookOptions<GetAllStreamingProvidersQuery, GetAllStreamingProvidersQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetAllStreamingProvidersQuery, GetAllStreamingProvidersQueryVariables>(GetAllStreamingProvidersDocument, options);
       }
@@ -950,7 +950,7 @@ export const GetWatchedMoviesDocument = gql`
  *   },
  * });
  */
-export function useGetWatchedMoviesQuery(baseOptions: Apollo.QueryHookOptions<GetWatchedMoviesQuery, GetWatchedMoviesQueryVariables> & ({ variables: GetWatchedMoviesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetWatchedMoviesQuery(baseOptions: Apollo.QueryHookOptions<GetWatchedMoviesQuery, GetWatchedMoviesQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetWatchedMoviesQuery, GetWatchedMoviesQueryVariables>(GetWatchedMoviesDocument, options);
       }
@@ -1047,7 +1047,7 @@ export const SearchDocument = gql`
  *   },
  * });
  */
-export function useSearchQuery(baseOptions: Apollo.QueryHookOptions<SearchQuery, SearchQueryVariables> & ({ variables: SearchQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useSearchQuery(baseOptions: Apollo.QueryHookOptions<SearchQuery, SearchQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<SearchQuery, SearchQueryVariables>(SearchDocument, options);
       }
@@ -1090,7 +1090,7 @@ export const GetTrendingMoviesDocument = gql`
  *   },
  * });
  */
-export function useGetTrendingMoviesQuery(baseOptions: Apollo.QueryHookOptions<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables> & ({ variables: GetTrendingMoviesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetTrendingMoviesQuery(baseOptions: Apollo.QueryHookOptions<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetTrendingMoviesQuery, GetTrendingMoviesQueryVariables>(GetTrendingMoviesDocument, options);
       }
@@ -1136,7 +1136,7 @@ export const GetRecommendedMoviesDocument = gql`
  *   },
  * });
  */
-export function useGetRecommendedMoviesQuery(baseOptions: Apollo.QueryHookOptions<GetRecommendedMoviesQuery, GetRecommendedMoviesQueryVariables> & ({ variables: GetRecommendedMoviesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetRecommendedMoviesQuery(baseOptions: Apollo.QueryHookOptions<GetRecommendedMoviesQuery, GetRecommendedMoviesQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetRecommendedMoviesQuery, GetRecommendedMoviesQueryVariables>(GetRecommendedMoviesDocument, options);
       }
@@ -1296,7 +1296,7 @@ export const GetListDocument = gql`
  *   },
  * });
  */
-export function useGetListQuery(baseOptions: Apollo.QueryHookOptions<GetListQuery, GetListQueryVariables> & ({ variables: GetListQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetListQuery(baseOptions: Apollo.QueryHookOptions<GetListQuery, GetListQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetListQuery, GetListQueryVariables>(GetListDocument, options);
       }
@@ -1347,7 +1347,7 @@ export const GetListsDocument = gql`
  *   },
  * });
  */
-export function useGetListsQuery(baseOptions: Apollo.QueryHookOptions<GetListsQuery, GetListsQueryVariables> & ({ variables: GetListsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetListsQuery(baseOptions: Apollo.QueryHookOptions<GetListsQuery, GetListsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetListsQuery, GetListsQueryVariables>(GetListsDocument, options);
       }
@@ -1405,7 +1405,7 @@ export const GetWatchlistDocument = gql`
  *   },
  * });
  */
-export function useGetWatchlistQuery(baseOptions: Apollo.QueryHookOptions<GetWatchlistQuery, GetWatchlistQueryVariables> & ({ variables: GetWatchlistQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetWatchlistQuery(baseOptions: Apollo.QueryHookOptions<GetWatchlistQuery, GetWatchlistQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetWatchlistQuery, GetWatchlistQueryVariables>(GetWatchlistDocument, options);
       }
@@ -1495,7 +1495,7 @@ export const GetMovieInfoDocument = gql`
  *   },
  * });
  */
-export function useGetMovieInfoQuery(baseOptions: Apollo.QueryHookOptions<GetMovieInfoQuery, GetMovieInfoQueryVariables> & ({ variables: GetMovieInfoQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetMovieInfoQuery(baseOptions: Apollo.QueryHookOptions<GetMovieInfoQuery, GetMovieInfoQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetMovieInfoQuery, GetMovieInfoQueryVariables>(GetMovieInfoDocument, options);
       }
@@ -1538,7 +1538,7 @@ export const GetCrewDocument = gql`
  *   },
  * });
  */
-export function useGetCrewQuery(baseOptions: Apollo.QueryHookOptions<GetCrewQuery, GetCrewQueryVariables> & ({ variables: GetCrewQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetCrewQuery(baseOptions: Apollo.QueryHookOptions<GetCrewQuery, GetCrewQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetCrewQuery, GetCrewQueryVariables>(GetCrewDocument, options);
       }
@@ -1582,7 +1582,7 @@ export const GetCastDocument = gql`
  *   },
  * });
  */
-export function useGetCastQuery(baseOptions: Apollo.QueryHookOptions<GetCastQuery, GetCastQueryVariables> & ({ variables: GetCastQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetCastQuery(baseOptions: Apollo.QueryHookOptions<GetCastQuery, GetCastQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetCastQuery, GetCastQueryVariables>(GetCastDocument, options);
       }
@@ -1628,7 +1628,7 @@ export const GetRottenTomatoesScoreDocument = gql`
  *   },
  * });
  */
-export function useGetRottenTomatoesScoreQuery(baseOptions: Apollo.QueryHookOptions<GetRottenTomatoesScoreQuery, GetRottenTomatoesScoreQueryVariables> & ({ variables: GetRottenTomatoesScoreQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetRottenTomatoesScoreQuery(baseOptions: Apollo.QueryHookOptions<GetRottenTomatoesScoreQuery, GetRottenTomatoesScoreQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetRottenTomatoesScoreQuery, GetRottenTomatoesScoreQueryVariables>(GetRottenTomatoesScoreDocument, options);
       }
@@ -1673,7 +1673,7 @@ export const GetStreamingProvidersDocument = gql`
  *   },
  * });
  */
-export function useGetStreamingProvidersQuery(baseOptions: Apollo.QueryHookOptions<GetStreamingProvidersQuery, GetStreamingProvidersQueryVariables> & ({ variables: GetStreamingProvidersQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetStreamingProvidersQuery(baseOptions: Apollo.QueryHookOptions<GetStreamingProvidersQuery, GetStreamingProvidersQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetStreamingProvidersQuery, GetStreamingProvidersQueryVariables>(GetStreamingProvidersDocument, options);
       }
@@ -1721,7 +1721,7 @@ export const GetPersonCreditsDocument = gql`
  *   },
  * });
  */
-export function useGetPersonCreditsQuery(baseOptions: Apollo.QueryHookOptions<GetPersonCreditsQuery, GetPersonCreditsQueryVariables> & ({ variables: GetPersonCreditsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetPersonCreditsQuery(baseOptions: Apollo.QueryHookOptions<GetPersonCreditsQuery, GetPersonCreditsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetPersonCreditsQuery, GetPersonCreditsQueryVariables>(GetPersonCreditsDocument, options);
       }
@@ -1766,7 +1766,7 @@ export const GetPersonInfoDocument = gql`
  *   },
  * });
  */
-export function useGetPersonInfoQuery(baseOptions: Apollo.QueryHookOptions<GetPersonInfoQuery, GetPersonInfoQueryVariables> & ({ variables: GetPersonInfoQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetPersonInfoQuery(baseOptions: Apollo.QueryHookOptions<GetPersonInfoQuery, GetPersonInfoQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetPersonInfoQuery, GetPersonInfoQueryVariables>(GetPersonInfoDocument, options);
       }
@@ -1850,7 +1850,7 @@ export const GetMovieListsDocument = gql`
  *   },
  * });
  */
-export function useGetMovieListsQuery(baseOptions: Apollo.QueryHookOptions<GetMovieListsQuery, GetMovieListsQueryVariables> & ({ variables: GetMovieListsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetMovieListsQuery(baseOptions: Apollo.QueryHookOptions<GetMovieListsQuery, GetMovieListsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetMovieListsQuery, GetMovieListsQueryVariables>(GetMovieListsDocument, options);
       }

@@ -14,6 +14,7 @@ import { SentimentSelect } from '../shared/movieActionButtons/SentimentSelect'
 import { WatchedButton } from '../shared/movieActionButtons/WatchedButton'
 import PageWrapper from '../shared/PageWrapper'
 import ToggleFilter from '../shared/ToggleFilter'
+import useSetTitle from '../shared/useSetTitle';
 import RottenTomatoesReview, { LoadingRottenTomatoesReview } from './RottenTomatoesReview'
 import StreamingProviders from './StreamingProviders'
 import { TmdbRating } from './TmdbRating'
@@ -50,6 +51,7 @@ export function MovieInfo() {
 
 function MovieSummary({id}: { id: Movie['id'] }) {
   const {data, error, loading, refetch} = useGetMovieInfoQuery({variables: {id}})
+  useSetTitle(data?.movie.title)
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>

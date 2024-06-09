@@ -8,6 +8,7 @@ import { Person, useGetPersonInfoQuery, useSetFavouriteMutation } from '../../ty
 import { ErrorMessage, useMutationErrorHandler } from '../shared/errorHandlers'
 import { Poster } from '../shared/general/Poster'
 import refetchQueries from '../shared/refetchQueries';
+import useSetTitle from '../shared/useSetTitle';
 
 export function PersonSummary({id}: { id: Person['id'] }) {
   const {data, error: fetchError, loading: loadingPerson, refetch} = useGetPersonInfoQuery({variables: {id}})
@@ -16,6 +17,7 @@ export function PersonSummary({id}: { id: Person['id'] }) {
     update: refetchQueries(['user.favouritePeople'])
   })
   useMutationErrorHandler(`Could not ${data?.person?.favourited ? 'unfavourite' : 'favourite'}`, mutationError)
+  useSetTitle(data?.person.name)
 
   if (fetchError) {
     return <ErrorMessage error={fetchError} onRetry={refetch}/>

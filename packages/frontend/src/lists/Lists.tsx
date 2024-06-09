@@ -10,6 +10,7 @@ import { ErrorMessage } from '../shared/errorHandlers'
 import DataGrid from '../shared/general/DataGrid'
 import PageWrapper from '../shared/PageWrapper'
 import UserBadge from '../shared/UserBadge'
+import useSetTitle from '../shared/useSetTitle';
 import useUser from '../useUser'
 import CreateListButton from './CreateListButton'
 import DeleteListsButton from './DeleteListButton'
@@ -20,6 +21,7 @@ export default function Lists() {
   const {username} = useParams<{ username: string }>()
   const {data, loading, error, refetch} = useGetListsQuery({variables: {username}})
   const [selected, setSelected] = useState([])
+  useSetTitle(user?.username === username ? `Your lists` : `${username}'s lists`)
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>

@@ -8,8 +8,10 @@ import { ErrorMessage } from '../shared/errorHandlers'
 import DataGrid from '../shared/general/DataGrid'
 import Link from '../shared/general/Link'
 import PageWrapper from '../shared/PageWrapper'
+import useSetTitle from '../shared/useSetTitle';
 
 export default function Admin() {
+  useSetTitle('Admin')
   return (
     <PageWrapper>
       <Typography variant="h1">Users</Typography>

@@ -5,9 +5,11 @@ import { useGetUpcomingMoviesQuery } from '../../types/graphql'
 import { MovieCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import PageWrapper from '../shared/PageWrapper'
+import useSetTitle from '../shared/useSetTitle';
 
 export default function UpcomingMovies() {
   const {data, error, loading, refetch} = useGetUpcomingMoviesQuery()
+  useSetTitle('Upcoming movies')
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>

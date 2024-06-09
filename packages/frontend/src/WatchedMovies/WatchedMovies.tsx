@@ -8,6 +8,7 @@ import { ErrorMessage } from '../shared/errorHandlers'
 import FetchMoreButton from '../shared/FetchMoreButton'
 import PageWrapper from '../shared/PageWrapper'
 import UserBadge from '../shared/UserBadge'
+import useSetTitle from '../shared/useSetTitle';
 import useUser from '../useUser'
 
 export default function WatchedMovies() {
@@ -17,6 +18,7 @@ export default function WatchedMovies() {
     variables: {username},
     notifyOnNetworkStatusChange: true,
   })
+  useSetTitle(user?.username === username ? `Watched movies` : `${username}'s watched movies`)
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>

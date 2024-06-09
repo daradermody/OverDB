@@ -7,12 +7,14 @@ import MoviesPeopleCards from '../shared/cards/MoviesPeopleCards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import PageWrapper from '../shared/PageWrapper'
 import UserBadge from '../shared/UserBadge'
+import useSetTitle from '../shared/useSetTitle';
 import useUser from '../useUser'
 
 export default function List() {
   const {user} = useUser()
   const {id, username} = useParams<{ id: string, username: string }>()
   const {data, loading, error, refetch} = useGetListQuery({variables: {id, username}})
+  useSetTitle(data?.user.list.name)
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>

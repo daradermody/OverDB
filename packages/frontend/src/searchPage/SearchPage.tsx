@@ -6,11 +6,13 @@ import { useSearchQuery } from '../../types/graphql'
 import MoviesPeopleCards from '../shared/cards/MoviesPeopleCards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import PageWrapper from '../shared/PageWrapper'
+import useSetTitle from '../shared/useSetTitle';
 
 export function SearchPage() {
   const query = useParams<{ query: string }>().query
   const navigate = useNavigate()
   const {data, loading, error, refetch} = useSearchQuery({variables: {query}})
+  useSetTitle(`Search for ${query}`)
 
   useEffect(() => {
     if (!query) navigate('/')

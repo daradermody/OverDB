@@ -10,6 +10,7 @@ import { ErrorMessage } from '../shared/errorHandlers'
 import FetchMoreButton from '../shared/FetchMoreButton'
 import PageWrapper from '../shared/PageWrapper'
 import UserBadge from '../shared/UserBadge'
+import useSetTitle from '../shared/useSetTitle';
 import useUser from '../useUser'
 
 export default function Watchlist() {
@@ -20,6 +21,7 @@ export default function Watchlist() {
     notifyOnNetworkStatusChange: true
   })
   const {data: providerData} = useGetSubscribedStreamingProvidersQuery()
+  useSetTitle(user?.username === username ? `Watchlist` : `${username}'s watchlist`)
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>

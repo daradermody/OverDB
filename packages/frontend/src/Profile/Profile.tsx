@@ -8,6 +8,7 @@ import { MovieCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import Link from '../shared/general/Link'
 import PageWrapper from '../shared/PageWrapper'
+import useSetTitle from '../shared/useSetTitle';
 import useUser from '../useUser'
 import ProfileSettings from './ProfileSettings/ProfileSettings'
 
@@ -15,6 +16,7 @@ export default function Profile() {
   const {user} = useUser()
   const {username} = useParams<{ username: string }>()
   const {data, loading, error, refetch} = useGetUserQuery({variables: {username}})
+  useSetTitle(username)
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>

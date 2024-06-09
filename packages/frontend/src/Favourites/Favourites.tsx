@@ -3,6 +3,7 @@ import * as React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import PageWrapper from '../shared/PageWrapper'
 import UserBadge from '../shared/UserBadge'
+import useSetTitle from '../shared/useSetTitle';
 import useUser from '../useUser'
 import { FavouritePeople } from './FavouritePeople'
 import { LikedMovies } from './LikedMovies'
@@ -11,6 +12,7 @@ export default function Favourites() {
   const {user} = useUser()
   const {type, username} = useParams<{ type: 'people' | 'movies', username: string }>()
   const navigate = useNavigate()
+  useSetTitle(user?.username === username ? `Favourite ${type}` : `${username}'s favourite ${type}`)
 
   return (
     <PageWrapper>

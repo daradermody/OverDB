@@ -19,7 +19,7 @@ export function WatchedButton({id, watched, withLabel}: WatchedButtonProps) {
   function handleClick() {
     return setWatched({
       variables: {id, watched: !watched},
-      update: refetchQueries(['user.watched']),
+      update: refetchQueries(['user.watched', 'creditsForPerson']),
       optimisticResponse: {
         setWatched: {
           __typename: "Movie",

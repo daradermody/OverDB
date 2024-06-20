@@ -26,7 +26,7 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
     setAnchor(null)
     void setSentiment({
       variables: {id, sentiment},
-      update: refetchQueries(['user.likedMovies']),
+      update: refetchQueries(['user.likedMovies', 'creditsForPerson']),
       optimisticResponse: {
         setSentiment: {
           __typename: 'Movie',
@@ -38,6 +38,7 @@ export function SentimentSelect({id, sentiment, withLabel, placement}: Sentiment
     if (sentiment !== Sentiment.None) {
       void setWatched({
         variables: {id, watched: true},
+        update: refetchQueries(['user.likedMovies', 'creditsForPerson']),
         optimisticResponse: {
           setWatched: {
             __typename: 'Movie',

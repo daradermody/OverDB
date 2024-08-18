@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 import { LoadingButton } from '@mui/lab'
-import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, MenuItem } from '@mui/material'
+import {Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, MenuItem, Skeleton} from '@mui/material'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
 import { List, Movie, useAddToListMutation, useGetMovieListsQuery, useRemoveFromListMutation } from '../../../types/graphql'
@@ -59,6 +59,7 @@ function AddToListDialog({movieId, onClose}: { movieId: Movie['id'], onClose: ()
       <DialogContent>
         {error && <div>Could not fetch lists</div>}
         {data?.user.lists.length === 0 && <div>You have no lists to add to. Create one <Link to={`/profile/${user.username}/lists`}>here</Link></div>}
+        {!data && <LoadingLists/>}
         {!!data && (
           <FormGroup>
             {data.user.lists.map(list => (
@@ -87,6 +88,25 @@ function AddToListDialog({movieId, onClose}: { movieId: Movie['id'], onClose: ()
         </LoadingButton>
       </DialogActions>
     </Dialog>
+  )
+}
+
+function LoadingLists() {
+  return (
+    <div style={{display: 'flex', flexDirection: 'column', gap: '18px'}}>
+      <div style={{display: 'flex', gap: '9px'}}>
+        <Skeleton variant="rectangular" animation="wave" height={24} width={24}/>
+        <Skeleton variant="rectangular" animation="wave" height={24} width={140}/>
+      </div>
+      <div style={{display: 'flex', gap: '9px'}}>
+        <Skeleton variant="rectangular" animation="wave" height={24} width={24}/>
+        <Skeleton variant="rectangular" animation="wave" height={24} width={220}/>
+      </div>
+      <div style={{display: 'flex', gap: '9px'}}>
+        <Skeleton variant="rectangular" animation="wave" height={24} width={24}/>
+        <Skeleton variant="rectangular" animation="wave" height={24} width={190}/>
+      </div>
+    </div>
   )
 }
 

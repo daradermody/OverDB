@@ -9,7 +9,6 @@ import useSetTitle from '../shared/useSetTitle'
 
 export function SearchPage() {
   const query = useParams<{ query: string }>().query!
-  console.log(`[${query}]`)
   const {data, isLoading, error, refetch} = useQuery(trpc.search.queryOptions(query))
   useSetTitle(`Search for ${query}`)
 

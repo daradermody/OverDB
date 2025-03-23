@@ -4,7 +4,7 @@ import {useQuery} from '@tanstack/react-query'
 import {useMemo} from 'react'
 import {useLocation} from 'react-router'
 import {useNavigate} from 'react-router-dom'
-import {type PersonCredit, ThingType} from '../../../apiTypes.ts'
+import {ThingType} from '../../../apiTypes.ts'
 import type {CrewCredit, Person} from '../../types/graphql'
 import {trpc} from '../queryClient.ts'
 import {MovieCards} from '../shared/cards'
@@ -12,7 +12,7 @@ import {ErrorMessage} from '../shared/errorHandlers'
 import ToggleFilter from '../shared/ToggleFilter'
 
 export function MovieList({id}: { id: Person['id'] }) {
-  const {data, error, isLoading, refetch} = useQuery(trpc.movieCreditsForPerson.queryOptions({id}, {initialData: [] as PersonCredit[]}))
+  const {data, error, isLoading, refetch} = useQuery(trpc.movieCreditsForPerson.queryOptions({id}))
   const credits = data || []
   const navigate = useNavigate()
   const location = useLocation()

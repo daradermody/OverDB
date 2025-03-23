@@ -1,6 +1,7 @@
 import styled from '@emotion/styled'
-import { Box, Skeleton, Typography } from '@mui/material'
+import {Box, Button, Skeleton, Typography} from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
+import {useState} from 'react'
 import { useLocation } from 'react-router'
 import { useNavigate, useParams } from 'react-router-dom'
 import type { MovieCredit } from '../../../apiTypes.ts'
@@ -144,12 +145,14 @@ function LoadingMovieSummary() {
 }
 
 function CrewList({id}: { id: string }) {
+  const [showOthers, setShowOthers] = useState(false)
   const {data, error, isLoading, refetch} = useQuery(trpc.movieCredits.queryOptions({id, type: 'Crew'}))
 
   if (error) return <ErrorMessage error={error} onRetry={refetch}/>
 
   const bigCrew = data?.slice(0, 12).map(creditToPerson)
   const smallCrew = data?.slice(12).map(creditToPerson)
+  const shouldShowOthers = (smallCrew?.length || 0) <= 12 || showOthers
 
   return (
     <>
@@ -158,7 +161,8 @@ function CrewList({id}: { id: string }) {
       {!!smallCrew?.length && (
         <>
           <Typography variant="h1" style={{marginTop: 20}}>Other Crew</Typography>
-          <PersonCards compressed people={smallCrew} loading={isLoading} loadingCount={15}/>
+          {shouldShowOthers && <PersonCards compressed people={smallCrew} loading={isLoading} loadingCount={15}/>}
+          {!shouldShowOthers && <Button variant="text" onClick={() => setShowOthers(true)}>Show others</Button>}
         </>
       )}
     </>
@@ -166,12 +170,14 @@ function CrewList({id}: { id: string }) {
 }
 
 function CastList({id}: { id: string }) {
+  const [showOthers, setShowOthers] = useState(false)
   const {data, error, isLoading, refetch} = useQuery(trpc.movieCredits.queryOptions({id, type: 'Cast'}))
 
   if (error) return <ErrorMessage error={error} onRetry={refetch}/>
 
   const bigCast = data?.slice(0, 12).map(creditToPerson)
   const smallCast = data?.slice(12).map(creditToPerson)
+  const shouldShowOthers = (smallCast?.length || 0) <= 12 || showOthers
 
   return (
     <>
@@ -180,7 +186,8 @@ function CastList({id}: { id: string }) {
       {!!smallCast?.length && (
         <>
           <Typography variant="h1" style={{marginTop: 20}}>Other Cast</Typography>
-          <PersonCards compressed people={smallCast} loading={isLoading} loadingCount={15} showCharactersOnly/>
+          {shouldShowOthers && <PersonCards compressed people={smallCast} loading={isLoading} loadingCount={15} showCharactersOnly/>}
+          {!shouldShowOthers && <Button variant="text" onClick={() => setShowOthers(true)}>Show others</Button>}
         </>
       )}
     </>

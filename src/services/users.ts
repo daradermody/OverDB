@@ -1,10 +1,9 @@
-import { readFileSync } from 'fs'
+import {TRPCError} from '@trpc/server'
 import { scryptSync, timingSafeEqual } from 'crypto'
 import YAML from 'yaml'
 import { dataDir } from './dataStorage'
-import type {User as ApiUser} from '../../types/graphql'
 
-const usersInfo: UsersFile = YAML.parse(readFileSync(`${dataDir}/users.yml`, 'utf8'))
+const usersInfo: UsersFile = YAML.parse(await Bun.file(`${dataDir}/users.yml`).text())
 
 export async function isLoginValid(username: string, password: string): Promise<boolean> {
   if (!(username in usersInfo)) return false
@@ -16,10 +15,18 @@ export async function isLoginValid(username: string, password: string): Promise<
 }
 
 export function getUser(username: string): User {
-  if (!(username in usersInfo)) throw new Error('User does not exist')
+  if (!(username in usersInfo)) throw new TRPCError({code: 'NOT_FOUND', message: 'User not found'})
   const {passwordHash, ...userInfo} = usersInfo[username]
   return {username, ...userInfo}
 }
+
+export function verifyUserAccessible(requestedUser: User, currentUser?: User) {
+  const canViewUser = currentUser?.username === requestedUser.username || currentUser?.isAdmin || requestedUser.public
+  if (!canViewUser) {
+    throw new TRPCError({code: 'NOT_FOUND', message: 'User not found'})
+  }
+}
+
 
 export function getUsers(): User[] {
   return Object.entries(usersInfo)
@@ -29,7 +36,12 @@ export function getUsers(): User[] {
   })
 }
 
-export type User = Pick<ApiUser, 'username' | 'avatarUrl' | 'isAdmin' | 'public'>
+interface User {
+  username: string;
+  avatarUrl: string;
+  isAdmin?: boolean;
+  public?: boolean;
+}
 
 type UserWithHash = User & { passwordHash: string }
 

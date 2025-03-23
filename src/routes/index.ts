@@ -1,10 +1,12 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import type {User as ApiUser} from '../../types'
 import { ListType, Sentiment } from '../apiTypes.ts'
 import recommendedMoviesResolver from '../resolvers/recommendedMovies.ts'
 import MovieDb from '../services/MovieDb.ts'
 import RottenTomatoes from '../services/RottenTomatoes.ts'
 import { UserData } from '../services/UserData.ts'
+import {getUser, verifyUserAccessible} from '../services/users.ts'
 import { loginRoute } from './auth.ts'
 import { publicProcedure, router, userProcedure } from './router.ts'
 
@@ -19,6 +21,36 @@ export const appRouter = router({
   recommendedMovies: userProcedure
     .input(z.object({size: z.number().min(1).default(10)}).default({}))
     .query(({input, ctx}) => recommendedMoviesResolver(ctx.user.username, input.size || 18)),
+  user: publicProcedure
+    .input(z.object({username: z.string()}))
+    .query(({input, ctx}) => {
+      const requestedUser = getUser(input.username)
+      verifyUserAccessible(requestedUser, ctx.user)
+      return requestedUser
+    }),
+  userStats: publicProcedure
+    .input(z.object({username: z.string()}))
+    .query(({input, ctx}) => {
+      const requestedUser = getUser(input.username)
+      verifyUserAccessible(requestedUser, ctx.user)
+      return {
+        favouritePeople: UserData.getFavourites(input.username).length,
+        watched: UserData.getWatched(input.username).length,
+        moviesLiked: UserData.getLikedMovies(input.username).length,
+        watchlist: UserData.getWatchlist(input.username).length
+      }
+    }),
+  getWatched: publicProcedure
+    .input(z.object({username: z.string(), limit: z.number().min(1).max(40).default(20), cursor: z.number().default(0)}))
+    .query(async ({input, ctx}) => {
+      const requestedUser = getUser(input.username)
+      verifyUserAccessible(requestedUser, ctx.user)
+      const watchedIds = UserData.getWatched(input.username).toReversed().slice(input.cursor, input.cursor + input.limit)
+      return {
+        items: await Promise.all(watchedIds.map(MovieDb.movieInfo)),
+        nextCursor: UserData.getWatched(input.username)[input.cursor + input.limit] ? input.cursor + input.limit : undefined
+      }
+    }),
 
   // Person stuff
   person: publicProcedure

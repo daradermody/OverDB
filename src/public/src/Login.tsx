@@ -31,7 +31,6 @@ export default function Login() {
       const returnPath = queryString.parse(location.search).andWeWillGetYouTo as string
       navigate(returnPath || '/')
     } catch (e) {
-      console.log(e)
       if (e instanceof TRPCClientError && e.data.httpStatus === 401) {
         setError('Invalid credentials')
       } else {

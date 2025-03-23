@@ -1,39 +1,35 @@
-import { gql } from '@apollo/client'
+import {gql} from '@apollo/client'
 import styled from '@emotion/styled'
-import { Divider, Typography } from '@mui/material'
-import * as React from 'react'
-import { useParams } from 'react-router-dom'
-import { useGetUserQuery, useGetUserStatsQuery, useGetWatchedMoviesQuery, User } from '../../types/graphql'
-import { MovieCards } from '../shared/cards'
-import { ErrorMessage } from '../shared/errorHandlers'
+import {Divider, Typography} from '@mui/material'
+import {useInfiniteQuery, useQuery} from '@tanstack/react-query'
+import {useParams} from 'react-router-dom'
+import {useGetWatchedMoviesQuery, User} from '../../types/graphql'
+import {trpc} from '../queryClient.ts'
+import {MovieCards} from '../shared/cards'
+import {ErrorMessage} from '../shared/errorHandlers'
 import Link from '../shared/general/Link'
 import PageWrapper from '../shared/PageWrapper'
-import useSetTitle from '../shared/useSetTitle';
+import useSetTitle from '../shared/useSetTitle'
 import useUser from '../useUser'
 import ProfileSettings from './ProfileSettings/ProfileSettings'
 
 export default function Profile() {
   const {user} = useUser()
-  const {username} = useParams<{ username: string }>()
-  const {data, loading, error, refetch} = useGetUserQuery({variables: {username}})
+  const username = useParams<{ username: string }>().username!
+  const {data, isLoading, error, refetch} = useQuery(trpc.user.queryOptions({username}))
   useSetTitle(username)
 
-  if (error) {
-    return <ErrorMessage error={error} onRetry={refetch}/>
-  }
-
-  if (loading) {
-    return <LoadingProfile/>
-  }
+  if (error) return <ErrorMessage error={error} onRetry={refetch}/>
+  if (isLoading) return <LoadingProfile/>
 
   return (
     <PageWrapper>
       <StyledProfile>
         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, margin: '20px 0 50px'}}>
-          <img style={{width: 300, aspectRatio: '1', clipPath: 'circle()'}} src={data.user.avatarUrl} alt="profile photo"/>
+          <img style={{width: 300, aspectRatio: '1', clipPath: 'circle()'}} src={data!.avatarUrl} alt="profile photo"/>
           <Stats/>
         </div>
-        {user.username === username ? <ProfileSettings/> : <RecentlyWatchedMovies username={username}/>}
+        {user.username !== username ? <ProfileSettings/> : <RecentlyWatchedMovies username={username}/>}
       </StyledProfile>
     </PageWrapper>
   )
@@ -56,30 +52,28 @@ const StyledProfile = styled.div`
 `
 
 function Stats() {
-  const {username} = useParams<{ username: string }>()
+  const username = useParams<{ username: string }>().username!
 
-  const {data, loading, error, refetch} = useGetUserStatsQuery({variables: {username}})
+  const {data, isLoading, error, refetch} = useQuery(trpc.userStats.queryOptions({username}))
 
-  if (error) {
-    return <ErrorMessage error={error} onRetry={refetch}/>
-  }
+  if (error) return <ErrorMessage error={error} onRetry={refetch}/>
 
   return (
     <div style={{display: 'flex', justifyContent: 'center', flexGrow: 1}}>
       <Link to={`/profile/${username}/favourite/people`}>
-        <Stat value={data?.user.stats.favouritePeople} label="Favourite people" loading={loading}/>
+        <Stat value={data?.favouritePeople} label="Favourite people" loading={isLoading}/>
       </Link>
       <Divider orientation="vertical" flexItem/>
       <Link to={`/profile/${username}/watched`}>
-        <Stat value={data?.user.stats.watched} label="Movies watched" loading={loading}/>
+        <Stat value={data?.watched} label="Movies watched" loading={isLoading}/>
       </Link>
       <Divider orientation="vertical" flexItem/>
       <Link to={`/profile/${username}/favourite/movies`}>
-        <Stat value={data?.user.stats.moviesLiked} label="Movies liked" loading={loading}/>
+        <Stat value={data?.moviesLiked} label="Movies liked" loading={isLoading}/>
       </Link>
       <Divider orientation="vertical" flexItem/>
       <Link to={`/profile/${username}/list/watchlist`}>
-        <Stat value={data?.user.stats.watchlist} label="In watchlist" loading={loading}/>
+        <Stat value={data?.watchlist} label="In watchlist" loading={isLoading}/>
       </Link>
     </div>
   )
@@ -105,40 +99,19 @@ const StatWrapper = styled.div`
   }
 `
 
-function RecentlyWatchedMovies({username}: {username: User['username']}) {
+function RecentlyWatchedMovies({username}: { username: User['username'] }) {
   const {user} = useUser()
-  const {data, error, loading, refetch} = useGetWatchedMoviesQuery({variables: {username, limit: 8}})
+  const {data, error, isLoading, refetch, hasNextPage, fetchNextPage} = useInfiniteQuery(
+    trpc.getWatched.infiniteQueryOptions({username, limit: 8}, {getNextPageParam: lastPage => lastPage.nextCursor})
+  )
 
-  if (error) {
-    return <ErrorMessage error={error} onRetry={refetch}/>
-  }
+  if (error) return <ErrorMessage error={error} onRetry={refetch}/>
 
+  const movies = data?.pages.map(page => page.items).flat()
   return (
     <div style={{width: '100%'}}>
       <Typography variant="h1">{user?.username === username ? 'Recently Watched' : `${username}'s recently watched`}</Typography>
-      <MovieCards movies={data?.user.watched?.results} loading={loading} loadingCount={4}/>
+      <MovieCards movies={movies} loading={isLoading} loadingCount={4}/>
     </div>
   )
 }
-
-
-gql`
-  query GetUser($username: ID!) {
-    user(username: $username) {
-      avatarUrl
-    }
-  }
-`
-
-gql`
-  query GetUserStats($username: ID!) {
-    user(username: $username) {
-      stats {
-        favouritePeople
-        watched
-        moviesLiked
-        watchlist
-      }
-    }
-  }
-`

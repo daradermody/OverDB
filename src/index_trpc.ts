@@ -16,6 +16,12 @@ Bun.serve({
   port: 3000,
   routes: {
     '/*': indexHtml,
+    '/privacy.html': new Response(await Bun.file('./src/public/public/privacy.html').bytes(), {headers: {'Content-Type': 'text/html'}}),
+    '/.well-known/*': async req => {
+      const {pathname} = new URL(req.url)
+      return new Response(await Bun.file(`./src/public/public${pathname}`).bytes(), {headers: {'Content-Type': 'text/plain'}})
+    },
+    '/robots.txt': new Response(await Bun.file('./src/public/public/robots.txt').bytes(), {headers: {'Content-Type': 'text/plain'}}),
     '/icon.png': new Response(await Bun.file('./src/public/public/icon.png').bytes(), {headers: {'Content-Type': 'image/png'}}),
     '/api/*': {
       GET: apiHandler,

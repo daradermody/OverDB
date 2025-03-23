@@ -10,9 +10,9 @@ export default function RottenTomatoesReview({imdbId}: { imdbId: string }) {
 
   if (error) return <ErrorMessage error={error} onRetry={refetch}/>
   if (isLoading) return <LoadingRottenTomatoesReview/>
+  if (!data) return null
 
-  const {state, score, consensus, link} = data!
-
+  const {state, score, consensus, link} = data
   return (
     <div style={{display: 'flex', alignItems: 'center', gap: 20}}>
       <a href={link} target="_blank" style={{position: 'relative', color: 'inherit'}}>

@@ -1,19 +1,9 @@
 import * as fs from 'fs'
-import {type Cast, type CreditsResponse, type Crew, MovieDb as MovieDbApi, type MovieResponse, type Person as TmdbPerson, type PersonMovieCreditsResponse} from 'moviedb-promise'
-import {
-  type CastCredit,
-  type CrewCredit,
-  isMovieSearchResult,
-  isPersonSearchResult,
-  type Movie,
-  type MovieInfo,
-  type Person,
-  type PersonWithoutFav,
-  type Provider
-} from '../../types'
+import {type Cast, type Crew, MovieDb as MovieDbApi, type MovieResponse, type Person as TmdbPerson} from 'moviedb-promise'
+import {isMovieSearchResult, isPersonSearchResult, type Movie, type Person, type Provider} from '../../types'
+import {type Movie as ApiMovie, type MovieCredit, type Person as ApiPerson, type PersonCredit, type SearchResult, ThingType} from '../apiTypes'
 import getToken from '../utils/getToken'
 import {dataDir} from './dataStorage'
-import {type Movie as ApiMovie, type MovieCredit, type Person as ApiPerson, type PersonCredit, type SearchResult, ThingType} from '../apiTypes'
 
 interface Cache {
   movieInfo: {
@@ -79,14 +69,24 @@ export default class MovieDb {
       const crew = filterInsignificantPeople(response.crew!)
       const cast = response.cast!
       const credits = [...cast, ...crew].map(convertMovieCredit)
-      MovieDb.cache.movieCredits[id] = aggregateMovieCredits(credits).sort(sortByRole)
+      MovieDb.cache.movieCredits[id] = aggregateMovieCredits(credits)
       MovieDb.save()
     }
 
     if (!options?.type) {
       return MovieDb.cache.movieCredits[id]
     } else {
-      return MovieDb.cache.movieCredits[id].filter(credit => options.type === 'Crew' ? credit.jobs.length : credit.characters.length)
+      if (options.type === 'Crew') {
+        const creditsWithoutActorJob = MovieDb.cache.movieCredits[id]
+          .map(credit => ({ ...credit, jobs: credit.jobs.filter(job => job !== 'Actor'), characters: [] }))
+          .sort(sortByRole)
+        return creditsWithoutActorJob.filter(credit => credit.jobs.length)
+      } else {
+        return MovieDb.cache.movieCredits[id]
+          .filter(credit => credit.jobs.includes('Actor'))
+          .map(credit => ({...credit, jobs: ['Actor']}))
+          .sort((creditA, creditB) => creditA.castOrder! - creditB.castOrder!)
+      }
     }
   }
 
@@ -133,7 +133,7 @@ export default class MovieDb {
       if (!MovieDb.cache.allProviders[region]) {
         await MovieDb.allStreamingProviders(region)
       }
-      const {results} = await this.movieDbApi.movieWatchProviders({id: movieId})
+      const {results} = await MovieDb.movieDbApi.movieWatchProviders({id: movieId})
       const movieProviders: Record<string, Provider['id'][]> = {}
       for (const [region, {flatrate}] of Object.entries(results!)) {
         movieProviders[region] = flatrate?.map(provider => `${provider.provider_id}`) || []
@@ -148,7 +148,7 @@ export default class MovieDb {
 
   static async allStreamingProviders(region: string): Promise<Provider[]> {
     if (!MovieDb.cache.allProviders[region]) {
-      const {results} = await this.movieDbApi.movieWatchProviderList({watch_region: region})
+      const {results} = await MovieDb.movieDbApi.movieWatchProviderList({watch_region: region})
       const providers = results?.map(provider => ({
         id: `${provider.provider_id!}`,
         name: provider.provider_name!,
@@ -207,7 +207,6 @@ function aggregateMovieCredits(credits: MovieCredit[]): MovieCredit[] {
       creditsById[credit.person.id].characters.push(...credit.characters)
     }
   }
-  console.log('done aggreaging:', JSON.stringify(creditsById, null, 2))
   return Object.values(creditsById)
 }
 
@@ -355,6 +354,6 @@ function convertMovieCredit(credit: Cast | Crew): MovieCredit {
     },
     jobs: 'job' in credit && credit.job ? [normaliseJob(credit.job)] : ['Actor'],
     characters: 'character' in credit && credit.character ? credit.character.split(' / ') : [],
-    castOrder: 'order' in credit ? credit.order || 9999 : undefined
+    castOrder: 'order' in credit ? credit.order ?? 9999 : undefined
   }
 }

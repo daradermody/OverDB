@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import {Button, Typography} from '@mui/material'
-import {enqueueSnackbar} from 'notistack'
+import { enqueueSnackbar, useSnackbar } from 'notistack'
 import {type ReactNode, useCallback, useEffect, useState} from 'react'
 import PageWrapper from './PageWrapper'
 import type {TRPCClientErrorBase, TRPCClientErrorLike} from '@trpc/client'
@@ -55,6 +55,8 @@ const StyledCodeBlock = styled.div`
 `
 
 export function useDeclarativeErrorHandler(prefix: string, error?: TRPCClientErrorLike<any> | null) {
+  const { enqueueSnackbar } = useSnackbar()
+
   useEffect(() => {
     if (error) {
       enqueueSnackbar(`${prefix}: ${error.message}`, {variant: 'error'})

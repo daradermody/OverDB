@@ -19,13 +19,10 @@ interface Cache {
   movieInfo: {
     [id: Movie['id']]: ApiMovie;
   }
-  movieCrew: {
-    [id: Movie['id']]: CrewCredit[];
+  movieCredits: {
+    [id: Movie['id']]: MovieCredit[];
   }
-  movieCast: {
-    [id: Movie['id']]: CastCredit[];
-  }
-  personMovieCredits: {
+  personCredits: {
     [id: Person['id']]: PersonCredit[];
   }
   personInfo: {
@@ -42,40 +39,28 @@ export default class MovieDb {
   private static movieDbApi = new MovieDbApi(key)
   private static cache: Cache = MovieDb.readCache()
 
-  static async personMovieCredits(id: Person['id']): Promise<PersonCredit[]> {
-    if (!MovieDb.cache.personMovieCredits[id]) {
-      const response = await MovieDb.movieDbApi.personMovieCredits({id})
-      const cast = response.cast as Required<NonNullable<PersonMovieCreditsResponse['cast']>[number]>[]
-      const crew = response.crew as Required<NonNullable<PersonMovieCreditsResponse['crew']>[number]>[]
-      const crewMovies = filterInvalidMovies(crew)
-      const castMovies = filterInvalidMovies(cast.map(c => ({...c, job: 'Actor'})))
-      const aggregatedMovieCredits = aggregateAndNormalizeJobs([...castMovies, ...crewMovies])
-      // TODO: Check what credit.character is when actor is multiple characters
-      console.log(castMovies.filter(credit => credit.title === 'Cloud Atlas').map(c => c.character))
-      MovieDb.cache.personMovieCredits[id] = aggregatedMovieCredits
-        .sort((credit1, credit2) => credit1.release_date < credit2.release_date ? 1 : -1)
-        .map((credit): PersonCredit => ({
-          id: credit.credit_id,
-          movie: {
-            id: `${credit.id}`,
-            title: credit.title,
-            releaseDate: credit.release_date,
-            posterPath: credit.poster_path || undefined
-          },
-          jobs: credit.jobs,
-          characters: 'character' in credit ? credit.character.split(' / ') : undefined
-        }))
-      MovieDb.save()
-    }
-    return MovieDb.cache.personMovieCredits[id]
-  }
-
   static async personInfo(id: Person['id']): Promise<ApiPerson> {
     if (!MovieDb.cache.personInfo[id]) {
       const person = await MovieDb.movieDbApi.personInfo({id})
       MovieDb.cache.personInfo[id] = convertPerson(person)
     }
     return MovieDb.cache.personInfo[id]
+  }
+
+  static async getPersonCredits(id: Person['id']): Promise<PersonCredit[]> {
+    if (!MovieDb.cache.personCredits[id]) {
+      const response = await MovieDb.movieDbApi.personMovieCredits({id})
+      const cast = filterInvalidCredits(response.cast!)
+      const crew = filterInvalidCredits(response.crew!)
+
+      const credits = [...cast, ...crew]
+        .sort((credit1, credit2) => (credit1.release_date || '9') < (credit2.release_date || '9') ? 1 : -1)
+        .map(convertPersonCredit)
+
+      MovieDb.cache.personCredits[id] = aggregatePersonCredits(credits)
+      MovieDb.save()
+    }
+    return MovieDb.cache.personCredits[id]
   }
 
   static async movieInfo(id: Movie['id']): Promise<ApiMovie> {
@@ -87,38 +72,22 @@ export default class MovieDb {
     return MovieDb.cache.movieInfo[id]
   }
 
-  static async personCreditsForMovie(id: string, options?: { type?: 'Crew' | 'Cast' }): Promise<MovieCredit> {
-    let crew: MovieCredit[] = MovieDb.cache.movieCrew[id];
-    let cast: MovieCredit[] = MovieDb.cache.movieCast[id];
+  static async getMovieCredits(id: string, options?: { type?: 'Crew' | 'Cast' }): Promise<MovieCredit[]> {
+    if (!MovieDb.cache.movieCredits[id]) {
+      const response = await MovieDb.movieDbApi.movieCredits(id)
 
-    let movieDbResponse: CreditsResponse;
-    if (!options?.type || options?.type === 'Cast') {
-      if ()
-    }
-  }
-
-  static async movieCrew(id: Movie['id']): Promise<CrewCredit[]> {
-    if (!MovieDb.cache.movieCrew[id]) {
-      const {crew} = await MovieDb.movieDbApi.movieCredits(id) as { crew: Required<Crew>[] }
-      const filteredCredits = filterInsignificantPeople(crew)
-      const aggregatedCredits = aggregateAndNormalizeJobs(filteredCredits)
-      MovieDb.cache.movieCrew[id] = aggregatedCredits
-        .map(pickCrewCreditForMovieProperties)
-        .sort(sortByRole)
+      const crew = filterInsignificantPeople(response.crew!)
+      const cast = response.cast!
+      const credits = [...cast, ...crew].map(convertMovieCredit)
+      MovieDb.cache.movieCredits[id] = aggregateMovieCredits(credits).sort(sortByRole)
       MovieDb.save()
     }
-    return MovieDb.cache.movieCrew[id]
-  }
 
-  static async movieCast(id: Movie['id']): Promise<CastCredit[]> {
-    if (!MovieDb.cache.movieCast[id]) {
-      const {cast} = await MovieDb.movieDbApi.movieCredits(id) as { cast: Required<Cast>[] }
-      MovieDb.cache.movieCast[id] = cast
-        .map(pickCastCreditForMovieProperties)
-        .sort((a, b) => a.order - b.order)
-      MovieDb.save()
+    if (!options?.type) {
+      return MovieDb.cache.movieCredits[id]
+    } else {
+      return MovieDb.cache.movieCredits[id].filter(credit => options.type === 'Crew' ? credit.jobs.length : credit.characters.length)
     }
-    return MovieDb.cache.movieCast[id]
   }
 
   static async search(query: string): Promise<SearchResult[]> {
@@ -201,122 +170,105 @@ export default class MovieDb {
 
   private static readCache(): Cache {
     if (!fs.existsSync(MovieDb.FILE_PATH)) {
-      const initial: Cache = {personInfo: {}, movieCrew: {}, movieCast: {}, personMovieCredits: {}, movieInfo: {}, allProviders: {}, movieProviders: {}}
+      const initial: Cache = {personInfo: {}, movieCredits: {}, personCredits: {}, movieInfo: {}, allProviders: {}, movieProviders: {}}
       fs.writeFileSync(MovieDb.FILE_PATH, JSON.stringify(initial))
     }
     return JSON.parse(fs.readFileSync(MovieDb.FILE_PATH, 'utf-8'))
   }
 }
 
-function filterInvalidMovies<T extends { vote_count: number, job: string }>(credits: T[]): T[] {
+function filterInvalidCredits<T extends { vote_count?: number, job?: string }>(credits: T[]): T[] {
   const ignoredRoles = ['Thanks', 'Characters']
-  return credits.filter(movie => !!movie.vote_count && !ignoredRoles.includes(movie.job))
+  return credits.filter(movie => !!movie.vote_count && (!movie.job || !ignoredRoles.includes(movie.job)))
 }
 
-function aggregateAndNormalizeJobs<T extends { id: number }>(credits: (T & { job?: string })[]): (T & { jobs: string[] })[] {
-  const creditsById: Record<number, any> = {}
-  for (let credit of credits) {
-    if (!credit.job) {
-      continue
-    }
-    const normalizedRole = credit.job
-      .replace('Executive ', '')
-      .replace('Associate ', '')
-      .replace('Special Guest ', '')
-      .replace('Co-Director', 'Director')
-      .replace('Co-Producer', 'Producer')
-      .replace('Assistant Director', 'Music')
-      .replace('Music Producer', 'Music')
-      .replace('Orchestrator', 'Music')
-      .replace('Music Arranger', 'Music')
-      .replace('Conductor', 'Music')
-      .replace('Theme Song Performance', 'Music')
-      .replace('Original Music Composer', 'Music')
-      .replace('Sound Designer', 'Sound')
-      .replace('Sound Editor', 'Sound')
-      .replace('Sound Mixer', 'Sound')
-      .replace('Sound Re-Recording Mixer', 'Sound')
-      .replace('Sound Effects', 'Sound')
-      .replace('Art Direction', 'Art')
-      .replace('Art Designer', 'Art')
-      .replace('Production Design', 'Art')
-      .replace('Special Effects', 'Effects')
-      .replace('Set Designer', 'Set')
-      .replace('Set Decoration', 'Set')
-      .replace('Screenplay', 'Writer')
-      .replace('Scenario Writer', 'Writer')
-      .replace('Theatre Play', 'Writer')
-      .replace('Story', 'Writer')
-      .replace('Author', 'Writer')
-      .replace('Script', 'Writer')
-      .replace('Theme Song Performance', 'Writer')
-      .replace('Additional Writing', 'Writer')
-      .replace('Idea', 'Writer')
-      .replace('Technical Advisor', 'Advisor')
-      .replace('Script Consultant', 'Advisor')
-      .replace('Creative Consultant', 'Advisor')
-      .replace('Camera', 'Cameras')
-      .replace('Camera Operator', 'Cameras')
-      .replace('Cameras Operator', 'Cameras')
-      .replace('First Assistant Cameras', 'Cameras')
-      .replace('Second Assistant Cameras', 'Cameras')
-      .replace('Director of Photography', 'Cinematography')
-      .replace('"A" Cameras', 'Cinematography')
-
-    if (creditsById[credit.id]) {
-      creditsById[credit.id].jobs.push(normalizedRole)
+function aggregatePersonCredits(credits: PersonCredit[]): PersonCredit[] {
+  const movieIds = credits.map(c => c.movie.id)
+  const creditsById: Record<string, PersonCredit> = {}
+  for (const credit of credits) {
+    if (!creditsById[credit.movie.id]) {
+      creditsById[credit.movie.id] = credit
     } else {
-      creditsById[credit.id] = {...credit, jobs: [normalizedRole]}
+      creditsById[credit.movie.id].jobs.push(...credit.jobs)
+      creditsById[credit.movie.id].characters.push(...credit.characters)
     }
   }
   return Object.values(creditsById)
+    .sort((creditA, creditB) => movieIds.indexOf(creditB.movie.id) - movieIds.indexOf(creditA.movie.id))
 }
 
-function filterInsignificantPeople<T extends { job: string }>(crew: T[]): T[] {
+function aggregateMovieCredits(credits: MovieCredit[]): MovieCredit[] {
+  const creditsById: Record<string, MovieCredit> = {}
+  for (const credit of credits) {
+    if (!creditsById[credit.person.id]) {
+      creditsById[credit.person.id] = credit
+    } else {
+      creditsById[credit.person.id].jobs.push(...credit.jobs)
+      creditsById[credit.person.id].characters.push(...credit.characters)
+    }
+  }
+  console.log('done aggreaging:', JSON.stringify(creditsById, null, 2))
+  return Object.values(creditsById)
+}
+
+function normaliseJob(job: string): string {
+  return job
+    .replace('Executive ', '')
+    .replace('Associate ', '')
+    .replace('Special Guest ', '')
+    .replace('Co-Director', 'Director')
+    .replace('Co-Producer', 'Producer')
+    .replace('Assistant Director', 'Music')
+    .replace('Music Producer', 'Music')
+    .replace('Orchestrator', 'Music')
+    .replace('Music Arranger', 'Music')
+    .replace('Conductor', 'Music')
+    .replace('Theme Song Performance', 'Music')
+    .replace('Original Music Composer', 'Music')
+    .replace('Sound Designer', 'Sound')
+    .replace('Sound Editor', 'Sound')
+    .replace('Sound Mixer', 'Sound')
+    .replace('Sound Re-Recording Mixer', 'Sound')
+    .replace('Sound Effects', 'Sound')
+    .replace('Art Direction', 'Art')
+    .replace('Art Designer', 'Art')
+    .replace('Production Design', 'Art')
+    .replace('Special Effects', 'Effects')
+    .replace('Set Designer', 'Set')
+    .replace('Set Decoration', 'Set')
+    .replace('Screenplay', 'Writer')
+    .replace('Scenario Writer', 'Writer')
+    .replace('Theatre Play', 'Writer')
+    .replace('Story', 'Writer')
+    .replace('Author', 'Writer')
+    .replace('Script', 'Writer')
+    .replace('Theme Song Performance', 'Writer')
+    .replace('Additional Writing', 'Writer')
+    .replace('Idea', 'Writer')
+    .replace('Technical Advisor', 'Advisor')
+    .replace('Script Consultant', 'Advisor')
+    .replace('Creative Consultant', 'Advisor')
+    .replace('Camera', 'Cameras')
+    .replace('Camera Operator', 'Cameras')
+    .replace('Cameras Operator', 'Cameras')
+    .replace('First Assistant Cameras', 'Cameras')
+    .replace('Second Assistant Cameras', 'Cameras')
+    .replace('Director of Photography', 'Cinematography')
+    .replace('"A" Cameras', 'Cinematography')
+}
+
+function filterInsignificantPeople(crew: Crew[]): Crew[] {
   const ignoredRoles = ['Thanks', 'Characters']
-  return crew.filter(personCredit => !ignoredRoles.includes(personCredit.job))
+  return crew.filter(personCredit => !!personCredit.job && !ignoredRoles.includes(personCredit.job))
 }
 
-function sortByRole(creditA: CrewCredit, creditB: CrewCredit): number {
+function sortByRole(creditA: MovieCredit, creditB: MovieCredit): number {
   const jobsByImportance = [
     'Casting', 'Editor', 'Music', 'Sound', 'Producer', 'Cinematography', 'Writer', 'Director',
   ]
-  const creditAPrecedence = Math.max(...creditA.jobs.map(job => jobsByImportance.findIndex(importantJob => job === importantJob)))
-  const creditBPrecedence = Math.max(...creditB.jobs.map(job => jobsByImportance.findIndex(importantJob => job === importantJob)))
+  const creditAPrecedence = Math.max(...(creditA.jobs || []).map(job => jobsByImportance.findIndex(importantJob => job === importantJob)))
+  const creditBPrecedence = Math.max(...(creditB.jobs || []).map(job => jobsByImportance.findIndex(importantJob => job === importantJob)))
   return creditAPrecedence > creditBPrecedence ? -1 : 1
-}
-
-function pickCrewCreditForMovieProperties(credit: Pick<Crew, 'id' | 'name' | 'profile_path'> & { jobs: string[] }): CrewCredit {
-  return {
-    id: `${credit.id}`,
-    name: credit.name || 'Name unknown',
-    profilePath: credit.profile_path,
-    jobs: credit.jobs,
-  }
-}
-
-function pickCastCreditForMovieProperties(credit: Pick<Cast, 'id' | 'name' | 'profile_path' | 'character' | 'order'>): CastCredit {
-  return {
-    id: `${credit.id}`,
-    name: credit.name || 'Name unknown',
-    profilePath: credit.profile_path,
-    character: credit.character || '',
-    order: credit.order ?? 9999
-  }
-}
-
-function pickMovieProperties(movie: Pick<MovieResponse, 'id' | 'imdb_id' | 'title' | 'poster_path' | 'release_date' | 'vote_average' | 'overview' | 'tagline'>): MovieInfo & { type: ThingType } {
-  return {
-    id: `${movie.id}`,
-    imdbId: `${movie.imdb_id}`,
-    title: movie.title!,
-    posterPath: movie.poster_path,
-    releaseDate: movie.release_date || null,
-    voteAverage: movie.vote_average!,
-    overview: movie.overview!,
-    tagline: movie.tagline || '',
-    type: ThingType.Movie
-  }
 }
 
 function convertMovie(movie: MovieResponse): ApiMovie {
@@ -328,6 +280,7 @@ function convertMovie(movie: MovieResponse): ApiMovie {
     overview: movie.overview!,
     tagline: movie.tagline!,
     voteAverage: movie.vote_average || 0,
+    imdbId: movie.imdb_id!
   }
 }
 
@@ -341,13 +294,67 @@ function convertPerson(person: TmdbPerson): ApiPerson {
   }
 }
 
-function pickPersonProperties(person: TmdbPerson): PersonWithoutFav & { type: ThingType } {
+interface MovieDbCrewCredit {
+  id?: number;
+  department?: string;
+  original_language?: string;
+  original_title?: string;
+  job?: string;
+  overview?: string;
+  vote_count?: number;
+  video?: boolean;
+  poster_path?: string | null;
+  backdrop_path?: string | null;
+  title?: string;
+  popularity?: number;
+  genre_ids?: number[];
+  vote_average?: number;
+  adult?: boolean;
+  release_date?: string;
+  credit_id?: string;
+}
+interface MovieDbCastCredit {
+  character?: string;
+  credit_id?: string;
+  release_date?: string;
+  vote_count?: number;
+  video?: boolean;
+  adult?: boolean;
+  vote_average?: number | number;
+  title?: string;
+  genre_ids?: number[];
+  original_language?: string;
+  original_title?: string;
+  popularity?: number;
+  id?: number;
+  backdrop_path?: string | null;
+  overview?: string;
+  poster_path?: string | null;
+}
+function convertPersonCredit(credit: MovieDbCrewCredit | MovieDbCastCredit): PersonCredit {
   return {
-    id: `${person.id}`,
-    name: person.name || 'Name unknown',
-    biography: person.biography || '',
-    knownForDepartment: person.known_for_department,
-    profilePath: person.profile_path,
-    type: ThingType.Person
+    id: credit.credit_id!,
+    movie: {
+      id: `${credit.id}`,
+      title: credit.title!,
+      releaseDate: credit.release_date,
+      posterPath: credit.poster_path || undefined
+    },
+    jobs: 'job' in credit && credit.job ? [normaliseJob(credit.job)] : ['Actor'],
+    characters: 'character' in credit && credit.character ? credit.character.split(' / ') : []
+  }
+}
+
+function convertMovieCredit(credit: Cast | Crew): MovieCredit {
+  return {
+    id: credit.credit_id!,
+    person: {
+      id: `${credit.id}`,
+      name: credit.name!,
+      profilePath: credit.profile_path || undefined
+    },
+    jobs: 'job' in credit && credit.job ? [normaliseJob(credit.job)] : ['Actor'],
+    characters: 'character' in credit && credit.character ? credit.character.split(' / ') : [],
+    castOrder: 'order' in credit ? credit.order || 9999 : undefined
   }
 }

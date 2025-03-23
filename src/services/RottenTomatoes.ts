@@ -1,5 +1,5 @@
 import { JSDOM } from 'jsdom'
-import { type Tomatometer, TomatometerState } from '../../types'
+import { type Tomatometer, TomatometerState } from '../apiTypes.ts'
 import getToken from '../utils/getToken'
 const OMDB_TOKEN = getToken('OMDB_TOKEN')
 

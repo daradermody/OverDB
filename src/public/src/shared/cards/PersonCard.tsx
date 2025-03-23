@@ -13,14 +13,15 @@ export interface PersonCardProps {
     characters?: string[];
   };
   compressed?: boolean
+  showCharactersOnly?: boolean
 }
 
-export function PersonCard({person, compressed}: PersonCardProps) {
+export function PersonCard({person, showCharactersOnly, compressed}: PersonCardProps) {
   return (
     <StyledCard sx={{height: compressed ? '75px' : undefined}}>
       <Link to={`/person/${person.id}`} sx={{display: compressed ? 'flex' : 'initial', height: '100%'}}>
         <PersonImage person={person} compressed={compressed}/>
-        <PersonSummary person={person} compressed={compressed}/>
+        <PersonSummary person={person} compressed={compressed} showCharactersOnly={showCharactersOnly}/>
       </Link>
     </StyledCard>
   )
@@ -49,7 +50,7 @@ function PersonImage({person, compressed}: PersonCardProps) {
   )
 }
 
-function PersonSummary({person, compressed}: PersonCardProps) {
+function PersonSummary({person, showCharactersOnly, compressed}: PersonCardProps) {
   return (
     <div style={{width: '100%', minWidth: 0, padding: compressed ? '11px 16px' : '16px'}}>
       <Tooltip placement="top" title={<Typography>{person.name}</Typography>}>
@@ -65,7 +66,7 @@ function PersonSummary({person, compressed}: PersonCardProps) {
             component="div"
             style={{textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'}}
           >
-            {person.jobs?.join(', ') || person.characters?.join(', ')}
+            {showCharactersOnly ? person.characters?.join(', ') : person.jobs?.join(', ')}
           </Typography>
         </Tooltip>
       )}

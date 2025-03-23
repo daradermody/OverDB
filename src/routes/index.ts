@@ -1,13 +1,12 @@
-import {TRPCError} from '@trpc/server'
-import {z} from 'zod'
-import type {MovieCredit} from '../../types'
-import {ListType, type PersonCredit, Sentiment} from '../apiTypes.ts'
+import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
+import { ListType, Sentiment } from '../apiTypes.ts'
 import recommendedMoviesResolver from '../resolvers/recommendedMovies.ts'
 import MovieDb from '../services/MovieDb.ts'
-import {UserData} from '../services/UserData.ts'
-import {sortMoviesByReleaseDateAsc} from '../utils/sorting.ts'
-import {loginRoute} from './auth.ts'
-import {publicProcedure, router, userProcedure} from './router.ts'
+import RottenTomatoes from '../services/RottenTomatoes.ts'
+import { UserData } from '../services/UserData.ts'
+import { loginRoute } from './auth.ts'
+import { publicProcedure, router, userProcedure } from './router.ts'
 
 export const appRouter = router({
   login: loginRoute,
@@ -27,7 +26,7 @@ export const appRouter = router({
     .query(({input}) => MovieDb.personInfo(input.id)),
   movieCreditsForPerson: publicProcedure
     .input(z.object({id: z.string()}))
-    .query(({input}) => MovieDb.personMovieCredits(input.id)),
+    .query(({input}) => MovieDb.getPersonCredits(input.id)),
   isFavourite: userProcedure
     .input(z.object({id: z.string()}))
     .query(({input, ctx}) => UserData.isFavourited(ctx.user.username, input.id)),
@@ -39,17 +38,15 @@ export const appRouter = router({
   movie: publicProcedure
     .input(z.object({id: z.string()}))
     .query(({input}) => MovieDb.movieInfo(input.id)),
-  personCreditsForMovie: publicProcedure
+  movieCredits: publicProcedure
     .input(z.object({id: z.string(), type: z.enum(['Crew', 'Cast']).optional()}))
-    .query(async ({input}) => {
-      if (input.type) {
-        return input.type === 'Crew' ? MovieDb.movieCrew(input.id) : MovieDb.movieCast(input.id)
-      }
-      return [...await MovieDb.movieCrew(input.id), ...await MovieDb.movieCast(input.id)]
-    }),
-  crew: publicProcedure
+    .query(({input}) => MovieDb.getMovieCredits(input.id, {type: input.type})),
+  tomatometer: publicProcedure
+    .input(z.object({imdbId: z.string()}))
+    .query(({input}) => RottenTomatoes.getScore(input.imdbId)),
+  streamingProvidersShowingMovie: publicProcedure
     .input(z.object({id: z.string()}))
-    .query(({input}) => MovieDb.movieCrew(input.id)),
+    .query(({input, ctx}) => MovieDb.streamingProviders(input.id, ctx.user ? UserData.getSettings(ctx.user.username).streaming.region || 'IE' : 'IE')),
   isWatched: userProcedure
     .input(z.object({id: z.string()}))
     .query(({input, ctx}) => UserData.isWatched(ctx.user.username, input.id)),

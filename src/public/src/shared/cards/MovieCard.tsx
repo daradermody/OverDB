@@ -93,7 +93,7 @@ const StyledMovieImage = styled.div`
 function MovieSummary({movie, showCharactersOnly, compressed}: MovieCardProps) {
   let roles
   if (isCredit(movie)) {
-    roles = showCharactersOnly ? movie.characters?.join(', ') : movie.jobs.join(', ')
+    roles = showCharactersOnly ? movie.characters?.join(', ') : movie.jobs?.join(', ')
   }
   return (
     <Link to={`/movie/${movie.id}`} sx={{display: 'block', width: '100%', minWidth: 0, padding: compressed ? '11px 16px' : '16px'}}>

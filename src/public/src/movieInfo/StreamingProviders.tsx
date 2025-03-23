@@ -1,31 +1,23 @@
-import * as React from 'react'
-import { gql } from '@apollo/client'
 import styled from '@emotion/styled'
 import { Skeleton, Typography } from '@mui/material'
-import { Movie, Provider, useGetStreamingProvidersQuery } from '../../types/graphql'
+import { useQuery } from '@tanstack/react-query'
+import type { Movie } from '../../../apiTypes.ts'
+import { trpc } from '../queryClient.ts'
+import { useDeclarativeErrorHandler } from '../shared/errorHandlers.tsx'
 import { ProviderLogo } from '../shared/general/Poster'
 
 export default function StreamingProviders({id}: { id: Movie['id'] }) {
-  const {data, loading, error} = useGetStreamingProvidersQuery({variables: {id}})
+  const {data: providers, isLoading, error} = useQuery(trpc.streamingProvidersShowingMovie.queryOptions({id}))
+  useDeclarativeErrorHandler('Could not get streaming providers showing this film', error)
 
-  if (loading) {
-    return <LoadingStreamingProviders/>
-  }
-
-  if (error) {
-    console.error(error)
-    return null
-  }
-
-  if (!data.movie.providers.length) {
-    return null
-  }
+  if (isLoading) return <LoadingStreamingProviders/>
+  if (error || !providers?.length) return null
 
   return (
     <StyledRoot>
       <Typography variant="subtitle1">Available to stream from</Typography>
       <div style={{display: 'flex', gap: '8px'}}>
-        {data.movie.providers.map((provider: Provider) => (
+        {providers.map(provider => (
           <a key={provider.id} target="_blank" href={`https://www.themoviedb.org/movie/${id}/watch?locale=IE`}>
             <ProviderLogo name={provider.name} path={provider.logo}/>
           </a>
@@ -56,18 +48,5 @@ const StyledRoot = styled.div`
 
   ${({theme}) => theme.breakpoints.up('sm')} {
     align-items: start;
-  }
-`
-
-gql`
-  query GetStreamingProviders($id: ID!) {
-    movie(id: $id) {
-      id
-      providers {
-        id
-        logo
-        name
-      }
-    }
   }
 `

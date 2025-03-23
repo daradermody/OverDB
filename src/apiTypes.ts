@@ -1,3 +1,4 @@
+import type { Maybe, Scalars } from '../types'
 
 export interface MovieSummary {
   id: string;
@@ -18,6 +19,7 @@ export interface Movie extends MovieSummary {
   overview: string;
   tagline: string;
   voteAverage: number;
+  imdbId: string;
 }
 
 export interface MovieWithUserMetadata extends Movie {
@@ -31,6 +33,7 @@ export interface MovieCredit {
   person: Pick<Person, 'id' | 'name' | 'profilePath'>;
   jobs: string[];
   characters: string[];
+  castOrder?: number;
 }
 
 export interface Person extends PersonSummary {
@@ -42,7 +45,7 @@ export interface PersonCredit {
   id: string;
   movie: Pick<Movie, 'id' | 'title' | 'posterPath' | 'releaseDate'>;
   jobs: string[];
-  characters?: string[];
+  characters: string[];
 }
 
 export interface ListSummary {
@@ -70,3 +73,17 @@ export enum ListType {
   Movie = 'MOVIE',
   Person = 'PERSON'
 }
+
+export type Tomatometer = {
+  consensus?: string;
+  link: string;
+  score: number;
+  state: TomatometerState;
+};
+
+export enum TomatometerState {
+  CertifiedFresh = 'CERTIFIED_FRESH',
+  Fresh = 'FRESH',
+  Rotten = 'ROTTEN'
+}
+

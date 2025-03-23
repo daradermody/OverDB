@@ -1,6 +1,4 @@
-import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material'
-import { ToggleButtonGroupProps } from '@mui/material/ToggleButtonGroup/ToggleButtonGroup'
-import * as React from 'react'
+import { Skeleton, ToggleButton, ToggleButtonGroup, type ToggleButtonGroupProps } from '@mui/material'
 
 interface ToggleFilterProps extends ToggleButtonGroupProps {
   options: string[]

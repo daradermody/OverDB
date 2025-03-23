@@ -1,24 +1,24 @@
-import {gql} from '@apollo/client'
 import styled from '@emotion/styled'
-import {Box, Skeleton, Typography} from '@mui/material'
-import {useQuery} from '@tanstack/react-query'
-import {useLocation} from 'react-router'
-import {useNavigate, useParams} from 'react-router-dom'
-import {trpc} from '../queryClient.ts'
-import {PersonCards} from '../shared/cards'
-import {ErrorMessage, useDeclarativeErrorHandler} from '../shared/errorHandlers'
-import {InterestingDivider} from '../shared/general/InterestingDivider'
-import {Poster} from '../shared/general/Poster'
+import { Box, Skeleton, Typography } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
+import { useLocation } from 'react-router'
+import { useNavigate, useParams } from 'react-router-dom'
+import type { MovieCredit } from '../../../apiTypes.ts'
+import { trpc } from '../queryClient.ts'
+import { type PersonCardProps, PersonCards } from '../shared/cards'
+import { ErrorMessage, useDeclarativeErrorHandler } from '../shared/errorHandlers'
+import { InterestingDivider } from '../shared/general/InterestingDivider'
+import { Poster } from '../shared/general/Poster'
 import MoreActionsButton from '../shared/movieActionButtons/MoreActionsButton'
-import {SentimentSelect} from '../shared/movieActionButtons/SentimentSelect'
-import {WatchedButton} from '../shared/movieActionButtons/WatchedButton'
+import { SentimentSelect } from '../shared/movieActionButtons/SentimentSelect'
+import { WatchedButton } from '../shared/movieActionButtons/WatchedButton'
 import PageWrapper from '../shared/PageWrapper'
 import ToggleFilter from '../shared/ToggleFilter'
 import useSetTitle from '../shared/useSetTitle'
-import RottenTomatoesReview, {LoadingRottenTomatoesReview} from './RottenTomatoesReview'
+import useUser from '../useUser.ts'
+import RottenTomatoesReview, { LoadingRottenTomatoesReview } from './RottenTomatoesReview'
 import StreamingProviders from './StreamingProviders'
-import {TmdbRating} from './TmdbRating'
-import { useMemo } from 'react'
+import { TmdbRating } from './TmdbRating'
 
 export function MovieInfo() {
   const id = useParams<{ id: string }>().id!
@@ -38,11 +38,7 @@ export function MovieInfo() {
           exclusive
           options={['Crew', 'Cast']}
           value={peopleType}
-          onChange={e => {
-            if ((e.target as any).value !== null) {
-              navigate(location, {state: {peopleType: (e.target as any).value}, replace: true})
-            }
-          }}
+          onChange={(_e, peopleType: 'Crew' | 'Cast') => navigate(location, {state: {peopleType}, replace: true})}
         />
       </Box>
       {peopleType === 'Crew' ? <CrewList id={id}/> : <CastList id={id}/>}
@@ -51,10 +47,11 @@ export function MovieInfo() {
 }
 
 function MovieSummary({id}: { id: string }) {
+  const {user} = useUser()
   const {data: movieData, isLoading: loadingMovie, error: movieError, refetch: refetchMovie} = useQuery(trpc.movie.queryOptions({id}))
-  const {data: isWatched, error: isWatchedError} = useQuery(trpc.isWatched.queryOptions({id}))
-  const {data: inWatchlist, error: inWatchlistError} = useQuery(trpc.inList.queryOptions({listId: 'watchlist', itemId: id}))
-  const {data: sentiment, error: sentimentError} = useQuery(trpc.sentiment.queryOptions({id}))
+  const {data: isWatched, error: isWatchedError} = useQuery(trpc.isWatched.queryOptions({id}, {enabled: !!user}))
+  const {data: inWatchlist, error: inWatchlistError} = useQuery(trpc.inList.queryOptions({listId: 'watchlist', itemId: id}, {enabled: !!user}))
+  const {data: sentiment, error: sentimentError} = useQuery(trpc.sentiment.queryOptions({id}, {enabled: !!user}))
   useSetTitle(movieData?.title)
   useDeclarativeErrorHandler('Could not fetch user info for this movie', isWatchedError || inWatchlistError || sentimentError)
 
@@ -88,7 +85,7 @@ function MovieSummary({id}: { id: string }) {
               <MoreActionsButton id={movie.id} withLabel/>
             </div>
           )}
-          <RottenTomatoesReview id={movie.id}/>
+          <RottenTomatoesReview imdbId={movie.imdbId}/>
         </StyledActionsAndReview>
 
         <StreamingProviders id={movie.id}/>
@@ -147,96 +144,55 @@ function LoadingMovieSummary() {
 }
 
 function CrewList({id}: { id: string }) {
-  const {} = useQuery(trpc.movieCredits.queryOptions({id}))
-  const {data, error, loading, refetch} = useGetCrewQuery({variables: {id}})
+  const {data, error, isLoading, refetch} = useQuery(trpc.movieCredits.queryOptions({id, type: 'Crew'}))
 
-  if (error) {
-    return <ErrorMessage error={error} onRetry={refetch}/>
-  }
+  if (error) return <ErrorMessage error={error} onRetry={refetch}/>
 
-  const bigCrew = data?.slice(0, 12)
-  const smallCrew = data?.slice(12)
+  const bigCrew = data?.slice(0, 12).map(creditToPerson)
+  const smallCrew = data?.slice(12).map(creditToPerson)
 
   return (
     <>
       <Typography variant="h1">Main Crew</Typography>
-      <PersonCards people={bigCrew} loading={loading}/>
+      <PersonCards people={bigCrew} loading={isLoading}/>
       {!!smallCrew?.length && (
         <>
           <Typography variant="h1" style={{marginTop: 20}}>Other Crew</Typography>
-          <PersonCards compressed people={smallCrew} loading={loading} loadingCount={15}/>
+          <PersonCards compressed people={smallCrew} loading={isLoading} loadingCount={15}/>
         </>
       )}
     </>
   )
 }
 
-function CastList({id}: { id: Movie['id'] }) {
-  const {data, error, loading, refetch} = useGetCastQuery({variables: {id}})
+function CastList({id}: { id: string }) {
+  const {data, error, isLoading, refetch} = useQuery(trpc.movieCredits.queryOptions({id, type: 'Cast'}))
 
-  if (error) {
-    return <ErrorMessage error={error} onRetry={refetch}/>
-  }
+  if (error) return <ErrorMessage error={error} onRetry={refetch}/>
 
-  const importantCast = data?.castForMovie
-    .filter((person: CastCredit) => person.order < 12)
-  const unimportantCast = data?.castForMovie
-    .filter((person: CastCredit) => person.order >= 12)
+  const bigCast = data?.slice(0, 12).map(creditToPerson)
+  const smallCast = data?.slice(12).map(creditToPerson)
 
   return (
     <>
       <Typography variant="h1">Main Crew</Typography>
-      <PersonCards people={importantCast} loading={loading}/>
-      {!!unimportantCast?.length && (
+      <PersonCards people={bigCast} loading={isLoading} showCharactersOnly/>
+      {!!smallCast?.length && (
         <>
           <Typography variant="h1" style={{marginTop: 20}}>Other Cast</Typography>
-          <PersonCards compressed people={unimportantCast} loading={loading} loadingCount={15}/>
+          <PersonCards compressed people={smallCast} loading={isLoading} loadingCount={15} showCharactersOnly/>
         </>
       )}
     </>
   )
 }
 
-const importantJobs = [
-  'Screenplay', 'Director', 'Producer', 'Sound', 'Music', 'Cinematography', 'Editor', 'Casting',
-]
-
-gql`
-  query GetMovieInfo($id: ID!) {
-    movie(id: $id) {
-      id
-      title
-      tagline
-      overview
-      voteAverage
-      posterPath
-      releaseDate
-      watched
-      inWatchlist
-      sentiment
-    }
+function creditToPerson(credit: MovieCredit): PersonCardProps['person'] {
+  return {
+    id: credit.person.id,
+    name: credit.person.name,
+    profilePath: credit.person.profilePath,
+    jobs: credit.jobs,
+    characters: credit.characters,
   }
-`
-
-gql`
-  query GetCrew($id: ID!) {
-    crewForMovie(id: $id) {
-      id
-      name
-      profilePath
-      jobs
-    }
-  }
-`
-
-gql`
-  query GetCast($id: ID!) {
-    castForMovie(id: $id) {
-      character
-      id
-      name
-      order
-      profilePath
-    }
-  }
-`
+}

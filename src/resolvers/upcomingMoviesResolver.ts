@@ -6,7 +6,7 @@ import {sortMoviesByReleaseDateDesc} from '../utils/sorting';
 
 export default async function upcomingMoviesResolver(username: User['username']): Promise<MovieInfo[]> {
   const peopleIds = UserData.getFavourites(username)
-  const creditsForPeople = await Promise.all(peopleIds.map(MovieDb.personMovieCredits))
+  const creditsForPeople = await Promise.all(peopleIds.map(MovieDb.getPersonCredits))
 
   const now = new Date()
   const movieIds: string[] = []

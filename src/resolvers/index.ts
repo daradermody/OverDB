@@ -121,7 +121,7 @@ const index: Resolvers<{ user?: User }> = {
     crewForMovie: (_, args: QueryCrewForMovieArgs) => MovieDb.movieCrew(args.id),
     castForMovie: (_, args: QueryCastForMovieArgs) => MovieDb.movieCast(args.id),
     creditsForPerson: async (_, args: QueryCreditsForPersonArgs) => {
-      const credits = await MovieDb.personMovieCredits(args.id)
+      const credits = await MovieDb.getPersonCredits(args.id)
       const fullCredits: MovieCredit[] = []
       await Promise.all(credits.map(async credit => {
         try {

@@ -1,30 +1,21 @@
-import { gql } from '@apollo/client'
 import styled from '@emotion/styled'
 import { Skeleton, Typography } from '@mui/material'
-import * as React from 'react'
-import { Movie, Tomatometer, TomatometerState, useGetRottenTomatoesScoreQuery } from '../../types/graphql'
+import { useQuery } from '@tanstack/react-query'
+import { type Tomatometer, TomatometerState } from '../../../apiTypes.ts'
+import { trpc } from '../queryClient'
 import { ErrorMessage } from '../shared/errorHandlers'
 
-export default function RottenTomatoesReview({id}: { id: Movie['id'] }) {
-  const {data, error, loading, refetch} = useGetRottenTomatoesScoreQuery({variables: {id}})
+export default function RottenTomatoesReview({imdbId}: { imdbId: string }) {
+  const {data, error, isLoading, refetch} = useQuery(trpc.tomatometer.queryOptions({imdbId}))
 
-  if (error) {
-    return <ErrorMessage error={error} onRetry={refetch}/>
-  }
+  if (error) return <ErrorMessage error={error} onRetry={refetch}/>
+  if (isLoading) return <LoadingRottenTomatoesReview/>
 
-  if (loading) {
-    return <LoadingRottenTomatoesReview/>
-  }
-
-  if (!data.movie.tomatometer) {
-    return null
-  }
-
-  const {state, score, consensus} = data.movie.tomatometer
+  const {state, score, consensus, link} = data!
 
   return (
     <div style={{display: 'flex', alignItems: 'center', gap: 20}}>
-      <a href={data.movie.tomatometer.link} target="_blank" style={{position: 'relative', color: 'inherit'}}>
+      <a href={link} target="_blank" style={{position: 'relative', color: 'inherit'}}>
         <img width="75px" src={TomatometerIcons[state]} alt={state}/>
         <StyledScoreText variant="h2">
           {score}%
@@ -57,18 +48,4 @@ const StyledScoreText = styled(Typography)`
   left: 50%;
   transform: translate(-50%, -50%);
   margin: 0;
-`
-
-gql`
-  query GetRottenTomatoesScore($id: ID!) {
-    movie(id: $id) {
-      id
-      tomatometer {
-        score
-        consensus
-        link
-        state
-      }
-    }
-  }
 `

@@ -23,7 +23,7 @@ function AddToListDialog({movieId, onClose}: { movieId: Movie['id'], onClose: ()
   const {mutate: removeFromList, isPending: removeFromListLoading, error: removeFromListError} = useMutation(trpc.removeFromList.mutationOptions())
   useDeclarativeErrorHandler('Could not add item to list', addToListError)
   useDeclarativeErrorHandler('Could not remove item from list', removeFromListError)
-  const [selectedListIds, setSelectedListIds] = useState<List['id'][]>([])
+  const [selectedListIds, setSelectedListIds] = useState<string[]>([])
 
   const includedInLists = useMemo(
     () => lists

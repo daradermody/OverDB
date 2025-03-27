@@ -1,6 +1,5 @@
 import { effect, signal } from '@preact/signals'
 import * as cookie from 'cookie'
-// @ts-ignore
 import Cookies from 'js-cookie'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'

@@ -1,14 +1,14 @@
-import { gql } from '@apollo/client'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material'
-import * as React from 'react'
+import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
-import { ListType, useCreateListMutation } from '../../types/graphql'
+import { ListType } from '../../../apiTypes.ts'
+import { trpc } from '../queryClient.ts'
 import { useDeclarativeErrorHandler } from '../shared/errorHandlers'
 
 export default function CreateListButton({onCreate}: { onCreate(): void }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [name, setName] = useState('')
-  const [create, {loading, error}] = useCreateListMutation()
+  const {mutateAsync: create, isPending, error} = useMutation(trpc.createList.mutationOptions())
   useDeclarativeErrorHandler('Could not create list', error)
 
   function close() {
@@ -17,7 +17,7 @@ export default function CreateListButton({onCreate}: { onCreate(): void }) {
   }
 
   async function handleCreate() {
-    await create({variables: {name, type: ListType.Movie}})
+    await create({name, type: ListType.Movie})
     onCreate()
     close()
   }
@@ -34,24 +34,16 @@ export default function CreateListButton({onCreate}: { onCreate(): void }) {
             variant="outlined"
             fullWidth
             sx={{mt: 1}}
-            disabled={loading}
+            disabled={isPending}
             value={name} onChange={e => setName(e.target.value)}
           />
         </DialogContent>
 
         <DialogActions>
           <Button variant="text" onClick={close}>Cancel</Button>
-          <Button variant="contained" loading={loading} disabled={!name} onClick={handleCreate}>Create</Button>
+          <Button variant="contained" loading={isPending} disabled={!name} onClick={handleCreate}>Create</Button>
         </DialogActions>
       </Dialog>
     </>
   )
 }
-
-gql`
-  mutation CreateList($name: String!, $type: ListType!) {
-    createList(name: $name, type: $type) {
-      id
-    }
-  }
-`

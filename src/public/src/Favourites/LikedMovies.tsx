@@ -1,28 +1,28 @@
-import { gql } from '@apollo/client'
 import { Box, Typography } from '@mui/material'
-import * as React from 'react'
-import { useGetLikedMoviesQuery, type User } from '../../types/graphql'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
+import { trpc } from '../queryClient.ts'
 import { MovieCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import FetchMoreButton from '../shared/FetchMoreButton'
 import useUser from '../useUser'
 
-export function LikedMovies({username}: { username: User['username'] }) {
+export function LikedMovies({username}: { username: string }) {
   const {user} = useUser()
-  const {data, error, loading, refetch, fetchMore} = useGetLikedMoviesQuery({
-    variables: {username},
-    notifyOnNetworkStatusChange: true
-  })
+  const {data, error, isLoading, isFetching, refetch, hasNextPage, fetchNextPage} = useInfiniteQuery(
+    trpc.likedMovies.infiniteQueryOptions({username, limit: 24}, {getNextPageParam: lastPage => lastPage.nextCursor})
+  )
+  const likedMovies = useMemo(() => data?.pages.map(page => page.items).flat(), [data]);
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
-  if (data && !data.user.likedMovies.results.length) {
+  if (likedMovies && !likedMovies.length) {
     return (
       <Box mb="30px">
         <Typography variant="body1">
-          {user.username === username ? 'You have no liked movies.' : 'This person has no liked movies'}
+          {user?.username === username ? 'You have no liked movies.' : 'This person has no liked movies'}
         </Typography>
       </Box>
     )
@@ -30,29 +30,8 @@ export function LikedMovies({username}: { username: User['username'] }) {
 
   return (
     <>
-      <MovieCards movies={data?.user.likedMovies.results} loading={loading && !data}/>
-      <FetchMoreButton
-        fetchMore={fetchMore}
-        currentLength={data?.user.likedMovies.results.length}
-        endReached={data?.user.likedMovies.endReached}
-        loading={loading}
-      />
+      <MovieCards movies={likedMovies} loading={isLoading}/>
+      <FetchMoreButton fetchMore={fetchNextPage} endReached={!hasNextPage} loading={isFetching}/>
     </>
   )
 }
-
-gql`
-  query GetLikedMovies($username: ID!, $offset: Int, $limit: Int) {
-    user(username: $username) {
-      likedMovies(offset: $offset, limit: $limit) {
-        endReached
-        results {
-          id
-          title
-          posterPath
-          releaseDate
-        }
-      }
-    }
-  }
-`

@@ -1,15 +1,14 @@
 import { Autocomplete, Box, Skeleton, TextField, Typography } from '@mui/material'
 import { getCodes, getName } from 'country-list'
-import * as React from 'react'
 import { useState } from 'react'
 
-export default function RegionSettings({region, onChange}: { region: string, onChange: (region: string) => void }) {
+export default function RegionSettings({region, onChange}: { region?: string, onChange: (region: string) => void | Promise<void> }) {
   const [updating, setUpdating] = useState(false)
 
-  function updateRegion(region: string) {
+  async function updateRegion(region: string) {
     setUpdating(true)
     try {
-      onChange(region)
+      await onChange(region)
     } finally {
       setUpdating(false)
     }
@@ -26,7 +25,7 @@ export default function RegionSettings({region, onChange}: { region: string, onC
         options={getCodes()}
         disableClearable
         autoHighlight
-        getOptionLabel={(option) => getName(option)}
+        getOptionLabel={(option) => getName(option)!}
         renderOption={(props, code) => (
           <Box component="li" sx={{'& > img': {mr: 2, flexShrink: 0}}} {...props}>
             <img loading="lazy" width="20" src={`https://flagcdn.com/w20/${code.toLowerCase()}.png`} alt={getName(code)}/>

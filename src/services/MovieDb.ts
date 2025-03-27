@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import {type Cast, type Crew, MovieDb as MovieDbApi, type MovieResponse, type Person as TmdbPerson} from 'moviedb-promise'
-import {isMovieSearchResult, isPersonSearchResult, type Movie, type Person, type Provider} from '../../types'
-import {type Movie as ApiMovie, type MovieCredit, type Person as ApiPerson, type PersonCredit, type SearchResult, ThingType} from '../apiTypes'
+import {isMovieSearchResult, isPersonSearchResult, type Movie, type Person} from '../../types'
+import { type Movie as ApiMovie, type MovieCredit, type Person as ApiPerson, type PersonCredit, type Provider, type SearchResult, ThingType } from '../apiTypes'
 import getToken from '../utils/getToken'
 import {dataDir} from './dataStorage'
 
@@ -177,9 +177,9 @@ export default class MovieDb {
   }
 }
 
-function filterInvalidCredits<T extends { vote_count?: number, job?: string }>(credits: T[]): T[] {
+function filterInvalidCredits<T extends { release_date?: string, vote_count?: number, job?: string }>(credits: T[]): T[] {
   const ignoredRoles = ['Thanks', 'Characters']
-  return credits.filter(movie => !!movie.vote_count && (!movie.job || !ignoredRoles.includes(movie.job)))
+  return credits.filter(movie => !movie.job || !ignoredRoles.includes(movie.job))
 }
 
 function aggregatePersonCredits(credits: PersonCredit[]): PersonCredit[] {

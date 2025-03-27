@@ -1,14 +1,14 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import type {User as ApiUser} from '../../types'
 import { ListType, Sentiment } from '../apiTypes.ts'
 import recommendedMoviesResolver from '../resolvers/recommendedMovies.ts'
+import upcomingMoviesResolver from '../resolvers/upcomingMoviesResolver.ts'
 import MovieDb from '../services/MovieDb.ts'
 import RottenTomatoes from '../services/RottenTomatoes.ts'
 import { UserData } from '../services/UserData.ts'
-import {getUser, verifyUserAccessible} from '../services/users.ts'
+import { getUser, getUsers } from '../services/users.ts'
 import { loginRoute } from './auth.ts'
-import { publicProcedure, router, userProcedure } from './router.ts'
+import { adminProcedure, canAccessUser, publicProcedure, router, userProcedure } from './router.ts'
 
 export const appRouter = router({
   login: loginRoute,
@@ -18,39 +18,107 @@ export const appRouter = router({
   trendingMovies: publicProcedure
     .input(z.object({size: z.number().min(1).default(10)}).default({}))
     .query(({input}) => MovieDb.trending(input.size)),
-  recommendedMovies: userProcedure
-    .input(z.object({size: z.number().min(1).default(10)}).default({}))
-    .query(({input, ctx}) => recommendedMoviesResolver(ctx.user.username, input.size || 18)),
+  allStreamingProviders: publicProcedure
+    .input(z.object({region: z.string()}))
+    .query(({input}) => MovieDb.allStreamingProviders(input.region)),
+
+  // User stuff
   user: publicProcedure
     .input(z.object({username: z.string()}))
-    .query(({input, ctx}) => {
-      const requestedUser = getUser(input.username)
-      verifyUserAccessible(requestedUser, ctx.user)
-      return requestedUser
-    }),
+    .use(canAccessUser)
+    .query(({input}) => getUser(input.username)),
+  users: adminProcedure
+    .query(() => getUsers().map(user => ({
+      ...user,
+      stats: {
+        favouritePeople: UserData.getFavourites(user.username).length,
+        watched: UserData.getWatched(user.username).length,
+        moviesLiked: UserData.getLikedMovies(user.username).length,
+        watchlist: UserData.getWatchlist(user.username).length
+      }
+    }))),
   userStats: publicProcedure
     .input(z.object({username: z.string()}))
-    .query(({input, ctx}) => {
-      const requestedUser = getUser(input.username)
-      verifyUserAccessible(requestedUser, ctx.user)
-      return {
-        favouritePeople: UserData.getFavourites(input.username).length,
-        watched: UserData.getWatched(input.username).length,
-        moviesLiked: UserData.getLikedMovies(input.username).length,
-        watchlist: UserData.getWatchlist(input.username).length
-      }
-    }),
+    .use(canAccessUser)
+    .query(({input}) => ({
+      favouritePeople: UserData.getFavourites(input.username).length,
+      watched: UserData.getWatched(input.username).length,
+      moviesLiked: UserData.getLikedMovies(input.username).length,
+      watchlist: UserData.getWatchlist(input.username).length
+    })),
   getWatched: publicProcedure
     .input(z.object({username: z.string(), limit: z.number().min(1).max(40).default(20), cursor: z.number().default(0)}))
-    .query(async ({input, ctx}) => {
-      const requestedUser = getUser(input.username)
-      verifyUserAccessible(requestedUser, ctx.user)
+    .use(canAccessUser)
+    .query(async ({input}) => {
       const watchedIds = UserData.getWatched(input.username).toReversed().slice(input.cursor, input.cursor + input.limit)
       return {
         items: await Promise.all(watchedIds.map(MovieDb.movieInfo)),
         nextCursor: UserData.getWatched(input.username)[input.cursor + input.limit] ? input.cursor + input.limit : undefined
       }
     }),
+  favouritePeople: publicProcedure
+    .input(z.object({username: z.string(), limit: z.number().min(1).max(40).default(20), cursor: z.number().default(0)}))
+    .use(canAccessUser)
+    .query(async ({input}) => {
+      const favouritedIds = UserData.getFavourites(input.username).toReversed().slice(input.cursor, input.cursor + input.limit)
+      return {
+        items: await Promise.all(favouritedIds.map(MovieDb.personInfo)),
+        nextCursor: UserData.getFavourites(input.username)[input.cursor + input.limit] ? input.cursor + input.limit : undefined
+      }
+    }),
+  likedMovies: publicProcedure
+    .input(z.object({username: z.string(), limit: z.number().min(1).max(40).default(20), cursor: z.number().default(0)}))
+    .use(canAccessUser)
+    .query(async ({input}) => {
+      const likedIds = UserData.getLikedMovies(input.username).toReversed().slice(input.cursor, input.cursor + input.limit)
+      return {
+        items: await Promise.all(likedIds.map(MovieDb.movieInfo)),
+        nextCursor: UserData.getLikedMovies(input.username)[input.cursor + input.limit] ? input.cursor + input.limit : undefined
+      }
+    }),
+  userSettings: userProcedure
+    .query(({ctx}) => UserData.getSettings(ctx.user.username)),
+  updateUserSettings: userProcedure
+    .input(z.object({streaming: z.object({providers: z.array(z.string()).optional(), region: z.string().optional()}).optional()}))
+    .mutation(({input, ctx}) => UserData.updateSettings(ctx.user.username, input)),
+
+  // List stuff
+  lists: publicProcedure
+    .input(z.object({username: z.string(), type: z.nativeEnum(ListType).optional()}))
+    .use(canAccessUser)
+    .query(({input}) => UserData.getLists(input.username)
+      .filter(list => !input.type || list.type === input.type)
+      .map(list => ({...list, size: list.ids.length}))
+    ),
+  inList: userProcedure
+    .input(z.object({listId: z.string(), itemId: z.string()}))
+    .query(({input, ctx}) => UserData.getList(ctx.user.username, input.listId).ids.includes(input.itemId)),
+  createList: userProcedure
+    .input(z.object({name: z.string(), type: z.nativeEnum(ListType)}))
+    .mutation(({input, ctx}) => UserData.createList(ctx.user.username, input)),
+  deleteList: userProcedure
+    .input(z.object({ids: z.array(z.string())}))
+    .mutation(({input, ctx}) => UserData.deleteLists(ctx.user.username, input.ids)),
+  editList: userProcedure
+    .input(z.object({id: z.string(), name: z.string()}))
+    .mutation(({input, ctx}) => UserData.updateList(ctx.user.username, input.id, {name: input.name})),
+  addToList: userProcedure
+    .input(z.object({listId: z.string(), itemId: z.string()}))
+    .mutation(async ({input, ctx}) => {
+      try {
+        if (UserData.getList(ctx.user.username, input.listId).type === ListType.Movie) {
+          await MovieDb.movieInfo(input.itemId)
+        } else {
+          await MovieDb.personInfo(input.itemId)
+        }
+      } catch (e) {
+        throw new TRPCError({code: 'BAD_REQUEST', message: `ID being added to the list is not valid: ${input.itemId}`})
+      }
+      UserData.addToList(ctx.user.username, input.listId, input.itemId)
+    }),
+  removeFromList: userProcedure
+    .input(z.object({listId: z.string(), itemId: z.string()}))
+    .mutation(async ({input, ctx}) => UserData.removeFromList(ctx.user.username, input.listId, input.itemId)),
 
   // Person stuff
   person: publicProcedure
@@ -78,7 +146,10 @@ export const appRouter = router({
     .query(({input}) => RottenTomatoes.getScore(input.imdbId)),
   streamingProvidersShowingMovie: publicProcedure
     .input(z.object({id: z.string()}))
-    .query(({input, ctx}) => MovieDb.streamingProviders(input.id, ctx.user ? UserData.getSettings(ctx.user.username).streaming.region || 'IE' : 'IE')),
+    .query(({input, ctx}) => MovieDb.streamingProviders(input.id, ctx.user ? UserData.getSettings(ctx.user.username).streaming?.region || 'IE' : 'IE')),
+  recommendedMovies: userProcedure
+    .input(z.object({size: z.number().min(1).default(10)}).default({}))
+    .query(({input, ctx}) => recommendedMoviesResolver(ctx.user.username, input.size || 18)),
   isWatched: userProcedure
     .input(z.object({id: z.string()}))
     .query(({input, ctx}) => UserData.isWatched(ctx.user.username, input.id)),
@@ -91,32 +162,8 @@ export const appRouter = router({
   setSentiment: userProcedure
     .input(z.object({movieId: z.string(), sentiment: z.nativeEnum(Sentiment)}))
     .mutation(({input, ctx}) => UserData.setSentiment(ctx.user.username, input.movieId, input.sentiment)),
-  lists: userProcedure
-    .input(z.object({username: z.string(), type: z.nativeEnum(ListType).optional()}))
-    .query(({input}) => UserData.getLists(input.username)
-      .filter(list => !input.type || list.type === input.type)
-      .map(list => ({...list, size: list.ids.length}))
-    ),
-  inList: userProcedure
-    .input(z.object({listId: z.string(), itemId: z.string()}))
-    .query(({input, ctx}) => UserData.getList(ctx.user.username, input.listId).ids.includes(input.itemId)),
-  addToList: userProcedure
-    .input(z.object({listId: z.string(), itemId: z.string()}))
-    .mutation(async ({input, ctx}) => {
-      try {
-        if (UserData.getList(ctx.user.username, input.listId).type === ListType.Movie) {
-          await MovieDb.movieInfo(input.itemId)
-        } else {
-          await MovieDb.personInfo(input.itemId)
-        }
-      } catch (e) {
-        throw new TRPCError({code: 'BAD_REQUEST', message: `ID being added to the list is not valid: ${input.itemId}`})
-      }
-      UserData.addToList(ctx.user.username, input.listId, input.itemId)
-    }),
-  removeFromList: userProcedure
-    .input(z.object({listId: z.string(), itemId: z.string()}))
-    .mutation(async ({input, ctx}) => UserData.removeFromList(ctx.user.username, input.listId, input.itemId))
+  upcomingMovies: userProcedure
+    .query(({ctx}) => upcomingMoviesResolver(ctx.user.username))
 })
 
 export type AppRouter = typeof appRouter;

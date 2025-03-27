@@ -1,26 +1,27 @@
-import { gql } from '@apollo/client'
 import { Box, Typography } from '@mui/material'
-import * as React from 'react'
-import { useGetFavouritePeopleQuery, type User } from '../../types/graphql'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
+import { trpc } from '../queryClient.ts'
 import { PersonCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import FetchMoreButton from '../shared/FetchMoreButton'
 import Link from '../shared/general/Link'
 import useUser from '../useUser'
 
-export function FavouritePeople({username}: { username: User['username'] }) {
+export function FavouritePeople({username}: { username: string }) {
   const {user} = useUser()
-  const {data, error, loading, refetch, fetchMore} = useGetFavouritePeopleQuery({
-    variables: {username},
-    notifyOnNetworkStatusChange: true
-  })
+  const {data, isLoading, isFetching, error, refetch, hasNextPage, fetchNextPage} = useInfiniteQuery(
+    trpc.favouritePeople.infiniteQueryOptions({username, limit: 24}, {getNextPageParam: lastPage => lastPage.nextCursor})
+  )
+  const favouritePeople = useMemo(() => data?.pages.map(page => page.items).flat(), [data]);
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
-  if (data && !data.user.favouritePeople.results.length) {
-    if (user.username === username) {
+
+  if (favouritePeople && !favouritePeople.length) {
+    if (user?.username === username) {
       return (
         <Box mb="30px">
           <Typography variant="body1">You have no people favourited. Here are some suggestions:</Typography>
@@ -42,28 +43,8 @@ export function FavouritePeople({username}: { username: User['username'] }) {
 
   return (
     <>
-      <PersonCards people={data?.user.favouritePeople.results} loading={loading && !data}/>
-      <FetchMoreButton
-        fetchMore={fetchMore}
-        currentLength={data?.user.favouritePeople.results.length}
-        endReached={data?.user.favouritePeople.endReached}
-        loading={loading}
-      />
+      <PersonCards people={favouritePeople} loading={isLoading}/>
+      <FetchMoreButton fetchMore={fetchNextPage} endReached={!hasNextPage} loading={isFetching}/>
     </>
   )
 }
-
-gql`
-  query GetFavouritePeople($username: ID!, $offset: Int, $limit: Int) {
-    user(username: $username) {
-      favouritePeople(offset: $offset, limit: $limit) {
-        endReached
-        results {
-          id
-          profilePath
-          name
-        }
-      }
-    }
-  }
-`

@@ -97,13 +97,16 @@ async function onSetWatchedSuccess(_data: unknown, variables: typeof trpc['setWa
     (oldMovies: Movie[]) => oldMovies?.map(movie => movie.id === variables.movieId ? {...movie, watched: variables.isWatched} : movie)
   )
   await queryClient.invalidateQueries({queryKey: trpc.getWatched.infiniteQueryKey()})
+  await queryClient.invalidateQueries({queryKey: trpc.getWatched.queryKey()})
   queryClient.setQueryData(trpc.isWatched.queryKey({id: variables.movieId}), () => variables.isWatched)
 }
 
-function onSetSentimentSuccess(_data: unknown, variables: typeof trpc['setSentiment']['~types']['input']) {
+async function onSetSentimentSuccess(_data: unknown, variables: typeof trpc['setSentiment']['~types']['input']) {
   queryClient.setQueriesData(
     { queryKey: trpc.recommendedMovies.queryKey() },
     (oldMovies: Movie[]) => oldMovies?.map(movie => movie.id === variables.movieId ? {...movie, sentiment: variables.sentiment} : movie)
   )
+  await queryClient.invalidateQueries({queryKey: trpc.likedMovies.infiniteQueryKey()})
+  await queryClient.invalidateQueries({queryKey: trpc.likedMovies.queryKey()})
   queryClient.setQueryData(trpc.sentiment.queryKey({id: variables.movieId}), () => variables.sentiment)
 }

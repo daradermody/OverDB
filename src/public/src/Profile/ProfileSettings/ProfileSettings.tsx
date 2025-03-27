@@ -1,32 +1,25 @@
-import { gql } from '@apollo/client'
 import styled from '@emotion/styled'
 import { CheckCircle } from '@mui/icons-material'
 import { CircularProgress, Tooltip, Typography } from '@mui/material'
-import * as React from 'react'
-import { useGetUserSettingsQuery, useUpdateUserSettingsMutation } from '../../../types/graphql'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import type { UserSettings } from '../../../../apiTypes.ts'
+import { queryClient, trpc } from '../../queryClient.ts'
 import { ErrorMessage, useDeclarativeErrorHandler } from '../../shared/errorHandlers'
 import StreamingSettings, { LoadingStreamingSettings } from './StreamingSettings'
 
 export default function ProfileSettings() {
-  const {data, loading: loadingSettings, error: settingsError, refetch: refetchSettings} = useGetUserSettingsQuery()
-  const [updateSettings, {loading: updatingSettings, error: updateSettingsError}] = useUpdateUserSettingsMutation({refetchQueries: ['GetUserSettings']})
+  const {data: settings, isLoading, error: settingsError, refetch: refetchSettings} = useQuery(trpc.userSettings.queryOptions())
+  const {mutateAsync: update, isPending: isUpdating, error: updateSettingsError} = useMutation(trpc.updateUserSettings.mutationOptions({onMutate, onError}))
   useDeclarativeErrorHandler('Could not update user settings', updateSettingsError)
-
-  function handleSettingsChange(newSettings) {
-    return updateSettings({
-      variables: {settings: newSettings},
-      optimisticResponse: { updateUserSettings: { ...data.settings, ...newSettings } }
-    })
-  }
 
   if (settingsError) {
     return <ErrorMessage error={settingsError} onRetry={refetchSettings}/>
   }
 
-  if (loadingSettings) {
+  if (isLoading) {
     return (
       <StyledSettings>
-        <SettingsHeader saving={loadingSettings || updatingSettings}/>
+        <SettingsHeader saving={isLoading || isUpdating}/>
         <LoadingStreamingSettings/>
       </StyledSettings>
     )
@@ -34,8 +27,8 @@ export default function ProfileSettings() {
 
   return (
     <StyledSettings>
-      <SettingsHeader saving={loadingSettings || updatingSettings}/>
-      <StreamingSettings settings={data.settings.streaming} onChange={streaming => handleSettingsChange({streaming})}/>
+      <SettingsHeader saving={isLoading || isUpdating}/>
+      <StreamingSettings settings={settings!.streaming} onChange={streaming => update({streaming})}/>
     </StyledSettings>
   )
 }
@@ -58,25 +51,10 @@ const StyledSettings = styled.div`
   width: 100%;
 `
 
+function onMutate(settings: UserSettings) {
+  queryClient.setQueryData(trpc.userSettings.queryKey(), () => settings)
+}
 
-gql`
-  query GetUserSettings {
-    settings {
-      streaming {
-        region
-        providers
-      }
-    }
-  }
-`
-
-gql`
-  mutation UpdateUserSettings($settings: UserSettingsInput!) {
-    updateUserSettings(settings: $settings) {
-      streaming {
-        region
-        providers
-      }
-    }
-  }
-`
+async function onError() {
+  await queryClient.invalidateQueries({ queryKey: trpc.userSettings.queryKey() })
+}

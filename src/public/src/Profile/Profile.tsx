@@ -1,12 +1,10 @@
-import {gql} from '@apollo/client'
 import styled from '@emotion/styled'
-import {Divider, Typography} from '@mui/material'
-import {useInfiniteQuery, useQuery} from '@tanstack/react-query'
-import {useParams} from 'react-router-dom'
-import {useGetWatchedMoviesQuery, User} from '../../types/graphql'
-import {trpc} from '../queryClient.ts'
-import {MovieCards} from '../shared/cards'
-import {ErrorMessage} from '../shared/errorHandlers'
+import { Divider, Typography } from '@mui/material'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useParams } from 'react-router-dom'
+import { trpc } from '../queryClient.ts'
+import { MovieCards } from '../shared/cards'
+import { ErrorMessage } from '../shared/errorHandlers'
 import Link from '../shared/general/Link'
 import PageWrapper from '../shared/PageWrapper'
 import useSetTitle from '../shared/useSetTitle'
@@ -29,7 +27,7 @@ export default function Profile() {
           <img style={{width: 300, aspectRatio: '1', clipPath: 'circle()'}} src={data!.avatarUrl} alt="profile photo"/>
           <Stats/>
         </div>
-        {user.username !== username ? <ProfileSettings/> : <RecentlyWatchedMovies username={username}/>}
+        {user?.username === username ? <ProfileSettings/> : <RecentlyWatchedMovies username={username}/>}
       </StyledProfile>
     </PageWrapper>
   )
@@ -99,19 +97,17 @@ const StatWrapper = styled.div`
   }
 `
 
-function RecentlyWatchedMovies({username}: { username: User['username'] }) {
+function RecentlyWatchedMovies({username}: { username: string }) {
   const {user} = useUser()
-  const {data, error, isLoading, refetch, hasNextPage, fetchNextPage} = useInfiniteQuery(
-    trpc.getWatched.infiniteQueryOptions({username, limit: 8}, {getNextPageParam: lastPage => lastPage.nextCursor})
-  )
+  const {data, error, isLoading, refetch} = useQuery(trpc.getWatched.queryOptions({username, limit: 8}))
 
   if (error) return <ErrorMessage error={error} onRetry={refetch}/>
 
-  const movies = data?.pages.map(page => page.items).flat()
+  const movies = data?.items
   return (
     <div style={{width: '100%'}}>
       <Typography variant="h1">{user?.username === username ? 'Recently Watched' : `${username}'s recently watched`}</Typography>
-      <MovieCards movies={movies} loading={isLoading} loadingCount={4}/>
+      <MovieCards movies={movies} loading={isLoading} loadingCount={8}/>
     </div>
   )
 }

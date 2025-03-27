@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import {Box, Button, Skeleton, Typography} from '@mui/material'
+import { Box, Button, Skeleton, Tooltip, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import {useState} from 'react'
 import { useLocation } from 'react-router'
@@ -71,7 +71,9 @@ function MovieSummary({id}: { id: string }) {
         <div>
           <Typography component="span" variant="h1">{movie.title}</Typography>
           {movie.releaseDate && (
-            <Typography component="span" sx={{ml: 1}} variant="subtitle1">({movie.releaseDate?.split('-')?.[0]})</Typography>
+            <Tooltip title={movie.releaseDate}>
+              <Typography component="span" sx={{ml: 1}} variant="subtitle1">({movie.releaseDate.split('-')?.[0]})</Typography>
+            </Tooltip>
           )}
         </div>
 

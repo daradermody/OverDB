@@ -1,14 +1,13 @@
-import { gql } from '@apollo/client'
 import { Typography } from '@mui/material'
-import * as React from 'react'
-import { useGetUpcomingMoviesQuery } from '../../types/graphql'
+import { useQuery } from '@tanstack/react-query'
+import { trpc } from '../queryClient.ts'
 import { MovieCards } from '../shared/cards'
 import { ErrorMessage } from '../shared/errorHandlers'
 import PageWrapper from '../shared/PageWrapper'
-import useSetTitle from '../shared/useSetTitle';
+import useSetTitle from '../shared/useSetTitle'
 
 export default function UpcomingMovies() {
-  const {data, error, loading, refetch} = useGetUpcomingMoviesQuery()
+  const {data, isLoading, error, refetch} = useQuery(trpc.upcomingMovies.queryOptions())
   useSetTitle('Upcoming movies')
 
   if (error) {
@@ -19,18 +18,7 @@ export default function UpcomingMovies() {
     <PageWrapper>
       <Typography variant="h1">Upcoming movies</Typography>
       <Typography sx={{mb: 4}}>Here are movies from your favourite people that have not been released yet</Typography>
-      <MovieCards movies={data?.upcoming} loading={loading}/>
+      <MovieCards movies={data} loading={isLoading} showExactDate/>
     </PageWrapper>
   )
 }
-
-gql`
-  query GetUpcomingMovies {
-    upcoming {
-      id
-      title
-      posterPath
-      releaseDate
-    }
-  }
-`

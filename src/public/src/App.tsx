@@ -1,6 +1,5 @@
 import styled from '@emotion/styled'
 import { Box } from '@mui/material'
-import * as React from 'react'
 import type { ReactNode } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Admin from './admin/Admin'
@@ -59,14 +58,14 @@ function AppRoutes() {
       <Route path="/movie/:id" element={<MovieInfo/>}/>
       <Route path="/profile" element={authed(<Navigate replace to={`/profile/${user?.username}`}/>)}/>
       <Route path="/profile/:username" element={<Profile/>}/>
-      {/*<Route path="/profile/:username/favourites" element={<Navigate to={`/profile/${user?.username}/favourite/people`} replace/>}/>*/}
-      {/*<Route path="/profile/:username/favourite/:type" element={<Favourites/>}/>*/}
-      {/*<Route path="/profile/:username/lists" element={<Lists/>}/>*/}
+      <Route path="/profile/:username/favourites" element={<Navigate to={`/profile/${user?.username}/favourite/people`} replace/>}/>
+      <Route path="/profile/:username/favourite/:type" element={<Favourites/>}/>
+      <Route path="/profile/:username/lists" element={<Lists/>}/>
       {/*<Route path="/profile/:username/list/watchlist" element={<Watchlist/>}/>*/}
       {/*<Route path="/profile/:username/list/:id" element={<List/>}/>*/}
-      {/*<Route path="/profile/:username/watched" element={<WatchedMovies/>}/>*/}
-      {/*<Route path="/upcoming" element={authed(<UpcomingMovies/>)}/>*/}
-      {/*<Route path="/admin" element={authed(<Admin/>)}/>*/}
+      <Route path="/profile/:username/watched" element={<WatchedMovies/>}/>
+      <Route path="/upcoming" element={authed(<UpcomingMovies/>)}/>
+      <Route path="/admin" element={authed(<Admin/>)}/>
       <Route path="*" element={<PageNotFound/>}/>
     </Routes>
   )

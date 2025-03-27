@@ -1,17 +1,17 @@
-import { gql } from '@apollo/client'
-import { Button, Dialog, List as MuiList, DialogActions, DialogContent, DialogTitle, ListItem, ListItemText, Typography } from '@mui/material'
-import * as React from 'react'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, List as MuiList, ListItem, ListItemText, Typography } from '@mui/material'
+import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
-import { type List, useDeleteListsMutation } from '../../types/graphql'
+import type { ListSummary } from '../../../apiTypes.ts'
+import { trpc } from '../queryClient.ts'
 import { useDeclarativeErrorHandler } from '../shared/errorHandlers'
 
-export default function DeleteListsButton({lists, onDelete}: { lists?: List[], onDelete(): void }) {
+export default function DeleteListsButton({lists, onDelete}: { lists?: ListSummary[], onDelete(): void }) {
   const [modalOpen, setModalOpen] = useState(false)
-  const [deleteLists, {loading, error}] = useDeleteListsMutation()
+  const {mutateAsync: deleteLists, isPending, error} = useMutation(trpc.deleteList.mutationOptions())
   useDeclarativeErrorHandler('Could not delete list', error)
 
-  async function handleCreate() {
-    await deleteLists({variables: {ids: lists.map(list => list.id)}})
+  async function handleDelete() {
+    await deleteLists({ids: lists!.map(list => list.id)})
     setModalOpen(false)
     onDelete()
   }
@@ -27,7 +27,7 @@ export default function DeleteListsButton({lists, onDelete}: { lists?: List[], o
           <MuiList>
             {lists?.map(list => (
               <ListItem key={list.id}>
-                <ListItemText primary={`${list.name} (${list.items.length} items)`}/>
+                <ListItemText primary={`${list.name} (${list.size} items)`}/>
               </ListItem>
             ))}
           </MuiList>
@@ -35,15 +35,9 @@ export default function DeleteListsButton({lists, onDelete}: { lists?: List[], o
 
         <DialogActions>
           <Button variant="text" onClick={() => setModalOpen(false)}>Cancel</Button>
-          <Button color="error" variant="contained" loading={loading} onClick={handleCreate}>Delete</Button>
+          <Button color="error" variant="contained" loading={isPending} onClick={handleDelete}>Delete</Button>
         </DialogActions>
       </Dialog>
     </>
   )
 }
-
-gql`
-  mutation DeleteLists($ids: [ID!]!) {
-    deleteLists(ids: $ids)
-  }
-`

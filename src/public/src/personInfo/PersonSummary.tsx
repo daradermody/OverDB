@@ -3,7 +3,8 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import {Box, Button, Skeleton, Typography} from '@mui/material'
 import {useMutation, useQuery} from '@tanstack/react-query'
-import {trpc} from '../queryClient.ts'
+import type { Movie } from '../../../apiTypes.ts'
+import { queryClient, trpc } from '../queryClient.ts'
 import {ErrorMessage, useDeclarativeErrorHandler} from '../shared/errorHandlers'
 import {Poster} from '../shared/general/Poster'
 import useSetTitle from '../shared/useSetTitle'
@@ -13,7 +14,7 @@ export function PersonSummary({id}: { id: string }) {
   const {user} = useUser()
   const {data: person, isLoading: loadingPerson, error: fetchError, refetch} = useQuery(trpc.person.queryOptions({id}))
   const {data: isFavourited, isLoading: loadingIsFavourite, error: isFavouriteError} = useQuery(trpc.isFavourite.queryOptions({id}, {enabled: !!user}))
-  const {mutate: setFavourite, isPending: loadingSetFavourite, error: setFavouriteError, variables} = useMutation(trpc.setFavourite.mutationOptions())
+  const {mutate: setFavourite, isPending: loadingSetFavourite, error: setFavouriteError, variables} = useMutation(trpc.setFavourite.mutationOptions({onSuccess}))
 
   useDeclarativeErrorHandler(`Could not ${variables?.isFavourited ? 'favourite' : 'unfavourite'}`, setFavouriteError)
   useSetTitle(person?.name)
@@ -75,3 +76,9 @@ const StyledWrapper = styled.div`
     align-items: start;
   }
 `
+
+async function onSuccess(_data: never, variables: typeof trpc['setFavourite']['~types']['input']) {
+  queryClient.setQueriesData({ queryKey: trpc.isFavourite.queryKey() }, () => variables.isFavourited)
+  await queryClient.invalidateQueries({queryKey: trpc.favouritePeople.infiniteQueryKey()})
+  await queryClient.invalidateQueries({queryKey: trpc.favouritePeople.queryKey()})
+}

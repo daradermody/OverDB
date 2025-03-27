@@ -1,5 +1,3 @@
-import type { Maybe, Scalars } from '../types'
-
 export interface MovieSummary {
   id: string;
   title: string;
@@ -43,7 +41,7 @@ export interface Person extends PersonSummary {
 
 export interface PersonCredit {
   id: string;
-  movie: Pick<Movie, 'id' | 'title' | 'posterPath' | 'releaseDate'>;
+  movie: MovieSummary;
   jobs: string[];
   characters: string[];
 }
@@ -52,6 +50,7 @@ export interface ListSummary {
   id: string;
   name: string;
   type: ListType; // TODO: Migrate user data to ThingType
+  size: number;
 }
 
 export interface List extends ListSummary {
@@ -87,3 +86,31 @@ export enum TomatometerState {
   Rotten = 'ROTTEN'
 }
 
+export interface UserSettings {
+  streaming?: {
+    providers?: string[];
+    region?: string;
+  }
+}
+
+export interface Provider {
+  id: string;
+  logo: string;
+  name: string;
+}
+
+export interface User {
+  username: string;
+  avatarUrl: string;
+  isAdmin?: boolean;
+  public?: boolean;
+}
+
+export interface UserWithStats extends User {
+  stats: {
+    favouritePeople: number;
+    watched: number;
+    moviesLiked: number;
+    watchlist: number;
+  };
+}

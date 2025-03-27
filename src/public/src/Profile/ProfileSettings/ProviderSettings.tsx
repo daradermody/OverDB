@@ -1,31 +1,28 @@
-import { gql } from '@apollo/client'
 import styled from '@emotion/styled'
 import { Add, Delete } from '@mui/icons-material'
 import { Autocomplete, Box, Popover, Skeleton, TextField, Typography } from '@mui/material'
-import * as React from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Provider, useGetAllStreamingProvidersQuery } from '../../../types/graphql'
+import type { Provider } from '../../../../apiTypes.ts'
+import { trpc } from '../../queryClient'
 import { ErrorMessage } from '../../shared/errorHandlers'
 import { getPosterUrl, ProviderLogo } from '../../shared/general/Poster'
 
 interface ProviderSettingsProps {
-  region: string;
-  providerIds: Provider['id'][];
-  onChange(providerIds: Provider['id'][]): void
+  region?: string;
+  providerIds?: string[];
+  onChange(providerIds: string[]): void
 }
 
 export default function ProviderSettings({region, providerIds, onChange}: ProviderSettingsProps) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
-  const {data, loading, error, refetch} = useGetAllStreamingProvidersQuery({
-    variables: {region},
-    skip: !region
-  })
+  const {data: providers, isLoading, error, refetch} = useQuery(trpc.allStreamingProviders.queryOptions({region: region!}, {enabled: !!region}))
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>
   }
 
-  if (loading) {
+  if (isLoading) {
     return <LoadingProviderSettings/>
   }
 
@@ -33,8 +30,8 @@ export default function ProviderSettings({region, providerIds, onChange}: Provid
     <div>
       <Typography variant="h6">Your streaming services</Typography>
       <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px'}}>
-        {providerIds.map(selectedId => {
-          const provider = data.streamingProviders.find(provider => provider.id === selectedId)
+        {providerIds?.map(selectedId => {
+          const provider = providers?.find(provider => provider.id === selectedId)
           if (!provider) return null
           return (
             <RemovableProviderLogo
@@ -65,11 +62,13 @@ export default function ProviderSettings({region, providerIds, onChange}: Provid
       >
         <Autocomplete
           onChange={(_: any, newProvider: Provider | null) => {
-            onChange([...providerIds, newProvider.id])
-            setAnchorEl(null)
+            if (newProvider) {
+              onChange([...(providerIds || []), newProvider.id])
+              setAnchorEl(null)
+            }
           }}
           sx={{width: 300}}
-          options={data?.streamingProviders.filter(provider => !providerIds.includes(provider.id)) as Provider[] || []}
+          options={providers?.filter(provider => !providerIds?.includes(provider.id)) || []}
           disableClearable
           autoHighlight
           getOptionLabel={(option) => option.name}
@@ -83,7 +82,9 @@ export default function ProviderSettings({region, providerIds, onChange}: Provid
             <TextField
               {...params}
               autoFocus
-              inputProps={{...params.inputProps, autoComplete: 'new-password'}}
+              slotProps={{
+                input: {...params.InputProps, autoComplete: 'new-password'}
+              }}
             />
           )}
         />
@@ -149,15 +150,4 @@ const StyledAddProviderButton = styled(StyledProviderButton)`
   background-color: #b16bda24;
   border: 1px solid #b16bda59;
   color: white;
-`
-
-
-gql`
-  query GetAllStreamingProviders($region: String!) {
-    streamingProviders(region: $region) {
-      id
-      name
-      logo
-    }
-  }
 `

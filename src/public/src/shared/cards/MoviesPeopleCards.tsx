@@ -1,5 +1,4 @@
 import {Card, Skeleton} from '@mui/material'
-import {useMemo} from 'react'
 import {ThingType} from '../../../../apiTypes.ts'
 import Cards from './Cards'
 import {MovieCard, type MovieCardProps} from './MovieCard'

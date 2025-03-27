@@ -1,13 +1,14 @@
 import styled from '@emotion/styled'
 import { Skeleton } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
-import { useGetUserQuery, User } from '../../types/graphql'
+import { trpc } from '../queryClient.ts'
 import Link from './general/Link'
 
-export default function UserBadge({username, children}: { username: User['username'], children: ReactNode }) {
-  const {data, loading} = useGetUserQuery({variables: {username}})
+export default function UserBadge({username, children}: { username: string, children: ReactNode }) {
+  const {data: user, isLoading} = useQuery(trpc.user.queryOptions({username}))
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Root style={{ marginBottom: '6.67px' }}>
         <Skeleton variant="circular" animation="wave" height={60} width={60}/>
@@ -19,7 +20,7 @@ export default function UserBadge({username, children}: { username: User['userna
   return (
     <Root>
       <Link to={`/profile/${username}`} sx={{display: 'flex'}}>
-        <img style={{width: 60, aspectRatio: '1', clipPath: 'circle()'}} src={data?.user.avatarUrl} alt="profile photo"/>
+        <img style={{width: 60, aspectRatio: '1', clipPath: 'circle()'}} src={user!.avatarUrl} alt="profile photo"/>
       </Link>
       {children}
     </Root>

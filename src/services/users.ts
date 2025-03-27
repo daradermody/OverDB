@@ -1,6 +1,7 @@
 import {TRPCError} from '@trpc/server'
 import { scryptSync, timingSafeEqual } from 'crypto'
 import YAML from 'yaml'
+import type { User } from '../apiTypes.ts'
 import { dataDir } from './dataStorage'
 
 const usersInfo: UsersFile = YAML.parse(await Bun.file(`${dataDir}/users.yml`).text())
@@ -20,27 +21,12 @@ export function getUser(username: string): User {
   return {username, ...userInfo}
 }
 
-export function verifyUserAccessible(requestedUser: User, currentUser?: User) {
-  const canViewUser = currentUser?.username === requestedUser.username || currentUser?.isAdmin || requestedUser.public
-  if (!canViewUser) {
-    throw new TRPCError({code: 'NOT_FOUND', message: 'User not found'})
-  }
-}
-
-
 export function getUsers(): User[] {
   return Object.entries(usersInfo)
     .map(([username, userInfo]) => {
     const {passwordHash, ...rest} = userInfo
     return {username, ...rest}
   })
-}
-
-interface User {
-  username: string;
-  avatarUrl: string;
-  isAdmin?: boolean;
-  public?: boolean;
 }
 
 type UserWithHash = User & { passwordHash: string }

@@ -143,7 +143,7 @@ const index: Resolvers<{ user?: User }> = {
     search: async (_, args: QuerySearchArgs) => await MovieDb.search(args.query) as (PersonWithoutFav | Movie)[],
     person: (_, args: QueryPersonArgs) => MovieDb.personInfo(args.id),
     trending: (_, args: QueryTrendingArgs) => MovieDb.trending(args.size || 12),
-    upcoming: requiresLogin(async (_1, _2, {user}) => await upcomingMoviesResolver(user.username) as Movie[]),
+    upcomingMovies: requiresLogin(async (_1, _2, {user}) => await upcomingMoviesResolver(user.username) as Movie[]),
     user: async (_, args: QueryUserArgs, {user}) => {
       const requestedUser = getUser(args.username)
       verifyUserAccessible(requestedUser, user)

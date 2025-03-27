@@ -32,11 +32,11 @@ export function WatchedButton({id, watched, withLabel}: WatchedButtonProps) {
 }
 
 async function onSuccess(_data: unknown, variables: typeof trpc['setWatched']['~types']['input']) {
-  console.log('testing', variables)
   queryClient.setQueriesData(
     { queryKey: trpc.recommendedMovies.queryKey() },
     (oldMovies: Movie[]) => oldMovies?.map(movie => movie.id === variables.movieId ? {...movie, watched: variables.isWatched} : movie)
   )
   await queryClient.invalidateQueries({queryKey: trpc.getWatched.infiniteQueryKey()})
+  await queryClient.invalidateQueries({queryKey: trpc.getWatched.queryKey()})
   queryClient.setQueryData(trpc.isWatched.queryKey({id: variables.movieId}), () => variables.isWatched)
 }

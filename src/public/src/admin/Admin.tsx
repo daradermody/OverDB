@@ -1,14 +1,14 @@
-import { gql } from '@apollo/client'
 import { Check, Close } from '@mui/icons-material'
-import { Skeleton, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import type { GridColDef } from '@mui/x-data-grid'
-import * as React from 'react'
-import { useGetUsersQuery, type User } from '../../types/graphql'
+import { useQuery } from '@tanstack/react-query'
+import type { UserWithStats } from '../../../apiTypes.ts'
+import { trpc } from '../queryClient.ts'
 import { ErrorMessage } from '../shared/errorHandlers'
 import DataGrid from '../shared/general/DataGrid'
 import Link from '../shared/general/Link'
 import PageWrapper from '../shared/PageWrapper'
-import useSetTitle from '../shared/useSetTitle';
+import useSetTitle from '../shared/useSetTitle'
 
 export default function Admin() {
   useSetTitle('Admin')
@@ -21,7 +21,7 @@ export default function Admin() {
 }
 
 function UsersTable() {
-  const {data, loading, error, refetch} = useGetUsersQuery()
+  const {data: users, isLoading, error, refetch} = useQuery(trpc.users.queryOptions())
 
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch}/>
@@ -31,15 +31,15 @@ function UsersTable() {
     <DataGrid
       rowSelection={false}
       disableColumnSelector
-      loading={loading}
-      rows={data?.users}
+      loading={isLoading}
+      rows={users}
       getRowId={row => row.username}
       columns={columns}
     />
   )
 }
 
-const columns: GridColDef<User>[] = [
+const columns: GridColDef<UserWithStats>[] = [
   {
     headerName: '',
     field: 'avatarUrl',
@@ -95,19 +95,3 @@ const columns: GridColDef<User>[] = [
       <Link to={`/profile/${params.row.username}/list/watchlist`}>{params.row.stats.watchlist}</Link>
   },
 ]
-
-gql`
-  query GetUsers {
-    users {
-      username
-      avatarUrl
-      isAdmin
-      stats {
-        favouritePeople
-        moviesLiked
-        watched
-        watchlist
-      }
-    }
-  }
-`

@@ -1,5 +1,4 @@
 import { Link as MaterialLink, type SxProps } from '@mui/material'
-import * as React from 'react'
 import type { ReactNode } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 

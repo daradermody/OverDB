@@ -18,16 +18,17 @@ export interface MovieCardProps {
     sentiment?: MovieWithUserMetadata['sentiment'];
     jobs?: MovieCredit['jobs'];
     characters?: MovieCredit['characters'];
-  }
-  showCharactersOnly?: boolean
-  compressed?: boolean
+  };
+  showCharactersOnly?: boolean;
+  compressed?: boolean;
+  showExactDate?: boolean;
 }
 
-export function MovieCard({movie, compressed, showCharactersOnly}: MovieCardProps) {
+export function MovieCard({movie, compressed, showCharactersOnly, showExactDate}: MovieCardProps) {
   return (
     <StyledCard sx={{height: compressed ? '75px' : undefined, display: compressed ? 'flex' : undefined}}>
       <MovieImage movie={movie} compressed={compressed}/>
-      <MovieSummary movie={movie} showCharactersOnly={showCharactersOnly} compressed={compressed}/>
+      <MovieSummary movie={movie} showCharactersOnly={showCharactersOnly} compressed={compressed} showExactDate={showExactDate}/>
     </StyledCard>
   )
 }
@@ -90,7 +91,7 @@ const StyledMovieImage = styled.div`
   }
 `
 
-function MovieSummary({movie, showCharactersOnly, compressed}: MovieCardProps) {
+function MovieSummary({movie, showCharactersOnly, compressed, showExactDate}: MovieCardProps) {
   let roles
   if (isCredit(movie)) {
     roles = showCharactersOnly ? movie.characters?.join(', ') : movie.jobs?.join(', ')
@@ -103,7 +104,7 @@ function MovieSummary({movie, showCharactersOnly, compressed}: MovieCardProps) {
         </Typography>
       </Tooltip>
       <Typography gutterBottom variant="caption" component="div">
-        {movie.releaseDate ? movie.releaseDate.split('-')[0] : 'TBD'}
+        {getReleaseDate(movie, showExactDate)}
       </Typography>
       {!compressed && roles && (
         <Tooltip placement="top" title={<Typography>{roles}</Typography>}>
@@ -119,6 +120,14 @@ function MovieSummary({movie, showCharactersOnly, compressed}: MovieCardProps) {
       )}
     </Link>
   )
+}
+
+function getReleaseDate(movie: { releaseDate?: string }, showExactDate?: boolean) {
+  if (!movie.releaseDate) {
+    return 'TBD'
+  }
+  return showExactDate ? movie.releaseDate : movie.releaseDate.split('-')[0]
+
 }
 
 function isCredit(movie: { jobs?: any }): movie is MovieCredit {

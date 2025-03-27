@@ -1,5 +1,4 @@
 import { Container } from '@mui/material'
-import * as React from 'react'
 import { PropsWithChildren } from 'react'
 
 export default function PageWrapper({children}: PropsWithChildren<{}>) {

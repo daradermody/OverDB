@@ -1,8 +1,8 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { ListType, Sentiment } from '../apiTypes.ts'
-import recommendedMoviesResolver from '../resolvers/recommendedMovies.ts'
-import upcomingMoviesResolver from '../resolvers/upcomingMoviesResolver.ts'
+import { type List, ListType, type Movie, Sentiment } from '../apiTypes.ts'
+import recommendedMoviesResolver from './recommendedMovies.ts'
+import upcomingMoviesResolver from './upcomingMoviesResolver.ts'
 import MovieDb from '../services/MovieDb.ts'
 import RottenTomatoes from '../services/RottenTomatoes.ts'
 import { UserData } from '../services/UserData.ts'
@@ -51,8 +51,17 @@ export const appRouter = router({
     .use(canAccessUser)
     .query(async ({input}) => {
       const watchedIds = UserData.getWatched(input.username).toReversed().slice(input.cursor, input.cursor + input.limit)
+
+      const items: Movie[] = []
+      await Promise.all(watchedIds.map(async id => {
+        try {
+          items.push(await MovieDb.movieInfo(id))
+        } catch (e) {
+          console.error(`Error fetching movie info for ID ${id}:`, (e as Error).message)
+        }
+      }))
       return {
-        items: await Promise.all(watchedIds.map(MovieDb.movieInfo)),
+        items,
         nextCursor: UserData.getWatched(input.username)[input.cursor + input.limit] ? input.cursor + input.limit : undefined
       }
     }),
@@ -90,6 +99,34 @@ export const appRouter = router({
       .filter(list => !input.type || list.type === input.type)
       .map(list => ({...list, size: list.ids.length}))
     ),
+  list: publicProcedure
+    .input(z.object({username: z.string(), id: z.string(), filterItemsByProvider: z.boolean().default(false)}))
+    .use(canAccessUser)
+    .query(async ({input, ctx}): Promise<List> => {
+      const list = UserData.getList(input.username, input.id)
+      if (list.type !== ListType.Movie && input.filterItemsByProvider) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Filtering by provider is only available for movie lists' })
+      }
+
+      const listItemIds: string[] = []
+      if (input.filterItemsByProvider) {
+        const streamingSettings = UserData.getSettings(ctx.user.username).streaming
+        await Promise.all(list.ids.map(async id => {
+          const providers = await MovieDb.streamingProviders(id, streamingSettings?.region || 'IE')
+          if (providers.some(provider => streamingSettings?.providers?.includes(provider.id))) {
+            listItemIds.push(id)
+          }
+        }))
+      } else {
+        listItemIds.push(...list.ids)
+      }
+
+      if (list.type === ListType.Movie) {
+        return { ...list, size: list.ids.length, items: await Promise.all(listItemIds.toReversed().map(MovieDb.movieInfo)) }
+      } else {
+        return { ...list, size: list.ids.length, items: await Promise.all(listItemIds.toReversed().map(MovieDb.personInfo)) }
+      }
+    }),
   inList: userProcedure
     .input(z.object({listId: z.string(), itemId: z.string()}))
     .query(({input, ctx}) => UserData.getList(ctx.user.username, input.listId).ids.includes(input.itemId)),
@@ -98,7 +135,12 @@ export const appRouter = router({
     .mutation(({input, ctx}) => UserData.createList(ctx.user.username, input)),
   deleteList: userProcedure
     .input(z.object({ids: z.array(z.string())}))
-    .mutation(({input, ctx}) => UserData.deleteLists(ctx.user.username, input.ids)),
+    .mutation(({input, ctx}) => {
+      if (input.ids.includes('watchlist')) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'You can not delete your watchlist' })
+      }
+      UserData.deleteLists(ctx.user.username, input.ids)
+    }),
   editList: userProcedure
     .input(z.object({id: z.string(), name: z.string()}))
     .mutation(({input, ctx}) => UserData.updateList(ctx.user.username, input.id, {name: input.name})),

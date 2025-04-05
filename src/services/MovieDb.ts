@@ -1,8 +1,18 @@
 import * as fs from 'fs'
-import {type Cast, type Crew, MovieDb as MovieDbApi, type MovieResponse, type Person as TmdbPerson} from 'moviedb-promise'
-import {isMovieSearchResult, isPersonSearchResult, type Movie, type Person} from '../../types'
+import {
+  type Cast,
+  type Crew,
+  MovieDb as MovieDbApi,
+  type MovieResponse,
+  type MovieResult,
+  type Person as TmdbPerson,
+  type PersonResult,
+  type TvResult
+} from 'moviedb-promise'
+import {type Movie, type Person} from '../apiTypes.ts'
 import { type Movie as ApiMovie, type MovieCredit, type Person as ApiPerson, type PersonCredit, type Provider, type SearchResult, ThingType } from '../apiTypes'
 import getToken from '../utils/getToken'
+import { sortMoviesByReleaseDateDesc } from '../utils/sorting.ts'
 import {dataDir} from './dataStorage'
 
 interface Cache {
@@ -44,8 +54,8 @@ export default class MovieDb {
       const crew = filterInvalidCredits(response.crew!)
 
       const credits = [...cast, ...crew]
-        .sort((credit1, credit2) => (credit1.release_date || '9') < (credit2.release_date || '9') ? 1 : -1)
         .map(convertPersonCredit)
+        .sort((creditA, creditB) => sortMoviesByReleaseDateDesc(creditA.movie, creditB.movie))
 
       MovieDb.cache.personCredits[id] = aggregatePersonCredits(credits)
       MovieDb.save()
@@ -175,6 +185,14 @@ export default class MovieDb {
     }
     return JSON.parse(fs.readFileSync(MovieDb.FILE_PATH, 'utf-8'))
   }
+}
+
+export function isMovieSearchResult(result: MovieResult | TvResult | PersonResult): result is MovieResult {
+  return result.media_type === 'movie'
+}
+
+export function isPersonSearchResult(result: MovieResult | TvResult | PersonResult): result is PersonResult {
+  return result.media_type === 'person'
 }
 
 function filterInvalidCredits<T extends { release_date?: string, vote_count?: number, job?: string }>(credits: T[]): T[] {

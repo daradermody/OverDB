@@ -1,10 +1,6 @@
 import * as fs from 'fs'
-import {nanoid} from 'nanoid'
-import {type List, type Movie, type Person, Sentiment, type UserSettingsInput} from '../../types'
-import {type Movie as ApiMovie, ListType} from '../apiTypes'
 import {dataDir} from './dataStorage'
-import type {User} from './users'
-import type {MovieWithUserMetadata, UserSettings} from '../apiTypes.ts'
+import { ListType, Sentiment, type Movie, type MovieWithUserMetadata, type Person, type User, type UserSettings} from '../apiTypes.ts'
 
 interface Data {
   [username: string]: {
@@ -126,7 +122,7 @@ export class UserData {
   }
 
   static createList(username: string, {name, type}: {name: string; type: ListType}): StoredList {
-    const id = nanoid(10)
+    const id = Bun.randomUUIDv7()
     const newList = UserData.forUser(username).lists[id] = {id, name, type, ids: []}
     UserData.save()
     return newList
@@ -187,13 +183,12 @@ export class UserData {
     return UserData.forUser(username).settings
   }
 
-  static updateSettings(username: string, newSettings: UserSettingsInput): UserSettings {
-    UserData.forUser(username).settings = mergeDeep(UserData.forUser(username).settings, newSettings) as UserSettings
+  static updateSettings(username: string, newSettings: UserSettings): void {
+    UserData.forUser(username).settings = mergeDeep(UserData.forUser(username).settings, newSettings)
     UserData.save()
-    return UserData.forUser(username).settings
   }
 
-  static addUserMetadataToMovie(username: string, movie: ApiMovie): MovieWithUserMetadata {
+  static addUserMetadataToMovie(username: string, movie: Movie): MovieWithUserMetadata {
     return {
       ...movie,
       watched: UserData.isWatched(username, movie.id),

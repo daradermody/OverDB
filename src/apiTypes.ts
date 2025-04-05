@@ -53,9 +53,16 @@ export interface ListSummary {
   size: number;
 }
 
-export interface List extends ListSummary {
-  items: Movie[] | Person[];
+export interface MovieList extends ListSummary {
+  type: ListType.Movie;
+  items: Movie[];
 }
+export interface PersonList extends ListSummary {
+  type: ListType.Person
+  items: Person[];
+}
+
+export type List = MovieList | PersonList
 
 export enum Sentiment {
   Disliked = 'DISLIKED',

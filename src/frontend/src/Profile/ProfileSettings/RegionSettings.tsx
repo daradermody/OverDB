@@ -27,7 +27,7 @@ export default function RegionSettings({region, onChange}: { region?: string, on
         autoHighlight
         getOptionLabel={(option) => getName(option)!}
         renderOption={(props, code) => (
-          <Box component="li" sx={{'& > img': {mr: 2, flexShrink: 0}}} {...props}>
+          <Box component="li" sx={{'& > img': {mr: 2, flexShrink: 0}}} {...props} key={code}>
             <img loading="lazy" width="20" src={`https://flagcdn.com/w20/${code.toLowerCase()}.png`} alt={getName(code)}/>
             {getName(code)} ({code})
           </Box>

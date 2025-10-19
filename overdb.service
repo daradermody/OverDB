@@ -1,0 +1,17 @@
+[Unit]
+Description=OverDB
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=500
+StartLimitBurst=5
+
+[Service]
+Type=simple
+ExecStartPre=/bin/mkdir -p /var/lib/overdb
+ExecStartPre=/bin/mkdir -p /etc/overdb
+ExecStartPre=/bin/touch /etc/overdb/overdb.conf
+EnvironmentFile=/etc/overdb/overdb.conf
+ExecStart=/home/dara/.bun/bin/bun /usr/local/lib/overdb/src/index.ts
+
+[Install]
+WantedBy=multi-user.target.

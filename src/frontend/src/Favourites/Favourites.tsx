@@ -19,7 +19,7 @@ export default function Favourites() {
         {user?.username === username ? 'Favourites' : <UserBadge username={username!}>{username}'s favourites</UserBadge>}
       </Typography>
       <Box sx={{borderBottom: 1, borderColor: 'divider', mb: 2}}>
-        <Tabs value={type} onChange={(e, value) => navigate(`/profile/${username}/favourite/${value}`)}>
+        <Tabs value={type} onChange={(_, value) => navigate(`/profile/${username}/favourite/${value}`)}>
           <Tab label="People" value="people"/>
           <Tab label="Movies" value="movies"/>
         </Tabs>

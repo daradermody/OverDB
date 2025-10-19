@@ -16,11 +16,11 @@ export default createTheme({
   typography: {
     h1: {
       fontSize: 28,
-      margin: '20 0',
+      margin: '20px 0',
     },
     h2: {
       fontSize: 24,
-      margin: '10 0',
+      margin: '10px 0',
     },
     subtitle1: {
       color: '#9ab',

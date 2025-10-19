@@ -37,6 +37,6 @@ if ((import.meta as any).hot) {
   createRoot(container).render(<Root/>)
 }
 
-// if ('serviceWorker' in navigator) {
-//   void navigator.serviceWorker.register('/serviceWorker.js', {scope: '/'})
-// }
+if ('serviceWorker' in navigator) {
+  void navigator.serviceWorker.register('/serviceWorker.js', {scope: '/'})
+}

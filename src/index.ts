@@ -11,6 +11,12 @@ const apiHandler = (req: Request) => fetchRequestHandler({
   createContext,
 })
 
+
+const serviceWorkerBuildResult = await Bun.build({
+  entrypoints: [`${import.meta.dir}/frontend/src/serviceWorker.js`],
+  minify: Bun.env.NODE_ENV === 'production',
+})
+
 Bun.serve({
   development: Bun.env.NODE_ENV !== 'production',
   port: Bun.env.PORT || 3000,
@@ -23,11 +29,17 @@ Bun.serve({
     },
     '/robots.txt': new Response(await Bun.file(`${import.meta.dir}/frontend/public/robots.txt`).bytes(), {headers: {'Content-Type': 'text/plain'}}),
     '/icon.png': new Response(await Bun.file(`${import.meta.dir}/frontend/public/icon.png`).bytes(), {headers: {'Content-Type': 'image/png'}}),
+    '/serviceWorker.js': new Response(await serviceWorkerBuildResult.outputs[0].arrayBuffer(), {headers: {'Content-Type': 'text/javascript'}}),
     '/api/*': {
       GET: apiHandler,
       POST: apiHandler
     }
-  }
+  },
+  // tls: {
+  //   passphrase: 'password',
+  //   cert: Bun.file(`${import.meta.dir}/../certs/overdb.pem`),
+  //   key: Bun.file(`${import.meta.dir}/../certs/overdb.key`)
+  // }
 })
 console.log('🚀 Serving http://localhost:3000')
 

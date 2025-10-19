@@ -1,7 +1,7 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "http://109.255.6.189:3000/" },
-    { "source": "/:path(.*)", "destination": "http://109.255.6.189:3000/:path" }
+    { "source": "/", "destination": "http://109.255.6.189/" },
+    { "source": "/:path(.*)", "destination": "http://109.255.6.189/:path" }
   ]
 }
 

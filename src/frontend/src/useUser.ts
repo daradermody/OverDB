@@ -7,7 +7,7 @@ import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {trpc} from './queryClient.ts'
 import type { User } from '../../apiTypes.ts'
 
-const userCookie = cookie.parse(document.cookie).user?.match(/^({.*})\.\w+$/)?.[1]
+const userCookie = cookie.parse(document.cookie).user?.match(/^(\{.*})\..+$/)?.[1]
 export const userSignal = signal<User | null>(JSON.parse(userCookie || 'null'))
 
 export default function useUser({redirectIfNoAuth} = {redirectIfNoAuth: false}) {

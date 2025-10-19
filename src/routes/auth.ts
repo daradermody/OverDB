@@ -23,8 +23,7 @@ export const loginRoute = publicProcedure
 
 async function getCookie(user: User): Promise<string> {
   const signedCookie = cookieSignature.sign(JSON.stringify(user), getToken('COOKIE_SECRET'))
-  const httpOnly = Bun.env.NODE_ENV === 'production' ? 'httpOnly' : ''
-  return `user=${signedCookie}; Max-Age=${SIX_MONTHS_IN_SECONDS}; Path=/; ${httpOnly}; Secure; SameSite=Strict`
+  return `user=${signedCookie}; Max-Age=${SIX_MONTHS_IN_SECONDS}; Path=/; Secure; SameSite=Strict`
 }
 
 export function getUserFromRequest(req: Request): User | undefined {

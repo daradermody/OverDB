@@ -1,22 +1,55 @@
 {
   "name": "overdb",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Dara Dermody",
   "description": "Web application that allows people to easily follow their favourite cast and crew in movies",
   "license": "MIT",
-  "packageManager": "yarn@3.5.0",
-  "workspaces": [
-    "packages/*"
-  ],
-  "scripts": {
-    "dev": "concurrently -n client,server -c green,cyan 'yarn workspace @overdb/frontend dev' 'yarn workspace @overdb/backend dev'",
-    "graphql-type-gen": "yarn workspaces foreach --parallel run graphql-type-gen",
-    "build": "NODE_ENV=production scripts/build.sh",
-    "deploy": "scripts/deploy.sh"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/daradermody/OverDB.git"
+  },
+  "scripts": {
+    "start": "NODE_ENV=production bun run src/index.ts",
+    "dev": "NODE_ENV=development bun --watch run src/index.ts",
+    "hash-password": "bun run scripts/digestPassword.ts"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "6.4.8",
+    "@mui/material": "6.4.8",
+    "@mui/system": "6.4.8",
+    "@mui/x-data-grid": "^7.28.1",
+    "@preact/signals": "^1.3.2",
+    "@tanstack/react-query": "^5.69.0",
+    "@tanstack/react-query-devtools": "^5.69.0",
+    "@trpc/client": "^11.0.0",
+    "@trpc/server": "^11.0.0",
+    "@trpc/tanstack-react-query": "^11.0.0",
+    "cookie": "^1.0.2",
+    "cookie-signature": "^1.2.2",
+    "country-list": "^2.3.0",
+    "js-cookie": "^3.0.5",
+    "jsdom": "^24.1.3",
+    "moviedb-promise": "^4.0.7",
+    "notistack": "alpha",
+    "preact": "^10.26.4",
+    "query-string": "^9.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.4.0",
+    "workbox-precaching": "^7.3.0",
+    "workbox-routing": "^7.3.0",
+    "workbox-strategies": "^7.3.0",
+    "yaml": "^2.7.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.5",
+    "@types/cookie-signature": "^1.1.2",
+    "@types/jsdom": "^21.1.7",
+    "@types/react-dom": "^19.0.4",
+    "typescript": "^5.8.2"
   },
   "keywords": [
     "movies",
@@ -28,20 +61,5 @@
     "url": "https://github.com/daradermody/OverDB/issues"
   },
   "private": true,
-  "devDependencies": {
-    "concurrently": "^8.2.2",
-    "pkg": "^5.8.1"
-  },
-  "bin": "build/backend.js",
-  "pkg": {
-    "outputPath": "build",
-    "assets": [
-      "build/schema.graphql",
-      "build/static",
-      "build/xhr-sync-worker.js"
-    ],
-    "targets": [
-      "node18-linux-x64"
-    ]
-  }
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }

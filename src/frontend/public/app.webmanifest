@@ -1,0 +1,14 @@
+{
+  "name": "OverDB",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#b16bda",
+  "background_color": "#0a1929",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

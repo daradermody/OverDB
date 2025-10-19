@@ -4,6 +4,15 @@ Follow directors, screenwriters, cinematographers, and others to find films you 
 
 ## Project structure
 
+OverDB's frontend uses the following technologies:
+
+- Typescript
+- React
+- Material UI
+- React Router
+- Bun
+- tRPC+Tanstack Query
+
 This project is composed of two workspaces:
 
 - [Frontend](./packages/frontend)

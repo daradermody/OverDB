@@ -88,7 +88,7 @@ function MovieSummary({id}: { id: string }) {
               <MoreActionsButton id={movie.id} withLabel/>
             </div>
           )}
-          <RottenTomatoesReview imdbId={movie.imdbId}/>
+          <RottenTomatoesReview imdbId={movie.imdbId} title={movie.title}/>
         </StyledActionsAndReview>
 
         <StreamingProviders id={movie.id}/>

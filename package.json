@@ -12,7 +12,7 @@
     "start": "NODE_ENV=production bun run src/index.ts",
     "dev": "NODE_ENV=development bun --watch run src/index.ts",
     "hash-password": "bun run scripts/digestPassword.ts",
-    "deploy": "ssh -p 2222 pi.local 'sudo systemctl stop overdb' && rsync -ae 'ssh -p 2222' bun.lock node_modules package.json src README.md src tsconfig.json pi.local:/usr/local/lib/overdb/ && ssh -p 2222 pi.local 'sudo systemctl start overdb'"
+    "deploy": "ssh -p 2222 ca3.ie 'sudo systemctl stop overdb' && rsync -ae 'ssh -p 2222' bun.lock node_modules package.json src README.md src tsconfig.json ca3.ie:/usr/local/lib/overdb/ && ssh -p 2222 ca3.ie 'sudo systemctl start overdb'"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
